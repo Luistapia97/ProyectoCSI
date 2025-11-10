@@ -1,6 +1,6 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
-import { TrendingUp, Clock, CheckCircle, AlertCircle, Users, Calendar } from 'lucidereact';
+import { TrendingUp, Clock, CheckCircle, AlertCircle, Users, Calendar } from 'lucide-react';
 import './ProjectAnalytics.css';
 
 const COLORS = {
@@ -74,7 +74,7 @@ export default function ProjectAnalytics({ tasks, project }) {
       name,
       total: data.total,
       completadas: data.completadas,
-      pendientes: data.total  data.completadas,
+      pendientes: data.total - data.completadas,
     }));
   }, [tasks]);
 
@@ -83,9 +83,9 @@ export default function ProjectAnalytics({ tasks, project }) {
     const last7Days = [];
     const today = new Date();
     
-    for (let i = 6; i >= 0; i) {
+    for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
-      date.setDate(date.getDate()  i);
+      date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().split('T')[0];
       
       const completadasHastaFecha = tasks.filter(t => {
@@ -95,7 +95,7 @@ export default function ProjectAnalytics({ tasks, project }) {
       }).length;
 
       last7Days.push({
-        fecha: date.toLocaleDateString('esES', { day: '2digit', month: 'short' }),
+        fecha: date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
         completadas: completadasHastaFecha,
       });
     }
@@ -104,59 +104,59 @@ export default function ProjectAnalytics({ tasks, project }) {
   }, [tasks]);
 
   return (
-    <div className="analyticscontainer">
-      <div className="analyticsheader">
+    <div className="analytics-container">
+      <div className="analytics-header">
         <h2>📊 Análisis del Proyecto</h2>
         <p>Estadísticas y métricas de desempeño</p>
       </div>
 
       {/* Tarjetas de resumen */}
-      <div className="statscards">
-        <div className="statcard">
-          <div className="staticon" style={{ background: 'lineargradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+      <div className="stats-cards">
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
             <TrendingUp size={24} />
           </div>
-          <div className="statcontent">
-            <span className="statvalue">{stats.progresoGeneral}%</span>
-            <span className="statlabel">Progreso General</span>
+          <div className="stat-content">
+            <span className="stat-value">{stats.progresoGeneral}%</span>
+            <span className="stat-label">Progreso General</span>
           </div>
         </div>
 
-        <div className="statcard">
-          <div className="staticon" style={{ background: 'lineargradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
             <CheckCircle size={24} />
           </div>
-          <div className="statcontent">
-            <span className="statvalue">{stats.completadas}</span>
-            <span className="statlabel">Tareas Completadas</span>
+          <div className="stat-content">
+            <span className="stat-value">{stats.completadas}</span>
+            <span className="stat-label">Tareas Completadas</span>
           </div>
         </div>
 
-        <div className="statcard">
-          <div className="staticon" style={{ background: 'lineargradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
             <Clock size={24} />
           </div>
-          <div className="statcontent">
-            <span className="statvalue">{stats.enProgreso}</span>
-            <span className="statlabel">En Progreso</span>
+          <div className="stat-content">
+            <span className="stat-value">{stats.enProgreso}</span>
+            <span className="stat-label">En Progreso</span>
           </div>
         </div>
 
-        <div className="statcard">
-          <div className="staticon" style={{ background: 'lineargradient(135deg, #fa709a 0%, #fee140 100%)' }}>
+        <div className="stat-card">
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
             <AlertCircle size={24} />
           </div>
-          <div className="statcontent">
-            <span className="statvalue">{stats.vencidas}</span>
-            <span className="statlabel">Tareas Vencidas</span>
+          <div className="stat-content">
+            <span className="stat-value">{stats.vencidas}</span>
+            <span className="stat-label">Tareas Vencidas</span>
           </div>
         </div>
       </div>
 
       {/* Gráficos */}
-      <div className="chartsgrid">
+      <div className="charts-grid">
         {/* Gráfico de estado (Pie) */}
-        <div className="chartcard">
+        <div className="chart-card">
           <h3>Estado de Tareas</h3>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
@@ -171,7 +171,7 @@ export default function ProjectAnalytics({ tasks, project }) {
                 dataKey="value"
               >
                 {estadoData.map((entry, index) => (
-                  <Cell key={`cell${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
               <Tooltip />
@@ -180,7 +180,7 @@ export default function ProjectAnalytics({ tasks, project }) {
         </div>
 
         {/* Gráfico de prioridad (Bar) */}
-        <div className="chartcard">
+        <div className="chart-card">
           <h3>Tareas por Prioridad</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={prioridadData}>
@@ -190,7 +190,7 @@ export default function ProjectAnalytics({ tasks, project }) {
               <Tooltip />
               <Bar dataKey="value" fill="#8884d8">
                 {prioridadData.map((entry, index) => (
-                  <Cell key={`cell${index}`} fill={entry.color} />
+                  <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
@@ -199,7 +199,7 @@ export default function ProjectAnalytics({ tasks, project }) {
 
         {/* Gráfico de tareas por usuario */}
         {tareasUsuarioData.length > 0 && (
-          <div className="chartcard chartcardwide">
+          <div className="chart-card chart-card-wide">
             <h3>Tareas por Usuario</h3>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={tareasUsuarioData}>
@@ -216,7 +216,7 @@ export default function ProjectAnalytics({ tasks, project }) {
         )}
 
         {/* Gráfico de tendencia */}
-        <div className="chartcard chartcardwide">
+        <div className="chart-card chart-card-wide">
           <h3>Tendencia de Completación (últimos 7 días)</h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={tendenciaData}>
@@ -238,7 +238,7 @@ export default function ProjectAnalytics({ tasks, project }) {
       </div>
 
       {/* Tabla de resumen */}
-      <div className="summarytable">
+      <div className="summary-table">
         <h3>Resumen Detallado</h3>
         <table>
           <thead>
@@ -250,27 +250,27 @@ export default function ProjectAnalytics({ tasks, project }) {
           </thead>
           <tbody>
             <tr>
-              <td><span className="metricname">Total de Tareas</span></td>
+              <td><span className="metric-name">Total de Tareas</span></td>
               <td><strong>{stats.total}</strong></td>
               <td>100%</td>
             </tr>
             <tr>
-              <td><span className="metricname">Pendientes</span></td>
+              <td><span className="metric-name">Pendientes</span></td>
               <td>{stats.pendientes}</td>
               <td>{stats.total > 0 ? Math.round((stats.pendientes / stats.total) * 100) : 0}%</td>
             </tr>
             <tr>
-              <td><span className="metricname">En Progreso</span></td>
+              <td><span className="metric-name">En Progreso</span></td>
               <td>{stats.enProgreso}</td>
               <td>{stats.total > 0 ? Math.round((stats.enProgreso / stats.total) * 100) : 0}%</td>
             </tr>
-            <tr className="highlightrow">
-              <td><span className="metricname">Completadas</span></td>
+            <tr className="highlight-row">
+              <td><span className="metric-name">Completadas</span></td>
               <td><strong>{stats.completadas}</strong></td>
               <td><strong>{stats.progresoGeneral}%</strong></td>
             </tr>
-            <tr className="dangerrow">
-              <td><span className="metricname">Vencidas</span></td>
+            <tr className="danger-row">
+              <td><span className="metric-name">Vencidas</span></td>
               <td>{stats.vencidas}</td>
               <td>{stats.total > 0 ? Math.round((stats.vencidas / stats.total) * 100) : 0}%</td>
             </tr>
@@ -280,4 +280,3 @@ export default function ProjectAnalytics({ tasks, project }) {
     </div>
   );
 }
-

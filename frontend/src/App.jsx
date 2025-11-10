@@ -1,5 +1,5 @@
-﻿import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'reactrouterdom';
+import { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import useAuthStore from './store/authStore';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,7 +14,7 @@ import Settings from './pages/Settings';
 function PrivateRoute({ children }) {
   const { isAuthenticated, loading } = useAuthStore();
 
-  console.log('🔒 PrivateRoute  isAuthenticated:', isAuthenticated, 'loading:', loading);
+  console.log('🔒 PrivateRoute - isAuthenticated:', isAuthenticated, 'loading:', loading);
 
   if (loading) {
     return (
@@ -103,13 +103,13 @@ export default function App() {
         {/* Rutas públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/registeradmin" element={<RegisterAdmin />} />
-        <Route path="/authsuccess" element={<AuthSuccess />} />
-        <Route path="/zohocomplete" element={<ZohoComplete />} />
+        <Route path="/register-admin" element={<RegisterAdmin />} />
+        <Route path="/auth-success" element={<AuthSuccess />} />
+        <Route path="/zoho-complete" element={<ZohoComplete />} />
 
         {/* Rutas protegidas */}
         <Route
-          path="/addpassword"
+          path="/add-password"
           element={
             <PrivateRoute>
               <AddPassword />
@@ -148,4 +148,3 @@ export default function App() {
     </BrowserRouter>
   );
 }
-

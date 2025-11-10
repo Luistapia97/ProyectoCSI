@@ -1,9 +1,9 @@
 ﻿# 🧪 Instrucciones para Probar el Login con Zoho
 
 ## Problema Resuelto
- ✅ Se eliminó el **doble envío** de la solicitud de completar registro
- ✅ Se agregaron **referencias (useRef)** para evitar múltiples ejecuciones
- ✅ Ahora solo se enviará **una solicitud** al backend
+- ✅ Se eliminó el **doble envío** de la solicitud de completar registro
+- ✅ Se agregaron **referencias (useRef)** para evitar múltiples ejecuciones
+- ✅ Ahora solo se enviará **una solicitud** al backend
 
 ## 📝 Pasos para Probar
 
@@ -34,18 +34,17 @@ En la terminal del backend deberías ver:
 ✅ Cuenta vinculada exitosamente
 ```
 
-### 5. Segundo Login (AutoLogin)
+### 5. Segundo Login (Auto-Login)
 1. Cierra sesión
 2. Haz clic en **"Continuar con Zoho"** de nuevo
-3. Deberías ver: **"✅ Cuenta detectada  Iniciando sesión con: info@proyectoscsi.mx"**
+3. Deberías ver: **"✅ Cuenta detectada - Iniciando sesión con: info@proyectoscsi.mx"**
 4. Te redirige automáticamente al dashboard **sin pedir el email**
 
 ## ✅ Resultado Esperado
- Primera vez: Pide tu email una vez
- Siguientes veces: Login automático sin pedir email
+- Primera vez: Pide tu email una vez
+- Siguientes veces: Login automático sin pedir email
 
 ## 🐛 Si Hay Errores
 Copia y pega aquí:
- Los logs del terminal del backend
- Los mensajes de error de la consola del navegador (F12)
-
+- Los logs del terminal del backend
+- Los mensajes de error de la consola del navegador (F12)

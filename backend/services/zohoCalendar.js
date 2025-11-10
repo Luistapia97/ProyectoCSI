@@ -29,7 +29,7 @@ class ZohoCalendarService {
         `${this.apiBase}/calendars`,
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
           },
         }
       );
@@ -91,8 +91,8 @@ class ZohoCalendarService {
             eventdata: JSON.stringify(eventdataObject) // Como query parameter
           },
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
-            'ContentType': 'application/json',
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -117,9 +117,9 @@ class ZohoCalendarService {
       if (typeof error.response?.data === 'string' && error.response?.data.includes('<html')) {
         console.error('   ❌ Error HTML 404: Page not found');
         console.error('   Posibles causas:');
-        console.error('    calendar_uid inválido o no existe');
-        console.error('    Token sin scope ZohoCalendar.calendar.ALL o ZohoCalendar.event.CREATE');
-        console.error('    Usuario no autenticado o token expirado');
+        console.error('   - calendar_uid inválido o no existe');
+        console.error('   - Token sin scope ZohoCalendar.calendar.ALL o ZohoCalendar.event.CREATE');
+        console.error('   - Usuario no autenticado o token expirado');
       } else {
         console.error('   Data:', JSON.stringify(error.response?.data, null, 2));
       }
@@ -142,4 +142,3 @@ class ZohoCalendarService {
 }
 
 export default ZohoCalendarService;
-

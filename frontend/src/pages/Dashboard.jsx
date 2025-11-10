@@ -1,6 +1,6 @@
-﻿import { useEffect, useState } from 'react';
-import { useNavigate } from 'reactrouterdom';
-import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon } from 'lucidereact';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import CreateProjectModal from '../components/CreateProjectModal';
@@ -37,7 +37,7 @@ export default function Dashboard() {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    document.documentElement.setAttribute('datatheme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
   };
 
   const getProjectStats = (project) => {
@@ -49,26 +49,26 @@ export default function Dashboard() {
 
   return (
     <div className="dashboard">
-      <header className="dashboardheader">
-        <div className="headerleft">
+      <header className="dashboard-header">
+        <div className="header-left">
           <h1>
             <TrendingUp size={32} />
             Nexus
           </h1>
         </div>
 
-        <div className="headerright">
-          <button onClick={toggleTheme} className="btnicon" title="Cambiar tema">
+        <div className="header-right">
+          <button onClick={toggleTheme} className="btn-icon" title="Cambiar tema">
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
 
           <NotificationBell />
 
-          <div className="usermenu">
+          <div className="user-menu">
             <img src={user?.avatar} alt={user?.name} className="avatar" />
-            <div className="userinfo">
-              <span className="username">{user?.name}</span>
-              <span className="userrole" style={{ 
+            <div className="user-info">
+              <span className="user-name">{user?.name}</span>
+              <span className="user-role" style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '4px',
@@ -80,19 +80,19 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <button onClick={handleLogout} className="btnicon" title="Cerrar sesión">
+          <button onClick={handleLogout} className="btn-icon" title="Cerrar sesión">
             <LogOut size={20} />
           </button>
         </div>
       </header>
 
-      <main className="dashboardcontent">
-        <div className="dashboardintro">
+      <main className="dashboard-content">
+        <div className="dashboard-intro">
           <div>
             <h2>Bienvenido, {user?.name?.split(' ')[0]} 👋</h2>
             <p>
               {isAdmin 
-                ? 'Panel de administración  Crea proyectos, tareas y gestiona usuarios' 
+                ? 'Panel de administración - Crea proyectos, tareas y gestiona usuarios' 
                 : 'Visualiza y completa las tareas asignadas a ti'}
             </p>
           </div>
@@ -102,13 +102,13 @@ export default function Dashboard() {
               <>
                 <button 
                   onClick={() => setShowCreateUserModal(true)} 
-                  className="btnsecondary"
+                  className="btn-secondary"
                   style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
                 >
                   <UserPlus size={20} />
                   Crear Usuario
                 </button>
-                <button onClick={() => setShowCreateModal(true)} className="btncreate">
+                <button onClick={() => setShowCreateModal(true)} className="btn-create">
                   <Plus size={20} />
                   Nuevo Proyecto
                 </button>
@@ -117,9 +117,9 @@ export default function Dashboard() {
             {!isAdmin && projects.length === 0 && (
               <div style={{ 
                 padding: '12px 20px', 
-                background: 'var(bgsecondary)', 
+                background: 'var(--bg-secondary)', 
                 borderRadius: '8px',
-                color: 'var(textsecondary)',
+                color: 'var(--text-secondary)',
                 fontSize: '14px'
               }}>
                 El administrador te asignará proyectos y tareas pronto
@@ -129,64 +129,64 @@ export default function Dashboard() {
         </div>
 
         {loading ? (
-          <div className="loadingstate">
+          <div className="loading-state">
             <div className="spinner"></div>
             <p>Cargando proyectos...</p>
           </div>
         ) : projects.length === 0 ? (
-          <div className="emptystate">
+          <div className="empty-state">
             <Folder size={64} />
             <h3>No tienes proyectos aún</h3>
             <p>Crea tu primer proyecto para comenzar a organizar tu trabajo</p>
-            <button onClick={() => setShowCreateModal(true)} className="btnprimary">
+            <button onClick={() => setShowCreateModal(true)} className="btn-primary">
               <Plus size={20} />
               Crear primer proyecto
             </button>
           </div>
         ) : (
-          <div className="projectsgrid">
+          <div className="projects-grid">
             {projects.map((project) => {
               const stats = getProjectStats(project);
               return (
                 <div
                   key={project._id}
-                  className="projectcard"
+                  className="project-card"
                   onClick={() => navigate(`/project/${project._id}`)}
                   style={{ borderTopColor: project.color }}
                 >
-                  <div className="projectheader">
-                    <div className="projectcolor" style={{ backgroundColor: project.color }}></div>
+                  <div className="project-header">
+                    <div className="project-color" style={{ backgroundColor: project.color }}></div>
                     <h3>{project.name}</h3>
                   </div>
 
                   {project.description && (
-                    <p className="projectdescription">{project.description}</p>
+                    <p className="project-description">{project.description}</p>
                   )}
 
-                  <div className="projecttags">
+                  <div className="project-tags">
                     {project.tags?.slice(0, 3).map((tag, index) => (
                       <span key={index} className="tag">{tag}</span>
                     ))}
                   </div>
 
-                  <div className="projectstats">
+                  <div className="project-stats">
                     <div className="stat">
-                      <span className="statvalue">{stats.total}</span>
-                      <span className="statlabel">Tareas</span>
+                      <span className="stat-value">{stats.total}</span>
+                      <span className="stat-label">Tareas</span>
                     </div>
                     <div className="stat">
-                      <span className="statvalue">{stats.completed}</span>
-                      <span className="statlabel">Completadas</span>
+                      <span className="stat-value">{stats.completed}</span>
+                      <span className="stat-label">Completadas</span>
                     </div>
                     <div className="stat">
-                      <span className="statvalue">{stats.percentage}%</span>
-                      <span className="statlabel">Progreso</span>
+                      <span className="stat-value">{stats.percentage}%</span>
+                      <span className="stat-label">Progreso</span>
                     </div>
                   </div>
 
-                  <div className="progressbar">
+                  <div className="progress-bar">
                     <div 
-                      className="progressfill" 
+                      className="progress-fill" 
                       style={{ 
                         width: `${stats.percentage}%`,
                         backgroundColor: project.color 
@@ -194,18 +194,18 @@ export default function Dashboard() {
                     ></div>
                   </div>
 
-                  <div className="projectmembers">
+                  <div className="project-members">
                     {project.members?.slice(0, 4).map((member) => (
                       <img
                         key={member.user._id}
                         src={member.user.avatar}
                         alt={member.user.name}
-                        className="memberavatar"
+                        className="member-avatar"
                         title={member.user.name}
                       />
                     ))}
                     {project.members?.length > 4 && (
-                      <span className="moremembers">+{project.members.length  4}</span>
+                      <span className="more-members">+{project.members.length - 4}</span>
                     )}
                   </div>
                 </div>
@@ -231,4 +231,3 @@ export default function Dashboard() {
     </div>
   );
 }
-

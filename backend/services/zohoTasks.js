@@ -21,13 +21,13 @@ class ZohoTasksService {
 
   /**
    * Crear una tarea en Zoho Tasks
-   * @param {Object} taskData  Datos de la tarea
-   * @param {string} taskData.title  Título de la tarea
-   * @param {string} taskData.description  Descripción
-   * @param {Date} taskData.dueDate  Fecha de vencimiento
-   * @param {string} taskData.priority  Prioridad (low, medium, high, urgent)
-   * @param {string} taskData.taskId  ID interno de Nexus
-   * @returns {Object}  Resultado con ID de la tarea en Zoho
+   * @param {Object} taskData - Datos de la tarea
+   * @param {string} taskData.title - Título de la tarea
+   * @param {string} taskData.description - Descripción
+   * @param {Date} taskData.dueDate - Fecha de vencimiento
+   * @param {string} taskData.priority - Prioridad (low, medium, high, urgent)
+   * @param {string} taskData.taskId - ID interno de Nexus
+   * @returns {Object} - Resultado con ID de la tarea en Zoho
    */
   async createTask({ title, description, dueDate, priority, taskId }) {
     try {
@@ -83,8 +83,8 @@ class ZohoTasksService {
         },
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
-            'ContentType': 'application/json',
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -128,9 +128,9 @@ class ZohoTasksService {
 
   /**
    * Actualizar una tarea en Zoho Tasks
-   * @param {string} zohoTaskId  ID de la tarea en Zoho
-   * @param {Object} updates  Datos a actualizar
-   * @returns {Object}  Resultado de la operación
+   * @param {string} zohoTaskId - ID de la tarea en Zoho
+   * @param {Object} updates - Datos a actualizar
+   * @returns {Object} - Resultado de la operación
    */
   async updateTask(zohoTaskId, { title, description, dueDate, priority, completed }) {
     try {
@@ -158,8 +158,8 @@ class ZohoTasksService {
         payload,
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
-            'ContentType': 'application/json',
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
+            'Content-Type': 'application/json',
           },
         }
       );
@@ -190,8 +190,8 @@ class ZohoTasksService {
 
   /**
    * Eliminar una tarea de Zoho Tasks
-   * @param {string} zohoTaskId  ID de la tarea en Zoho
-   * @returns {Object}  Resultado de la operación
+   * @param {string} zohoTaskId - ID de la tarea en Zoho
+   * @returns {Object} - Resultado de la operación
    */
   async deleteTask(zohoTaskId) {
     try {
@@ -202,7 +202,7 @@ class ZohoTasksService {
         `${this.baseURL}/${this.userEmail}/tasks/${zohoTaskId}`,
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
           },
         }
       );
@@ -238,8 +238,8 @@ class ZohoTasksService {
 
   /**
    * Marcar tarea como completada en Zoho
-   * @param {string} zohoTaskId  ID de la tarea en Zoho
-   * @returns {Object}  Resultado de la operación
+   * @param {string} zohoTaskId - ID de la tarea en Zoho
+   * @returns {Object} - Resultado de la operación
    */
   async completeTask(zohoTaskId) {
     return this.updateTask(zohoTaskId, {
@@ -249,7 +249,7 @@ class ZohoTasksService {
 
   /**
    * Obtener todas las tareas de Zoho Tasks
-   * @returns {Object}  Lista de tareas
+   * @returns {Object} - Lista de tareas
    */
   async getTasks() {
     try {
@@ -257,7 +257,7 @@ class ZohoTasksService {
         `${this.baseURL}/${this.userEmail}/tasks`,
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
           },
         }
       );
@@ -278,4 +278,3 @@ class ZohoTasksService {
 }
 
 export default ZohoTasksService;
-

@@ -2,27 +2,27 @@
 
 Esta guía te ayudará a integrar **autenticación de usuarios con Zoho** y **sincronización con Zoho Calendar** en Nexus.
 
-
+---
 
 ## 📋 Requisitos Previos
 
 1. **Cuenta de Zoho**: Necesitas una cuenta en [Zoho](https://www.zoho.com)
 2. **Zoho Calendar activado**: Asegúrate de tener acceso a Zoho Calendar
 
-
+---
 
 ## 🔧 Paso 1: Crear Aplicación en Zoho API Console
 
 ### 1.1 Acceder a Zoho API Console
 
-1. Ve a [Zoho API Console](https://apiconsole.zoho.com/)
+1. Ve a [Zoho API Console](https://api-console.zoho.com/)
 2. Inicia sesión con tu cuenta de Zoho
 3. Haz clic en **"Add Client"** (Agregar Cliente)
 
 ### 1.2 Configurar el Cliente
 
-1. **Client Type**: Selecciona **"Serverbased Applications"**
-2. **Client Name**: `Nexus  Gestión de Proyectos`
+1. **Client Type**: Selecciona **"Server-based Applications"**
+2. **Client Name**: `Nexus - Gestión de Proyectos`
 3. **Homepage URL**: `http://localhost:5173`
 4. **Authorized Redirect URIs**: 
    ```
@@ -33,12 +33,12 @@ Esta guía te ayudará a integrar **autenticación de usuarios con Zoho** y **si
 ### 1.3 Obtener Credenciales
 
 Después de crear el cliente, verás:
- **Client ID**: Una cadena larga de caracteres (ejemplo: `1000.XXXXXXXXXXXXXXXXXXXXXXXXXX`)
- **Client Secret**: Otra cadena de caracteres
+- **Client ID**: Una cadena larga de caracteres (ejemplo: `1000.XXXXXXXXXXXXXXXXXXXXXXXXXX`)
+- **Client Secret**: Otra cadena de caracteres
 
 ⚠️ **¡Guarda estas credenciales de forma segura!**
 
-
+---
 
 ## 🔑 Paso 2: Configurar Scopes (Permisos)
 
@@ -81,7 +81,7 @@ En la configuración de tu aplicación en Zoho API Console:
    ```
 3. Guarda los cambios
 
-
+---
 
 ## ⚙️ Paso 3: Configurar Variables de Entorno
 
@@ -109,7 +109,7 @@ npm start
 
 El servidor debe mostrar: **"✅ Zoho OAuth Strategy configurada correctamente"**
 
-
+---
 
 ## � Paso 4: Usar la Autenticación con Zoho
 
@@ -128,7 +128,7 @@ El servidor debe mostrar: **"✅ Zoho OAuth Strategy configurada correctamente"*
 3. Sigue el mismo proceso de autorización
 4. Tu cuenta será creada con información de tu perfil de Zoho
 
-
+---
 
 ## 📅 Paso 5: Sincronizar Tareas con Zoho Calendar
 
@@ -142,11 +142,11 @@ Una vez que inicies sesión con Zoho:
 
 ### 5.1 Funciones de Sincronización
 
- ✅ **Crear eventos**: Al hacer clic en "Sincronizar con Zoho Calendar"
- ✅ **Actualizar eventos**: Los cambios en fechas se sincronizan automáticamente
- ✅ **Eliminar eventos**: Al desvincular o eliminar la tarjeta
+- ✅ **Crear eventos**: Al hacer clic en "Sincronizar con Zoho Calendar"
+- ✅ **Actualizar eventos**: Los cambios en fechas se sincronizan automáticamente
+- ✅ **Eliminar eventos**: Al desvincular o eliminar la tarjeta
 
-
+---
 
 ## 🔐 Paso 6 (Opcional): Generar Token Manual
 
@@ -173,12 +173,12 @@ https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.calendar.ALL,ZohoCale
 Usa este comando cURL (reemplaza los valores):
 
 ```bash
-curl X POST https://accounts.zoho.com/oauth/v2/token \
-  d "code=YOUR_AUTHORIZATION_CODE" \
-  d "client_id=YOUR_CLIENT_ID" \
-  d "client_secret=YOUR_CLIENT_SECRET" \
-  d "redirect_uri=http://localhost:5000/api/auth/zoho/callback" \
-  d "grant_type=authorization_code"
+curl -X POST https://accounts.zoho.com/oauth/v2/token \
+  -d "code=YOUR_AUTHORIZATION_CODE" \
+  -d "client_id=YOUR_CLIENT_ID" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "redirect_uri=http://localhost:5000/api/auth/zoho/callback" \
+  -d "grant_type=authorization_code"
 ```
 
 Recibirás una respuesta JSON con:
@@ -192,7 +192,7 @@ Recibirás una respuesta JSON con:
 
 **Guarda el `refresh_token`**, lo necesitarás para configurar usuarios.
 
-
+---
 
 ## 👤 Paso 5: Configurar Usuario en la Base de Datos
 
@@ -219,7 +219,7 @@ Puedes crear una ruta en el backend para manejar el flujo OAuth completo.
 
 *(Próximamente se implementará en el sistema)*
 
-
+---
 
 ## ✅ Paso 6: Probar la Integración
 
@@ -243,14 +243,14 @@ npm run dev
 2. La tarea debería aparecer en tu Zoho Calendar
 3. Ve a [Zoho Calendar](https://calendar.zoho.com) y verifica
 
-
+---
 
 ## 🧪 API de Zoho Calendar
 
 ### Endpoints Utilizados
 
 | Endpoint | Método | Descripción |
-||||
+|----------|--------|-------------|
 | `/events` | POST | Crear evento |
 | `/events/{id}` | PUT | Actualizar evento |
 | `/events/{id}` | DELETE | Eliminar evento |
@@ -261,11 +261,11 @@ npm run dev
 
 Zoho Calendar usa timestamps en **milisegundos**:
 ```javascript
-const timestamp = new Date('20251103T09:00:00').getTime();
+const timestamp = new Date('2025-11-03T09:00:00').getTime();
 // 1730635200000
 ```
 
-
+---
 
 ## 🛑 Troubleshooting
 
@@ -288,15 +288,15 @@ const timestamp = new Date('20251103T09:00:00').getTime();
 2. Revisa los logs del backend para errores
 3. Verifica que el `refresh_token` sea válido
 
-
+---
 
 ## 🔐 Seguridad
 
 ### Tokens
 
- **Access Token**: Expira cada hora
- **Refresh Token**: No expira (úsalo para obtener nuevos access tokens)
- **Almacenamiento**: Los tokens se guardan encriptados en MongoDB
+- **Access Token**: Expira cada hora
+- **Refresh Token**: No expira (úsalo para obtener nuevos access tokens)
+- **Almacenamiento**: Los tokens se guardan encriptados en MongoDB
 
 ### Mejores Prácticas
 
@@ -305,19 +305,19 @@ const timestamp = new Date('20251103T09:00:00').getTime();
 3. Usa **HTTPS** en producción
 4. Regenera tokens si sospechas que fueron comprometidos
 
-
+---
 
 ## 📊 Diferencias con Google Calendar
 
 | Característica | Google Calendar | Zoho Calendar |
-||||
+|----------------|-----------------|---------------|
 | Formato de Fecha | ISO 8601 | Timestamp (ms) |
 | Autenticación | OAuth 2.0 | OAuth 2.0 |
 | Colores | IDs numéricos | Nombres de colores |
 | Recordatorios | Array de objetos | Array simple |
 | API Docs | [Google](https://developers.google.com/calendar) | [Zoho](https://www.zoho.com/calendar/help/api/) |
 
-
+---
 
 ## 🎯 Próximos Pasos
 
@@ -328,7 +328,7 @@ Una vez configurado:
 3. ✅ Actualiza la fecha en Nexus → se actualiza en Zoho
 4. ✅ Elimina la sincronización cuando lo desees
 
-
+---
 
 ## 📞 Soporte
 
@@ -338,16 +338,15 @@ Si tienes problemas:
 2. Verifica la consola del navegador (F12)
 3. Consulta la [documentación oficial de Zoho API](https://www.zoho.com/calendar/help/api/)
 
-
+---
 
 ## 🔗 Enlaces Útiles
 
- [Zoho API Console](https://apiconsole.zoho.com/)
- [Zoho Calendar API Docs](https://www.zoho.com/calendar/help/api/)
- [Zoho OAuth 2.0 Guide](https://www.zoho.com/accounts/protocol/oauth.html)
- [Zoho Developer Portal](https://www.zoho.com/developer/)
+- [Zoho API Console](https://api-console.zoho.com/)
+- [Zoho Calendar API Docs](https://www.zoho.com/calendar/help/api/)
+- [Zoho OAuth 2.0 Guide](https://www.zoho.com/accounts/protocol/oauth.html)
+- [Zoho Developer Portal](https://www.zoho.com/developer/)
 
-
+---
 
 **¡Listo! Ahora puedes sincronizar tus tareas de Nexus con Zoho Calendar automáticamente.** 🎉
-

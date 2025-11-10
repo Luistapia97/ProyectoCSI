@@ -3,7 +3,7 @@ import Task from '../models/Task.js';
 import Notification from '../models/Notification.js';
 
 // Usar la URI de MongoDB Atlas directamente
-const MONGO_URI = 'mongodb+srv://luisosmx:Mikami82@cluster0.v2fu9dg.mongodb.net/nexustasks?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = 'mongodb+srv://luisosmx:Mikami82@cluster0.v2fu9dg.mongodb.net/nexus-tasks?retryWrites=true&w=majority&appName=Cluster0';
 
 async function testReminders() {
   try {
@@ -11,7 +11,7 @@ async function testReminders() {
     console.log('✅ Conectado a MongoDB\n');
 
     const now = new Date();
-    console.log(`📅 Fecha actual: ${now.toLocaleString('esMX')}\n`);
+    console.log(`📅 Fecha actual: ${now.toLocaleString('es-MX')}\n`);
 
     // 1. Verificar tareas que vencen en 24 horas
     console.log('═══════════════════════════════════════');
@@ -19,7 +19,7 @@ async function testReminders() {
     console.log('═══════════════════════════════════════\n');
 
     const in24Hours = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-    console.log(`   Rango: ${now.toLocaleString('esMX')} → ${in24Hours.toLocaleString('esMX')}\n`);
+    console.log(`   Rango: ${now.toLocaleString('es-MX')} → ${in24Hours.toLocaleString('es-MX')}\n`);
 
     const tasks24h = await Task.find({
       completed: false,
@@ -36,7 +36,7 @@ async function testReminders() {
 
     tasks24h.forEach((task, index) => {
       console.log(`   ${index + 1}. "${task.title}"`);
-      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('esMX')}`);
+      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('es-MX')}`);
       console.log(`      Asignada a: ${task.assignedTo.map(u => u.name).join(', ')}`);
       console.log(`      Proyecto: ${task.project?.name || 'Sin proyecto'}\n`);
     });
@@ -47,7 +47,7 @@ async function testReminders() {
     console.log('═══════════════════════════════════════\n');
 
     const in1Hour = new Date(now.getTime() + 1 * 60 * 60 * 1000);
-    console.log(`   Rango: ${now.toLocaleString('esMX')} → ${in1Hour.toLocaleString('esMX')}\n`);
+    console.log(`   Rango: ${now.toLocaleString('es-MX')} → ${in1Hour.toLocaleString('es-MX')}\n`);
 
     const tasks1h = await Task.find({
       completed: false,
@@ -64,7 +64,7 @@ async function testReminders() {
 
     tasks1h.forEach((task, index) => {
       console.log(`   ${index + 1}. "${task.title}"`);
-      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('esMX')}`);
+      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('es-MX')}`);
       console.log(`      Asignada a: ${task.assignedTo.map(u => u.name).join(', ')}`);
       console.log(`      Proyecto: ${task.project?.name || 'Sin proyecto'}\n`);
     });
@@ -85,9 +85,9 @@ async function testReminders() {
     console.log(`   📋 Encontradas: ${overdueTask.length} tareas vencidas\n`);
 
     overdueTask.forEach((task, index) => {
-      const overdueDays = Math.floor((now  new Date(task.dueDate)) / (1000 * 60 * 60 * 24));
+      const overdueDays = Math.floor((now - new Date(task.dueDate)) / (1000 * 60 * 60 * 24));
       console.log(`   ${index + 1}. "${task.title}"`);
-      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('esMX')}`);
+      console.log(`      Vence: ${new Date(task.dueDate).toLocaleString('es-MX')}`);
       console.log(`      ⚠️ Vencida hace: ${overdueDays} días`);
       console.log(`      Asignada a: ${task.assignedTo.map(u => u.name).join(', ')}`);
       console.log(`      Proyecto: ${task.project?.name || 'Sin proyecto'}\n`);
@@ -111,7 +111,7 @@ async function testReminders() {
 
     allTasksWithDueDate.forEach((task, index) => {
       const dueDate = new Date(task.dueDate);
-      const diff = dueDate  now;
+      const diff = dueDate - now;
       const hours = Math.floor(diff / (1000 * 60 * 60));
       let status = '';
       
@@ -128,7 +128,7 @@ async function testReminders() {
 
       console.log(`   ${index + 1}. ${status}`);
       console.log(`      Tarea: "${task.title}"`);
-      console.log(`      Vence: ${dueDate.toLocaleString('esMX')}`);
+      console.log(`      Vence: ${dueDate.toLocaleString('es-MX')}`);
       console.log(`      Asignada a: ${task.assignedTo.map(u => u.name).join(', ')}`);
       console.log(`      Proyecto: ${task.project?.name || 'Sin proyecto'}\n`);
     });
@@ -143,7 +143,7 @@ async function testReminders() {
     })
       .populate('user', 'name email')
       .populate('relatedTask', 'title')
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .limit(20);
 
     console.log(`   📋 Últimas 20 notificaciones de recordatorio:\n`);
@@ -156,7 +156,7 @@ async function testReminders() {
         console.log(`      Usuario: ${notif.user?.name || 'N/A'}`);
         console.log(`      Título: ${notif.title}`);
         console.log(`      Tarea: ${notif.relatedTask?.title || 'N/A'}`);
-        console.log(`      Creada: ${notif.createdAt.toLocaleString('esMX')}`);
+        console.log(`      Creada: ${notif.createdAt.toLocaleString('es-MX')}`);
         console.log(`      Leída: ${notif.read ? 'Sí' : 'No'}\n`);
       });
     }
@@ -192,4 +192,3 @@ async function testReminders() {
 }
 
 testReminders();
-

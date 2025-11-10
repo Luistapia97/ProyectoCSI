@@ -25,7 +25,7 @@ const listAllUsers = async () => {
         console.log(`   📧 Email:         ${user.email}`);
         console.log(`   👤 Rol:           ${user.role === 'administrador' ? '🔴 Administrador' : '🔵 Usuario'}`);
         console.log(`   🔐 Auth Provider: ${user.authProvider || 'local'}`);
-        console.log(`   📅 Creado:        ${new Date(user.createdAt).toLocaleDateString('esMX')}`);
+        console.log(`   📅 Creado:        ${new Date(user.createdAt).toLocaleDateString('es-MX')}`);
         
         // Estado de conexión con servicios
         const hasZoho = user.zohoAccessToken ? '✅ Conectado' : '❌ No conectado';
@@ -60,4 +60,3 @@ const listAllUsers = async () => {
 };
 
 listAllUsers();
-

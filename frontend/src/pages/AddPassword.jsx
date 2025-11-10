@@ -1,6 +1,6 @@
-﻿import { useState } from 'react';
-import { useNavigate } from 'reactrouterdom';
-import { Lock, AlertCircle, CheckCircle } from 'lucidereact';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Lock, AlertCircle, CheckCircle } from 'lucide-react';
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import './Auth.css';
@@ -41,7 +41,7 @@ export default function AddPassword() {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/auth/addpassword',
+        'http://localhost:5000/api/auth/add-password',
         { password: formData.password },
         {
           headers: {
@@ -69,10 +69,10 @@ export default function AddPassword() {
   }
 
   return (
-    <div className="authcontainer">
-      <div className="authcard">
-        <div className="authheader">
-          <Lock className="authicon" size={48} />
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <Lock className="auth-icon" size={48} />
           <h1>Agregar Contraseña</h1>
           <p>Agrega una contraseña para iniciar sesión con email</p>
         </div>
@@ -102,7 +102,7 @@ export default function AddPassword() {
         </div>
 
         {error && (
-          <div className="errormessage">
+          <div className="error-message">
             {error}
           </div>
         )}
@@ -125,8 +125,8 @@ export default function AddPassword() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="authform">
-          <div className="formgroup">
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
             <label htmlFor="password">
               <Lock size={18} />
               Nueva Contraseña
@@ -142,7 +142,7 @@ export default function AddPassword() {
             />
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label htmlFor="confirmPassword">
               <Lock size={18} />
               Confirmar Contraseña
@@ -158,12 +158,12 @@ export default function AddPassword() {
             />
           </div>
 
-          <button type="submit" className="btnprimary" disabled={loading || success}>
+          <button type="submit" className="btn-primary" disabled={loading || success}>
             {loading ? 'Agregando contraseña...' : success ? '✓ Contraseña agregada' : 'Agregar contraseña'}
           </button>
         </form>
 
-        <div className="authfooter">
+        <div className="auth-footer">
           <p>
             <a href="/dashboard" style={{ cursor: 'pointer' }}>Volver al Dashboard</a>
           </p>
@@ -172,4 +172,3 @@ export default function AddPassword() {
     </div>
   );
 }
-

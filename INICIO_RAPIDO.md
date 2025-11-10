@@ -1,4 +1,4 @@
-﻿# 🚀 Guía de Inicio Rápido  Nexus
+﻿# 🚀 Guía de Inicio Rápido - Nexus
 
 ## Instalación en 3 pasos
 
@@ -9,9 +9,9 @@
 ```
 
 Este script:
- ✅ Verifica Node.js y MongoDB
- ✅ Instala dependencias del backend y frontend
- ✅ Crea el archivo .env desde .env.example
+- ✅ Verifica Node.js y MongoDB
+- ✅ Instala dependencias del backend y frontend
+- ✅ Crea el archivo .env desde .env.example
 
 ### 2️⃣ Configurar variables de entorno
 
@@ -35,8 +35,8 @@ GOOGLE_CLIENT_SECRET=
 ```
 
 Esto iniciará:
- 🔹 Backend en http://localhost:5000
- 🔹 Frontend en http://localhost:5173
+- 🔹 Backend en http://localhost:5000
+- 🔹 Frontend en http://localhost:5173
 
 ## Primer Uso
 
@@ -105,29 +105,29 @@ FRONTEND_URL=http://localhost:5173
 ## Características Principales
 
 ### ✅ Sin configuración compleja
- No necesitas configurar Google OAuth para empezar
- Solo email y contraseña
+- No necesitas configurar Google OAuth para empezar
+- Solo email y contraseña
 
 ### 🎨 Interfaz Simple
- Diseño limpio y moderno
- Modo claro/oscuro
- Responsive (móvil y desktop)
+- Diseño limpio y moderno
+- Modo claro/oscuro
+- Responsive (móvil y desktop)
 
 ### ⚡ Tiempo Real
- Los cambios se reflejan instantáneamente
- Socket.IO para colaboración
+- Los cambios se reflejan instantáneamente
+- Socket.IO para colaboración
 
 ### 🔐 Seguro
- Contraseñas encriptadas con bcrypt
- JWT para sesiones
- CORS configurado
+- Contraseñas encriptadas con bcrypt
+- JWT para sesiones
+- CORS configurado
 
 ## Próximos Pasos
 
- 📖 Lee el [README.md](README.md) completo
- 🎨 Personaliza los colores de tus proyectos
- 👥 Invita miembros a tus proyectos (próximamente)
- 📊 Visualiza el progreso de tus tareas
+- 📖 Lee el [README.md](README.md) completo
+- 🎨 Personaliza los colores de tus proyectos
+- 👥 Invita miembros a tus proyectos (próximamente)
+- 📊 Visualiza el progreso de tus tareas
 
 ## Soporte
 
@@ -137,7 +137,6 @@ FRONTEND_URL=http://localhost:5173
 3. Que ambos servidores estén iniciados
 4. Los logs en la consola
 
-
+---
 
 **¡Listo para gestionar tus proyectos de forma simple! 🚀**
-

@@ -2,9 +2,9 @@
 
 /**
  * Enviar email de asignación de tarea
- * @param {Object} taskData  Datos de la tarea
- * @param {Object} assignedUser  Usuario al que se asigna
- * @param {Object} assignedBy  Usuario que asigna la tarea (con email y token de Zoho)
+ * @param {Object} taskData - Datos de la tarea
+ * @param {Object} assignedUser - Usuario al que se asigna
+ * @param {Object} assignedBy - Usuario que asigna la tarea (con email y token de Zoho)
  */
 export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy) {
   try {
@@ -16,13 +16,13 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
     const taskUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/tasks/${taskData._id}`;
     
     const dueDateFormatted = taskData.dueDate 
-      ? new Date(taskData.dueDate).toLocaleDateString('esMX', {
+      ? new Date(taskData.dueDate).toLocaleDateString('es-MX', {
           weekday: 'long',
           year: 'numeric',
           month: 'long',
           day: 'numeric',
-          hour: '2digit',
-          minute: '2digit'
+          hour: '2-digit',
+          minute: '2-digit'
         })
       : 'Sin fecha límite';
 
@@ -34,7 +34,7 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
     };
 
     const mailOptions = {
-      from: `"Nexus  Sistema de Gestión" <${process.env.EMAIL_USER}>`,
+      from: `"Nexus - Sistema de Gestión" <${process.env.EMAIL_USER}>`,
       to: assignedUser.email,
       subject: `📋 Nueva tarea asignada: ${taskData.title}`,
       html: `
@@ -43,55 +43,55 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
         <head>
           <style>
             body {
-              fontfamily: applesystem, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sansserif;
-              lineheight: 1.6;
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
               color: #333;
-              maxwidth: 600px;
+              max-width: 600px;
               margin: 0 auto;
               padding: 20px;
             }
             .header {
-              background: lineargradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
               color: white;
               padding: 30px;
-              borderradius: 10px 10px 0 0;
-              textalign: center;
+              border-radius: 10px 10px 0 0;
+              text-align: center;
             }
             .header h1 {
               margin: 0;
-              fontsize: 24px;
+              font-size: 24px;
             }
             .content {
               background: #f9f9f9;
               padding: 30px;
               border: 1px solid #e0e0e0;
-              bordertop: none;
+              border-top: none;
             }
-            .taskcard {
+            .task-card {
               background: white;
               padding: 20px;
-              borderradius: 8px;
+              border-radius: 8px;
               margin: 20px 0;
-              boxshadow: 0 2px 4px rgba(0,0,0,0.1);
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             }
-            .tasktitle {
-              fontsize: 20px;
-              fontweight: bold;
+            .task-title {
+              font-size: 20px;
+              font-weight: bold;
               color: #667eea;
-              marginbottom: 15px;
+              margin-bottom: 15px;
             }
-            .taskdetail {
+            .task-detail {
               margin: 10px 0;
               padding: 8px 0;
-              borderbottom: 1px solid #f0f0f0;
+              border-bottom: 1px solid #f0f0f0;
             }
-            .taskdetail:lastchild {
-              borderbottom: none;
+            .task-detail:last-child {
+              border-bottom: none;
             }
             .label {
-              fontweight: bold;
+              font-weight: bold;
               color: #666;
-              display: inlineblock;
+              display: inline-block;
               width: 140px;
             }
             .value {
@@ -100,19 +100,19 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
             .description {
               background: #f5f5f5;
               padding: 15px;
-              borderradius: 5px;
+              border-radius: 5px;
               margin: 15px 0;
-              whitespace: prewrap;
+              white-space: pre-wrap;
             }
             .button {
-              display: inlineblock;
-              background: lineargradient(135deg, #667eea 0%, #764ba2 100%);
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
               color: white;
               padding: 12px 30px;
-              textdecoration: none;
-              borderradius: 5px;
+              text-decoration: none;
+              border-radius: 5px;
               margin: 20px 0;
-              fontweight: bold;
+              font-weight: bold;
             }
             .button:hover {
               opacity: 0.9;
@@ -120,27 +120,27 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
             .footer {
               background: #f0f0f0;
               padding: 20px;
-              borderradius: 0 0 10px 10px;
-              textalign: center;
-              fontsize: 12px;
+              border-radius: 0 0 10px 10px;
+              text-align: center;
+              font-size: 12px;
               color: #666;
             }
-            .prioritybadge {
-              display: inlineblock;
+            .priority-badge {
+              display: inline-block;
               padding: 4px 12px;
-              borderradius: 12px;
-              fontsize: 12px;
-              fontweight: bold;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: bold;
             }
-            .priorityhigh, .priorityurgent {
+            .priority-high, .priority-urgent {
               background: #fee;
               color: #c00;
             }
-            .prioritymedium {
+            .priority-medium {
               background: #ffc;
               color: #c90;
             }
-            .prioritylow {
+            .priority-low {
               background: #efe;
               color: #090;
             }
@@ -155,33 +155,33 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
             <p>Hola <strong>${assignedUser.name}</strong>,</p>
             <p><strong>${assignedBy.name}</strong> te ha asignado una nueva tarea en el sistema Nexus.</p>
             
-            <div class="taskcard">
-              <div class="tasktitle">${taskData.title}</div>
+            <div class="task-card">
+              <div class="task-title">${taskData.title}</div>
               
-              <div class="taskdetail">
+              <div class="task-detail">
                 <span class="label">📅 Fecha límite:</span>
                 <span class="value">${dueDateFormatted}</span>
               </div>
               
-              <div class="taskdetail">
+              <div class="task-detail">
                 <span class="label">⚡ Prioridad:</span>
                 <span class="value">${priorityLabels[taskData.priority] || taskData.priority}</span>
               </div>
               
-              <div class="taskdetail">
+              <div class="task-detail">
                 <span class="label">👤 Asignado por:</span>
                 <span class="value">${assignedBy.name} (${assignedBy.email})</span>
               </div>
               
               ${taskData.project ? `
-                <div class="taskdetail">
+                <div class="task-detail">
                   <span class="label">📁 Proyecto:</span>
                   <span class="value">${taskData.project.name || 'Sin proyecto'}</span>
                 </div>
               ` : ''}
               
               ${taskData.description ? `
-                <div style="margintop: 20px;">
+                <div style="margin-top: 20px;">
                   <strong>📝 Descripción:</strong>
                   <div class="description">${taskData.description}</div>
                 </div>
@@ -192,7 +192,7 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
               <a href="${taskUrl}" class="button">Ver Tarea en Nexus</a>
             </center>
             
-            <p style="margintop: 30px; color: #666; fontsize: 14px;">
+            <p style="margin-top: 30px; color: #666; font-size: 14px;">
               💡 <strong>Tip:</strong> Haz clic en el botón de arriba para acceder directamente a la tarea y comenzar a trabajar en ella.
             </p>
           </div>
@@ -200,7 +200,7 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
           <div class="footer">
             <p>Este es un mensaje automático del sistema Nexus.</p>
             <p>Si tienes alguna duda, contacta a tu administrador.</p>
-            <p style="margintop: 10px;">
+            <p style="margin-top: 10px;">
               <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}" style="color: #667eea;">Ir a Nexus</a>
             </p>
           </div>
@@ -225,7 +225,7 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
         
         Ver tarea: ${taskUrl}
         
-        
+        ---
         Este es un mensaje automático del sistema Nexus.
       `
     };
@@ -312,10 +312,10 @@ export async function sendTaskAssignmentEmail(taskData, assignedUser, assignedBy
 
 /**
  * Enviar email de actualización de tarea
- * @param {Object} taskData  Datos de la tarea
- * @param {Object} assignedUser  Usuario asignado
- * @param {Object} updatedBy  Usuario que actualiza
- * @param {Object} changes  Cambios realizados
+ * @param {Object} taskData - Datos de la tarea
+ * @param {Object} assignedUser - Usuario asignado
+ * @param {Object} updatedBy - Usuario que actualiza
+ * @param {Object} changes - Cambios realizados
  */
 export async function sendTaskUpdateEmail(taskData, assignedUser, updatedBy, changes) {
   try {
@@ -339,7 +339,7 @@ export async function sendTaskUpdateEmail(taskData, assignedUser, updatedBy, cha
       .join('');
 
     const mailOptions = {
-      from: `"Nexus  Sistema de Gestión" <${process.env.EMAIL_USER}>`,
+      from: `"Nexus - Sistema de Gestión" <${process.env.EMAIL_USER}>`,
       to: assignedUser.email,
       subject: `🔄 Tarea actualizada: ${taskData.title}`,
       html: `
@@ -347,12 +347,12 @@ export async function sendTaskUpdateEmail(taskData, assignedUser, updatedBy, cha
         <html>
         <head>
           <style>
-            body { fontfamily: Arial, sansserif; lineheight: 1.6; color: #333; }
-            .container { maxwidth: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #667eea; color: white; padding: 20px; borderradius: 10px 10px 0 0; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: #667eea; color: white; padding: 20px; border-radius: 10px 10px 0 0; }
             .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
-            .button { display: inlineblock; background: #667eea; color: white; padding: 10px 20px; textdecoration: none; borderradius: 5px; margin: 15px 0; }
-            ul { background: white; padding: 20px; borderradius: 5px; }
+            .button { display: inline-block; background: #667eea; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 15px 0; }
+            ul { background: white; padding: 20px; border-radius: 5px; }
           </style>
         </head>
         <body>
@@ -401,4 +401,3 @@ export async function verifyEmailConfig() {
     return false;
   }
 }
-

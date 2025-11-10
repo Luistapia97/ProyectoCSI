@@ -18,14 +18,14 @@ class ReminderService {
   start() {
     console.log('⏰ Iniciando servicio de recordatorios...');
 
-    // Recordatorio cada 2 horas  Tareas que vencen en 24 horas
+    // Recordatorio cada 2 horas - Tareas que vencen en 24 horas
     // Se ejecuta: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00
     const dailyReminder = cron.schedule('0 */2 * * *', async () => {
       console.log('\n⏰ Ejecutando verificación programada de 24h...');
       await this.checkTasksDueSoon(24);
     });
 
-    // Recordatorio cada 30 minutos  Tareas que vencen en 1 hora
+    // Recordatorio cada 30 minutos - Tareas que vencen en 1 hora
     const hourlyReminder = cron.schedule('*/30 * * * *', async () => {
       console.log('\n⏰ Ejecutando verificación programada de 1h...');
       await this.checkTasksDueSoon(1);
@@ -41,16 +41,16 @@ class ReminderService {
     this.jobs.push(dailyReminder, hourlyReminder, overdueCheck);
 
     console.log('✅ Recordatorios programados:');
-    console.log('   📅 Cada 2 horas  Tareas que vencen en 24h');
-    console.log('   ⏰ Cada 30 minutos  Tareas que vencen en 1h');
-    console.log('   ⚠️ Cada 4 horas  Verificación de tareas vencidas');
+    console.log('   📅 Cada 2 horas - Tareas que vencen en 24h');
+    console.log('   ⏰ Cada 30 minutos - Tareas que vencen en 1h');
+    console.log('   ⚠️ Cada 4 horas - Verificación de tareas vencidas');
     console.log('\n💡 Ejecutar manualmente desde rutas:');
-    console.log('    Probar inmediatamente con recordatorio manual en cualquier tarea');
+    console.log('   - Probar inmediatamente con recordatorio manual en cualquier tarea');
   }
 
   /**
    * Verificar tareas que vencen pronto
-   * @param {number} hours  Horas antes del vencimiento
+   * @param {number} hours - Horas antes del vencimiento
    */
   async checkTasksDueSoon(hours) {
     try {
@@ -69,7 +69,7 @@ class ReminderService {
         ? new Date(now.getTime() + 25 * 60 * 60 * 1000)
         : new Date(now.getTime() + 1.5 * 60 * 60 * 1000);
 
-      console.log(`   🕐 Rango: ${minTime.toLocaleString('esMX')} → ${maxTime.toLocaleString('esMX')}`);
+      console.log(`   🕐 Rango: ${minTime.toLocaleString('es-MX')} → ${maxTime.toLocaleString('es-MX')}`);
 
       // Buscar tareas que:
       // 1. No estén completadas
@@ -119,13 +119,13 @@ class ReminderService {
 
             // Emitir notificaciones por Socket.IO
             createdNotifications.forEach(notification => {
-              this.io.to(`user${notification.user}`).emit('notification', notification);
+              this.io.to(`user-${notification.user}`).emit('notification', notification);
             });
             
             remindersSent += createdNotifications.length;
-            console.log(`   ✅ "${task.title}"  Enviado a ${createdNotifications.length} usuario(s)`);
+            console.log(`   ✅ "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
           } else {
-            console.log(`   ⏭️ "${task.title}"  Ya se envió recordatorio recientemente`);
+            console.log(`   ⏭️ "${task.title}" - Ya se envió recordatorio recientemente`);
           }
         }
       }
@@ -192,13 +192,13 @@ class ReminderService {
 
             // Emitir notificaciones por Socket.IO
             createdNotifications.forEach(notification => {
-              this.io.to(`user${notification.user}`).emit('notification', notification);
+              this.io.to(`user-${notification.user}`).emit('notification', notification);
             });
             
             remindersSent += createdNotifications.length;
-            console.log(`   ⚠️ "${task.title}"  Enviado a ${createdNotifications.length} usuario(s)`);
+            console.log(`   ⚠️ "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
           } else {
-            console.log(`   ⏭️ "${task.title}"  Ya se envió alerta recientemente`);
+            console.log(`   ⏭️ "${task.title}" - Ya se envió alerta recientemente`);
           }
         }
       }
@@ -228,13 +228,13 @@ class ReminderService {
     } else if (hours < 24) {
       return `en ${hours} horas`;
     } else {
-      return dueDate.toLocaleDateString('esMX', {
+      return dueDate.toLocaleDateString('es-MX', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        hour: '2digit',
-        minute: '2digit'
+        hour: '2-digit',
+        minute: '2-digit'
       });
     }
   }
@@ -297,7 +297,7 @@ class ReminderService {
 
       // Emitir notificaciones por Socket.IO
       createdNotifications.forEach(notification => {
-        this.io.to(`user${notification.user}`).emit('notification', notification);
+        this.io.to(`user-${notification.user}`).emit('notification', notification);
       });
 
       console.log(`✅ Recordatorio manual enviado para tarea: ${task.title}`);
@@ -309,7 +309,7 @@ class ReminderService {
   }
 
   /**
-   * Método de prueba  Ejecutar verificación de 24h inmediatamente
+   * Método de prueba - Ejecutar verificación de 24h inmediatamente
    */
   async testCheck24h() {
     console.log('\n🧪 PRUEBA MANUAL: Verificación de tareas que vencen en 24h');
@@ -317,7 +317,7 @@ class ReminderService {
   }
 
   /**
-   * Método de prueba  Ejecutar verificación de 1h inmediatamente
+   * Método de prueba - Ejecutar verificación de 1h inmediatamente
    */
   async testCheck1h() {
     console.log('\n🧪 PRUEBA MANUAL: Verificación de tareas que vencen en 1h');
@@ -325,7 +325,7 @@ class ReminderService {
   }
 
   /**
-   * Método de prueba  Ejecutar verificación de tareas vencidas inmediatamente
+   * Método de prueba - Ejecutar verificación de tareas vencidas inmediatamente
    */
   async testCheckOverdue() {
     console.log('\n🧪 PRUEBA MANUAL: Verificación de tareas vencidas');
@@ -334,4 +334,3 @@ class ReminderService {
 }
 
 export default ReminderService;
-

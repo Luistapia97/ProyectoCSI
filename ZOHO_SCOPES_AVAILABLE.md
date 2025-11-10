@@ -1,18 +1,18 @@
 ﻿# Scopes Disponibles en Zoho OAuth
 
 ## Zoho Mail Scopes
- `ZohoMail.messages.ALL`  Todos los permisos de mensajes
- `ZohoMail.messages.READ`  Leer mensajes
- `ZohoMail.messages.CREATE`  Crear/enviar mensajes
- `ZohoMail.folders.ALL`  Gestionar carpetas
- `ZohoMail.accounts.READ`  Leer información de cuentas
+- `ZohoMail.messages.ALL` - Todos los permisos de mensajes
+- `ZohoMail.messages.READ` - Leer mensajes
+- `ZohoMail.messages.CREATE` - Crear/enviar mensajes
+- `ZohoMail.folders.ALL` - Gestionar carpetas
+- `ZohoMail.accounts.READ` - Leer información de cuentas
 
 ## Zoho Tasks Scopes (Standalone App)
- `ZohoTasks.tasks.ALL`  Todos los permisos de tareas
- `ZohoTasks.tasks.READ`  Leer tareas
- `ZohoTasks.tasks.CREATE`  Crear tareas
- `ZohoTasks.tasks.UPDATE`  Actualizar tareas
- `ZohoTasks.tasks.DELETE`  Eliminar tareas
+- `ZohoTasks.tasks.ALL` - Todos los permisos de tareas
+- `ZohoTasks.tasks.READ` - Leer tareas
+- `ZohoTasks.tasks.CREATE` - Crear tareas
+- `ZohoTasks.tasks.UPDATE` - Actualizar tareas
+- `ZohoTasks.tasks.DELETE` - Eliminar tareas
 
 ## ⚠️ Problema con ZohoMail.tasks.ALL
 
@@ -32,4 +32,3 @@ Ya que Zoho no proporciona una API pública confiable para Tasks, las mejores op
 ## 🎯 Recomendación
 
 **Desactivar la sincronización con Zoho Tasks** y usar solo las notificaciones internas del sistema que ya funcionan perfectamente.
-

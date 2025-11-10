@@ -4,16 +4,16 @@
 
 Esta implementación sigue la documentación oficial de Zoho Assist OAuth 2.0 y es compatible con todas las API de Zoho.
 
-
+---
 
 ## 🎯 Flujo de Autenticación
 
 ### 1. **Registro de la Aplicación**
 La aplicación ya está registrada en Zoho con las siguientes credenciales:
 
- **Client ID:** `1000.PV5VLITLAS39ZUV6L26PDH87BFTQQK`
- **Client Secret:** `d3b5b398b36b34f61700a407c36bc020d4b49b8361`
- **Redirect URI:** `http://localhost:5000/api/auth/zoho/callback`
+- **Client ID:** `1000.PV5VLITLAS39ZUV6L26PDH87BFTQQK`
+- **Client Secret:** `d3b5b398b36b34f61700a407c36bc020d4b49b8361`
+- **Redirect URI:** `http://localhost:5000/api/auth/zoho/callback`
 
 ### 2. **Scopes Configurados**
 
@@ -29,14 +29,14 @@ scope: [
 #### Scopes Disponibles en Zoho:
 
 | Scope | Operaciones | Descripción |
-||||
+|-------|------------|-------------|
 | `ZohoAssist.userapi.READ` | READ | Obtener información del usuario |
 | `ZohoAssist.sessionapi.CREATE` | CREATE | Crear sesiones de soporte remoto |
 | `ZohoAssist.unattended.computer.READ` | READ | Ver computadoras desatendidas |
 | `ZohoCalendar.calendar.ALL` | ALL | Gestión completa del calendario |
 | `ZohoCalendar.event.ALL` | ALL | Gestión completa de eventos |
 
-
+---
 
 ## 🚀 Cómo Usar el Inicio de Sesión con Zoho
 
@@ -46,8 +46,8 @@ http://localhost:5173/login
 ```
 
 ### Paso 2: Click en "Continuar con Zoho"
- El usuario será redirigido a: `https://accounts.zoho.com/oauth/v2/auth`
- Se solicitará autorización para los scopes configurados
+- El usuario será redirigido a: `https://accounts.zoho.com/oauth/v2/auth`
+- Se solicitará autorización para los scopes configurados
 
 ### Paso 3: Autorización en Zoho
 El usuario debe:
@@ -57,12 +57,12 @@ El usuario debe:
 
 ### Paso 4: Callback y Creación de Cuenta
 El sistema automáticamente:
- Recibe el `access_token` y `refresh_token`
- Intenta obtener el email del usuario desde Zoho Assist API
- Si no está disponible, intenta Zoho Accounts API
- Si ninguno funciona, genera un email temporal
+- Recibe el `access_token` y `refresh_token`
+- Intenta obtener el email del usuario desde Zoho Assist API
+- Si no está disponible, intenta Zoho Accounts API
+- Si ninguno funciona, genera un email temporal
 
-
+---
 
 ## 🔄 APIs Utilizadas para Obtener Información del Usuario
 
@@ -76,8 +76,8 @@ GET {api_domain}/assist/v2/user
 **Headers:**
 ```javascript
 {
-  'Authorization': 'Zohooauthtoken {access_token}',
-  'ContentType': 'application/json'
+  'Authorization': 'Zoho-oauthtoken {access_token}',
+  'Content-Type': 'application/json'
 }
 ```
 
@@ -124,7 +124,7 @@ Si ninguna API funciona, se genera un email temporal:
 zoho_{últimos_8_caracteres_del_token}@temp.nexus.local
 ```
 
-
+---
 
 ## 📡 Proceso de Obtención de Access Token
 
@@ -186,19 +186,19 @@ POST https://accounts.zoho.com/oauth/v2/token
 }
 ```
 
-
+---
 
 ## 🔑 Gestión de Tokens
 
 ### Access Token
- **Duración:** 1 hora (3600 segundos)
- **Uso:** Llamadas a las APIs de Zoho
- **Formato:** `1000.xxxxxxxxxxxxxx`
+- **Duración:** 1 hora (3600 segundos)
+- **Uso:** Llamadas a las APIs de Zoho
+- **Formato:** `1000.xxxxxxxxxxxxxx`
 
 ### Refresh Token
- **Duración:** Permanente (hasta que se revoque)
- **Uso:** Obtener nuevos access tokens
- **Se obtiene solo con:** `access_type=offline` y `prompt=consent`
+- **Duración:** Permanente (hasta que se revoque)
+- **Uso:** Obtener nuevos access tokens
+- **Se obtiene solo con:** `access_type=offline` y `prompt=consent`
 
 ### Almacenamiento en BD
 
@@ -212,7 +212,7 @@ Campos en el modelo `User`:
 }
 ```
 
-
+---
 
 ## 🧪 Testing del Flujo OAuth
 
@@ -243,7 +243,7 @@ Campos en el modelo `User`:
 📝 Creando nuevo usuario / ✅ Usuario existente encontrado
 ```
 
-
+---
 
 ## 🔧 Configuración de Zoho Client
 
@@ -251,14 +251,14 @@ Si necesitas crear un nuevo cliente o modificar el existente:
 
 ### 1. **Acceder a API Console**
 ```
-https://apiconsole.zoho.com/
+https://api-console.zoho.com/
 ```
 
 ### 2. **Crear Client**
 1. Click en "Add Client"
 2. Selecciona:
-    **Serverbased Applications** (para OAuth)
-    **Self Client** (para testing sin dominio público)
+   - **Server-based Applications** (para OAuth)
+   - **Self Client** (para testing sin dominio público)
 
 ### 3. **Configurar Redirect URI**
 ```
@@ -266,29 +266,29 @@ http://localhost:5000/api/auth/zoho/callback
 ```
 
 ### 4. **Seleccionar Scopes**
- `ZohoAssist.userapi.READ`
- `ZohoCalendar.calendar.ALL`
- `ZohoCalendar.event.ALL`
+- `ZohoAssist.userapi.READ`
+- `ZohoCalendar.calendar.ALL`
+- `ZohoCalendar.event.ALL`
 
 ### 5. **Obtener Credenciales**
- Copia el **Client ID**
- Copia el **Client Secret**
- Actualiza el archivo `.env`
+- Copia el **Client ID**
+- Copia el **Client Secret**
+- Actualiza el archivo `.env`
 
-
+---
 
 ## 🛡️ Seguridad
 
 ### State Parameter
- Se genera automáticamente con `passportoauth2`
- Previene ataques CSRF
- Se valida en el callback
+- Se genera automáticamente con `passport-oauth2`
+- Previene ataques CSRF
+- Se valida en el callback
 
 ### HTTPS en Producción
 Para producción, actualiza:
 ```env
-ZOHO_REDIRECT_URI=https://tudominio.com/api/auth/zoho/callback
-FRONTEND_URL=https://tudominio.com
+ZOHO_REDIRECT_URI=https://tu-dominio.com/api/auth/zoho/callback
+FRONTEND_URL=https://tu-dominio.com
 ```
 
 ### Revocación de Tokens
@@ -297,7 +297,7 @@ Los usuarios pueden revocar el acceso desde:
 https://accounts.zoho.com/oauth/v2/token/revoke
 ```
 
-
+---
 
 ## 🐛 Troubleshooting
 
@@ -325,28 +325,28 @@ https://accounts.zoho.com/oauth/v2/token/revoke
 2. Agrega `prompt: 'consent'` para forzar la pantalla de consentimiento
 3. Revoca el acceso previo y vuelve a autorizar
 
-
+---
 
 ## 📚 Referencias
 
- **Documentación Oficial de Zoho OAuth:** https://www.zoho.com/assist/api/v2/oauth.html
- **Zoho API Console:** https://apiconsole.zoho.com/
- **Zoho Assist API Docs:** https://www.zoho.com/assist/api/v2/
- **Zoho Calendar API Docs:** https://www.zoho.com/calendar/help/api/
+- **Documentación Oficial de Zoho OAuth:** https://www.zoho.com/assist/api/v2/oauth.html
+- **Zoho API Console:** https://api-console.zoho.com/
+- **Zoho Assist API Docs:** https://www.zoho.com/assist/api/v2/
+- **Zoho Calendar API Docs:** https://www.zoho.com/calendar/help/api/
 
-
+---
 
 ## ✅ Estado Actual
 
- ✅ OAuth configurado con documentación oficial
- ✅ Scopes según Zoho Assist API
- ✅ Múltiples APIs para obtener información del usuario
- ✅ Fallback a email temporal si no se obtiene email
- ✅ Integración con calendario de Zoho lista
- ✅ Refresh token habilitado
- ✅ Botón de login habilitado en frontend
+- ✅ OAuth configurado con documentación oficial
+- ✅ Scopes según Zoho Assist API
+- ✅ Múltiples APIs para obtener información del usuario
+- ✅ Fallback a email temporal si no se obtiene email
+- ✅ Integración con calendario de Zoho lista
+- ✅ Refresh token habilitado
+- ✅ Botón de login habilitado en frontend
 
-
+---
 
 ## 🎯 Próximos Pasos
 
@@ -355,5 +355,4 @@ https://accounts.zoho.com/oauth/v2/token/revoke
 3. **Implementar refresh de tokens automático**
 4. **Usar los tokens para sincronizar con Zoho Calendar**
 5. **Agregar manejo de errores más robusto**
-
 

@@ -34,7 +34,7 @@ export const getBackendURL = () => {
 const api = axios.create({
   baseURL: API_URL,
   headers: {
-    'ContentType': 'application/json',
+    'Content-Type': 'application/json',
   },
   withCredentials: true, // Importante para CORS con cookies
 });
@@ -58,7 +58,7 @@ api.interceptors.request.use(
 // Interceptor para manejar errores de autenticación
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url}  ${response.status}`);
+    console.log(`✅ ${response.config.method?.toUpperCase()} ${response.config.url} - ${response.status}`);
     return response;
   },
   (error) => {
@@ -79,13 +79,13 @@ api.interceptors.response.use(
 // Auth
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
-  registerAdmin: (data) => api.post('/auth/registeradmin', data),
+  registerAdmin: (data) => api.post('/auth/register-admin', data),
   login: (data) => api.post('/auth/login', data),
   getMe: () => api.get('/auth/me'),
   googleAuth: () => window.location.href = `${API_URL}/auth/google`,
   getAllUsers: () => api.get('/auth/users'),
-  createUser: (data) => api.post('/auth/createuser', data),
-  getAdminCount: () => api.get('/auth/admincount'),
+  createUser: (data) => api.post('/auth/create-user', data),
+  getAdminCount: () => api.get('/auth/admin-count'),
 };
 
 // Projects
@@ -110,10 +110,9 @@ export const tasksAPI = {
   getComments: (id) => api.get(`/tasks/${id}/comments`),
   updateComment: (taskId, commentId, data) => api.put(`/tasks/${taskId}/comments/${commentId}`, data),
   deleteComment: (taskId, commentId) => api.delete(`/tasks/${taskId}/comments/${commentId}`),
-  requestValidation: (id) => api.post(`/tasks/${id}/requestvalidation`),
+  requestValidation: (id) => api.post(`/tasks/${id}/request-validation`),
   validateTask: (id, data) => api.post(`/tasks/${id}/validate`, data),
   sendReminder: (id) => api.post(`/tasks/${id}/remind`),
 };
 
 export default api;
-

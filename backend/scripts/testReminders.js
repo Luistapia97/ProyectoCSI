@@ -4,7 +4,7 @@ import User from '../models/User.js';
 import Project from '../models/Project.js';
 
 // Usar la URI de MongoDB Atlas directamente (el servidor ya está corriendo con ella)
-const MONGO_URI = 'mongodb+srv://luisosmx:Mikami82@cluster0.v2fu9dg.mongodb.net/nexustasks?retryWrites=true&w=majority&appName=Cluster0';
+const MONGO_URI = 'mongodb+srv://luisosmx:Mikami82@cluster0.v2fu9dg.mongodb.net/nexus-tasks?retryWrites=true&w=majority&appName=Cluster0';
 
 async function testReminders() {
   try {
@@ -34,7 +34,7 @@ async function testReminders() {
       createdBy: user._id,
       dueDate: in30Minutes,
       priority: 'high',
-      status: 'inprogress',
+      status: 'in-progress',
       completed: false,
       archived: false
     });
@@ -42,7 +42,7 @@ async function testReminders() {
     await task30min.save();
     console.log(`✅ Tarea creada (vence en 30 min):`);
     console.log(`   ID: ${task30min._id}`);
-    console.log(`   Fecha: ${in30Minutes.toLocaleString('esMX')}\n`);
+    console.log(`   Fecha: ${in30Minutes.toLocaleString('es-MX')}\n`);
 
     // Crear tarea que vence en 23 horas (para probar recordatorio de 24h)
     const in23Hours = new Date(Date.now() + 23 * 60 * 60 * 1000);
@@ -55,7 +55,7 @@ async function testReminders() {
       createdBy: user._id,
       dueDate: in23Hours,
       priority: 'medium',
-      status: 'inprogress',
+      status: 'in-progress',
       completed: false,
       archived: false
     });
@@ -63,10 +63,10 @@ async function testReminders() {
     await task23h.save();
     console.log(`✅ Tarea creada (vence en 23h):`);
     console.log(`   ID: ${task23h._id}`);
-    console.log(`   Fecha: ${in23Hours.toLocaleString('esMX')}\n`);
+    console.log(`   Fecha: ${in23Hours.toLocaleString('es-MX')}\n`);
 
     // Crear tarea vencida (para probar verificación de vencidas)
-    const yesterday = new Date(Date.now()  24 * 60 * 60 * 1000);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
     
     const taskOverdue = new Task({
       title: '🧪 TEST: Tarea vencida (ayer)',
@@ -76,7 +76,7 @@ async function testReminders() {
       createdBy: user._id,
       dueDate: yesterday,
       priority: 'high',
-      status: 'inprogress',
+      status: 'in-progress',
       completed: false,
       archived: false
     });
@@ -84,12 +84,12 @@ async function testReminders() {
     await taskOverdue.save();
     console.log(`✅ Tarea creada (vencida):`);
     console.log(`   ID: ${taskOverdue._id}`);
-    console.log(`   Fecha: ${yesterday.toLocaleString('esMX')}\n`);
+    console.log(`   Fecha: ${yesterday.toLocaleString('es-MX')}\n`);
 
     console.log('📋 RESUMEN:');
-    console.log('   ⏰ Tarea en 30 min  Debería recibir recordatorio de 1h en la próxima hora');
-    console.log('   📅 Tarea en 23h  Debería recibir recordatorio de 24h mañana a las 9:00 AM');
-    console.log('   ⚠️ Tarea vencida  Debería recibir alerta en las próximas 6 horas\n');
+    console.log('   ⏰ Tarea en 30 min - Debería recibir recordatorio de 1h en la próxima hora');
+    console.log('   📅 Tarea en 23h - Debería recibir recordatorio de 24h mañana a las 9:00 AM');
+    console.log('   ⚠️ Tarea vencida - Debería recibir alerta en las próximas 6 horas\n');
 
     console.log('💡 PRUEBA INMEDIATA:');
     console.log('   1. En el modal de una de estas tareas, haz clic en "Enviar Recordatorio"');
@@ -103,4 +103,3 @@ async function testReminders() {
 }
 
 testReminders();
-

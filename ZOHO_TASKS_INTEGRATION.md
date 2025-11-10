@@ -4,31 +4,31 @@
 
 He integrado **Zoho Tasks** para que las tareas asignadas en Nexus se sincronicen automáticamente con el sistema de tareas de Zoho Mail.
 
-
+---
 
 ## 🎯 Características Implementadas
 
 ### ✅ Sincronización Automática
 
 **Al crear una tarea en Nexus:**
- ✅ Se crea automáticamente en Zoho Tasks de cada usuario asignado
- ✅ Incluye título, descripción, fecha límite y prioridad
- ✅ Marca de referencia: `[Nexus Task ID: xxx]`
- ✅ Visible en mail.zoho.com → Tasks
+- ✅ Se crea automáticamente en Zoho Tasks de cada usuario asignado
+- ✅ Incluye título, descripción, fecha límite y prioridad
+- ✅ Marca de referencia: `[Nexus Task ID: xxx]`
+- ✅ Visible en mail.zoho.com → Tasks
 
 **Al actualizar una tarea:**
- ✅ Se actualiza en Zoho Tasks de todos los usuarios
- ✅ Sincroniza cambios de título, descripción, fecha y prioridad
- ✅ Marca como completada si se completa en Nexus
+- ✅ Se actualiza en Zoho Tasks de todos los usuarios
+- ✅ Sincroniza cambios de título, descripción, fecha y prioridad
+- ✅ Marca como completada si se completa en Nexus
 
 **Al eliminar una tarea:**
- ✅ Se elimina automáticamente de Zoho Tasks de todos los usuarios
+- ✅ Se elimina automáticamente de Zoho Tasks de todos los usuarios
 
 **Al completar una tarea:**
- ✅ Se marca como completada en Zoho Tasks
- ✅ Porcentaje de completado: 100%
+- ✅ Se marca como completada en Zoho Tasks
+- ✅ Porcentaje de completado: 100%
 
-
+---
 
 ## 🔧 Componentes Creados
 
@@ -38,11 +38,11 @@ Servicio completo para gestionar tareas en Zoho:
 
 ```javascript
 // Métodos disponibles:
- createTask()      // Crear tarea
- updateTask()      // Actualizar tarea
- deleteTask()      // Eliminar tarea
- completeTask()    // Marcar como completada
- getTasks()        // Obtener todas las tareas
+- createTask()      // Crear tarea
+- updateTask()      // Actualizar tarea
+- deleteTask()      // Eliminar tarea
+- completeTask()    // Marcar como completada
+- getTasks()        // Obtener todas las tareas
 ```
 
 **API Endpoint:**
@@ -58,10 +58,10 @@ GET    https://mail.zoho.com/api/accounts/{email}/tasks
 Middleware automático que se ejecuta en cada operación:
 
 ```javascript
- syncTaskToZoho()      // Al crear tarea
- updateZohoTask()      // Al actualizar tarea
- deleteZohoTask()      // Al eliminar tarea
- completeZohoTask()    // Al completar tarea
+- syncTaskToZoho()      // Al crear tarea
+- updateZohoTask()      // Al actualizar tarea
+- deleteZohoTask()      // Al eliminar tarea
+- completeZohoTask()    // Al completar tarea
 ```
 
 ### 3. **Modelo actualizado** (`backend/models/Task.js`)
@@ -101,7 +101,7 @@ scopes: [
 // Archiva tarea + elimina de Zoho Tasks
 ```
 
-
+---
 
 ## 📊 Flujo de Sincronización
 
@@ -115,8 +115,8 @@ Tarea se guarda en MongoDB
 Middleware detecta usuarios asignados
          ↓
 Para cada usuario con cuenta Zoho:
-   Crear tarea en Zoho Tasks
-   Guardar Zoho Task ID en MongoDB
+  - Crear tarea en Zoho Tasks
+  - Guardar Zoho Task ID en MongoDB
          ↓
 Usuario ve la tarea en:
   ✅ Nexus (web)
@@ -134,7 +134,7 @@ Cambios se guardan en MongoDB
 Middleware detecta cambios
          ↓
 Para cada Zoho Task ID almacenado:
-   Actualizar tarea en Zoho Tasks
+  - Actualizar tarea en Zoho Tasks
          ↓
 Cambios se reflejan en:
   ✅ Nexus
@@ -170,7 +170,7 @@ Elimina tarea de Zoho Tasks de cada usuario
 ❌ Tarea eliminada de ambos sistemas
 ```
 
-
+---
 
 ## 🔐 Requisitos de OAuth
 
@@ -181,11 +181,11 @@ Elimina tarea de Zoho Tasks de cada usuario
 ```
 
 **Permisos que otorga:**
- Crear tareas
- Leer tareas
- Actualizar tareas
- Eliminar tareas
- Marcar como completada/incompleta
+- Crear tareas
+- Leer tareas
+- Actualizar tareas
+- Eliminar tareas
+- Marcar como completada/incompleta
 
 ### Reautenticación Necesaria
 
@@ -198,7 +198,7 @@ Elimina tarea de Zoho Tasks de cada usuario
 4. Aceptar permisos
 5. Ya puedes sincronizar tareas ✅
 
-
+---
 
 ## 📱 Dónde Ver las Tareas Sincronizadas
 
@@ -220,7 +220,7 @@ Elimina tarea de Zoho Tasks de cada usuario
 
 Las tareas de Zoho Mail Tasks también pueden integrarse con Zoho Projects si tienes ambos servicios conectados.
 
-
+---
 
 ## 🧪 Cómo Probar
 
@@ -276,7 +276,7 @@ Las tareas de Zoho Mail Tasks también pueden integrarse con Zoho Projects si ti
 3. ✅ Tarea eliminada
 ```
 
-
+---
 
 ## 🐛 Manejo de Errores
 
@@ -303,34 +303,34 @@ Las tareas de Zoho Mail Tasks también pueden integrarse con Zoho Projects si ti
 **Causa:** Usuario no tiene cuenta de Zoho conectada
 
 **Solución:**
- Las tareas se guardan normalmente en Nexus
- No se sincronizan con Zoho Tasks
- Usuario debe iniciar sesión con Zoho para activar sincronización
+- Las tareas se guardan normalmente en Nexus
+- No se sincronizan con Zoho Tasks
+- Usuario debe iniciar sesión con Zoho para activar sincronización
 
-
+---
 
 ## 📊 Ventajas de Esta Integración
 
 ### ✅ Para Usuarios
 
- 📱 **Acceso móvil**: Ve tareas en app de Zoho Mail
- 🔔 **Notificaciones push**: Zoho Mail notifica nuevas tareas
- 📅 **Vista de calendario**: Tareas con fecha aparecen en calendario
- ✔️ **Marcar completadas**: Desde Zoho o Nexus (sincronización bidireccional*)
- 🔍 **Búsqueda**: Busca tareas en Zoho Mail
- 📧 **Un solo lugar**: Email + Tareas en Zoho Mail
+- 📱 **Acceso móvil**: Ve tareas en app de Zoho Mail
+- 🔔 **Notificaciones push**: Zoho Mail notifica nuevas tareas
+- 📅 **Vista de calendario**: Tareas con fecha aparecen en calendario
+- ✔️ **Marcar completadas**: Desde Zoho o Nexus (sincronización bidireccional*)
+- 🔍 **Búsqueda**: Busca tareas en Zoho Mail
+- 📧 **Un solo lugar**: Email + Tareas en Zoho Mail
 
 *Nota: Sincronización bidireccional (Zoho → Nexus) requiere webhooks
 
 ### ✅ Para Administradores
 
- 🎯 **Gestión centralizada**: Crea tareas en Nexus, se sincronizan automáticamente
- 📊 **Reportes**: Usa herramientas de Zoho para análisis
- 🔐 **Seguridad**: OAuth seguro, tokens encriptados
- 🔄 **Sincronización automática**: Sin intervención manual
- 📝 **Logs detallados**: Tracking completo de sincronización
+- 🎯 **Gestión centralizada**: Crea tareas en Nexus, se sincronizan automáticamente
+- 📊 **Reportes**: Usa herramientas de Zoho para análisis
+- 🔐 **Seguridad**: OAuth seguro, tokens encriptados
+- 🔄 **Sincronización automática**: Sin intervención manual
+- 📝 **Logs detallados**: Tracking completo de sincronización
 
-
+---
 
 ## 🚀 Mejoras Futuras (Opcional)
 
@@ -340,7 +340,7 @@ Implementar webhooks para que cambios en Zoho Tasks se reflejen en Nexus:
 
 ```javascript
 // Zoho Tasks → Nexus
-// Webhook endpoint: POST /api/webhooks/zohotasks
+// Webhook endpoint: POST /api/webhooks/zoho-tasks
 // Actualizar tarea en Nexus cuando cambia en Zoho
 ```
 
@@ -369,30 +369,30 @@ Configurar recordatorios automáticos en Zoho Tasks:
 // Notificación push nativa de Zoho
 ```
 
-
+---
 
 ## 📝 Resumen
 
 ✅ **Implementado:**
- Crear tarea en Zoho Tasks
- Actualizar tarea en Zoho Tasks
- Eliminar tarea de Zoho Tasks
- Completar tarea en Zoho Tasks
- Sincronización automática
- Soporte multiusuario
- Manejo de errores robusto
+- Crear tarea en Zoho Tasks
+- Actualizar tarea en Zoho Tasks
+- Eliminar tarea de Zoho Tasks
+- Completar tarea en Zoho Tasks
+- Sincronización automática
+- Soporte multi-usuario
+- Manejo de errores robusto
 
 ⏳ **Requiere:**
- Usuario debe iniciar sesión con Zoho
- Aceptar scope `ZohoMail.tasks.ALL`
+- Usuario debe iniciar sesión con Zoho
+- Aceptar scope `ZohoMail.tasks.ALL`
 
 🎯 **Resultado:**
- Tareas de Nexus visibles en Zoho Mail
- Acceso móvil a todas las tareas
- Notificaciones push nativas
- Un solo sistema de tareas
+- Tareas de Nexus visibles en Zoho Mail
+- Acceso móvil a todas las tareas
+- Notificaciones push nativas
+- Un solo sistema de tareas
 
-
+---
 
 ## 🧪 Prueba Ahora
 
@@ -402,7 +402,6 @@ Configurar recordatorios automáticos en Zoho Tasks:
 4. **Ve a Zoho Mail** → Tasks
 5. **¡Disfruta!** ✨
 
-
+---
 
 ¿Necesitas ayuda configurando o tienes alguna pregunta? 🤔
-

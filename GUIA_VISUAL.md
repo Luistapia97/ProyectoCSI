@@ -149,51 +149,51 @@ Acento:             #6366f1  ████████ (Índigo)
 ## Iconografía
 
 ```
-📊 Dashboard       TrendingUp
-🔐 Login           LogIn
-👤 Usuario         User
-📁 Proyectos       Folder
-➕ Agregar         Plus
-✏️ Editar          Edit
-🗑️ Eliminar        Trash2
-⚙️ Configuración   Settings
-📅 Calendario      Calendar
-🚩 Prioridad       Flag
-🏷️ Etiqueta        Tag
-☑️ Subtareas       CheckSquare
-💬 Comentarios     MessageCircle
-🔔 Notificación    Bell
-← Regresar         ArrowLeft
-🌙 Modo Oscuro     Moon
-☀️ Modo Claro      Sun
-↩️ Salir           LogOut
-✓ Completado       Check
-⚠️ Advertencia     AlertCircle
+📊 Dashboard      - TrendingUp
+🔐 Login          - LogIn
+👤 Usuario        - User
+📁 Proyectos      - Folder
+➕ Agregar        - Plus
+✏️ Editar         - Edit
+🗑️ Eliminar       - Trash2
+⚙️ Configuración  - Settings
+📅 Calendario     - Calendar
+🚩 Prioridad      - Flag
+🏷️ Etiqueta       - Tag
+☑️ Subtareas      - CheckSquare
+💬 Comentarios    - MessageCircle
+🔔 Notificación   - Bell
+← Regresar        - ArrowLeft
+🌙 Modo Oscuro    - Moon
+☀️ Modo Claro     - Sun
+↩️ Salir          - LogOut
+✓ Completado      - Check
+⚠️ Advertencia    - AlertCircle
 ```
 
 ## Estados Visuales
 
 ### Prioridades
 ```
-🟢 Baja       Verde   (#10b981)
-🟡 Media      Amarillo (#f59e0b)
-🟠 Alta       Naranja  (#ef4444)
-🔴 Urgente    Rojo     (#dc2626)
+🟢 Baja      - Verde   (#10b981)
+🟡 Media     - Amarillo (#f59e0b)
+🟠 Alta      - Naranja  (#ef4444)
+🔴 Urgente   - Rojo     (#dc2626)
 ```
 
 ### Estados de Tarea
 ```
-📝 Pendiente      Sin color especial
-⚡ En Progreso    Azul
-✅ Completado     Verde con check
-⏰ Vencida        Rojo con alerta
+📝 Pendiente     - Sin color especial
+⚡ En Progreso   - Azul
+✅ Completado    - Verde con check
+⏰ Vencida       - Rojo con alerta
 ```
 
 ## Animaciones
 
 ### Microinteracciones
 ```
-Hover en botones:      translateY(2px) + sombra
+Hover en botones:      translateY(-2px) + sombra
 Click en tarjeta:      Scale(0.98)
 Drag tarea:            Opacidad 0.5
 Drop zona:             Borde punteado azul
@@ -208,7 +208,7 @@ Eliminar elemento:     fadeOut + slideOut
 
 ```
 Mobile:     < 640px   (1 columna)
-Tablet:     6401024px (2 columnas)
+Tablet:     640-1024px (2 columnas)
 Desktop:    > 1024px   (3+ columnas)
 ```
 
@@ -237,15 +237,14 @@ Desktop:    > 1024px   (3+ columnas)
 
 ## Principios de Diseño
 
-1. **Menos es Más**  Solo lo esencial
-2. **Feedback Inmediato**  Cada acción tiene respuesta
-3. **Jerarquía Visual**  Tamaños y colores claros
-4. **Consistencia**  Mismo estilo en toda la app
-5. **Accesibilidad**  Contraste y tamaños legibles
-6. **Performance**  Animaciones de 60fps
-7. **Responsivo**  Funciona en todos los dispositivos
+1. **Menos es Más** - Solo lo esencial
+2. **Feedback Inmediato** - Cada acción tiene respuesta
+3. **Jerarquía Visual** - Tamaños y colores claros
+4. **Consistencia** - Mismo estilo en toda la app
+5. **Accesibilidad** - Contraste y tamaños legibles
+6. **Performance** - Animaciones de 60fps
+7. **Responsivo** - Funciona en todos los dispositivos
 
-
+---
 
 **Diseño pensado para la productividad y la simplicidad** 🎨✨
-

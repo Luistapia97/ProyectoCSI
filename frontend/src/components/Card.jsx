@@ -1,6 +1,6 @@
-﻿import { Calendar, User, CheckSquare, AlertCircle, CheckCircle } from 'lucidereact';
-import { format, parseISO } from 'datefns';
-import { es } from 'datefns/locale';
+import { Calendar, User, CheckSquare, AlertCircle, CheckCircle } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 import './Card.css';
 
 const PRIORITY_COLORS = {
@@ -21,8 +21,8 @@ export default function Card({ task, onClick }) {
   const getLocalDate = (dateStr) => {
     if (!dateStr) return null;
     const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr;
-    const [year, month, day] = datePart.split('');
-    return new Date(year, month  1, day);
+    const [year, month, day] = datePart.split('-');
+    return new Date(year, month - 1, day);
   };
 
   const isOverdue = task.dueDate 
@@ -31,77 +31,76 @@ export default function Card({ task, onClick }) {
 
   return (
     <div
-      className={`taskcard ${task.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''} ${task.pendingValidation ? 'pendingvalidation' : ''}`}
+      className={`task-card ${task.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''} ${task.pendingValidation ? 'pending-validation' : ''}`}
       onClick={onClick}
       style={task.color ? { borderLeftColor: task.color } : {}}
     >
       {task.pendingValidation && (
-        <div className="validationbadge">
+        <div className="validation-badge">
           <CheckCircle size={14} />
           <span>Pendiente de validación</span>
         </div>
       )}
       
-      <div className="cardheader">
-        <h4 className="cardtitle">{task.title}</h4>
+      <div className="card-header">
+        <h4 className="card-title">{task.title}</h4>
         <div
-          className="priorityindicator"
+          className="priority-indicator"
           style={{ backgroundColor: priorityColor }}
           title={`Prioridad: ${task.priority}`}
         />
       </div>
 
       {task.description && (
-        <p className="carddescription">{task.description}</p>
+        <p className="card-description">{task.description}</p>
       )}
 
       {task.tags && task.tags.length > 0 && (
-        <div className="cardtags">
+        <div className="card-tags">
           {task.tags.slice(0, 3).map((tag, index) => (
-            <span key={index} className="cardtag">{tag}</span>
+            <span key={index} className="card-tag">{tag}</span>
           ))}
         </div>
       )}
 
-      <div className="cardfooter">
-        <div className="cardmeta">
+      <div className="card-footer">
+        <div className="card-meta">
           {task.dueDate && (
-            <div className={`carddate ${isOverdue ? 'overduetext' : ''}`}>
+            <div className={`card-date ${isOverdue ? 'overdue-text' : ''}`}>
               <Calendar size={14} />
               <span>{format(getLocalDate(task.dueDate), 'dd MMM', { locale: es })}</span>
             </div>
           )}
 
           {hasSubtasks && (
-            <div className="cardsubtasks">
+            <div className="card-subtasks">
               <CheckSquare size={14} />
               <span>{completedSubtasks}/{totalSubtasks}</span>
             </div>
           )}
 
           {task.assignedTo && task.assignedTo.length > 0 && (
-            <div className="cardassignees">
+            <div className="card-assignees">
               {task.assignedTo.slice(0, 2).map((user) => (
                 <img
                   key={user._id}
                   src={user.avatar}
                   alt={user.name}
-                  className="assigneeavatar"
+                  className="assignee-avatar"
                   title={user.name}
                 />
               ))}
               {task.assignedTo.length > 2 && (
-                <span className="moreassignees">+{task.assignedTo.length  2}</span>
+                <span className="more-assignees">+{task.assignedTo.length - 2}</span>
               )}
             </div>
           )}
         </div>
 
         {isOverdue && (
-          <AlertCircle size={16} className="overdueicon" />
+          <AlertCircle size={16} className="overdue-icon" />
         )}
       </div>
     </div>
   );
 }
-

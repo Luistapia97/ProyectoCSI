@@ -1,6 +1,6 @@
-﻿import { useState } from 'react';
-import { Link, useNavigate } from 'reactrouterdom';
-import { LogIn, Mail, Lock } from 'lucidereact';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { LogIn, Mail, Lock } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import { getBackendURL } from '../services/api';
 import './Auth.css';
@@ -36,22 +36,22 @@ export default function Login() {
   };
 
   return (
-    <div className="authcontainer">
-      <div className="authcard">
-        <div className="authheader">
-          <LogIn className="authicon" size={48} />
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <LogIn className="auth-icon" size={48} />
           <h1>Bienvenido de nuevo</h1>
           <p>Inicia sesión en tu cuenta de Nexus</p>
         </div>
 
         {error && (
-          <div className="errormessage">
+          <div className="error-message">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="authform">
-          <div className="formgroup">
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
             <label htmlFor="email">
               <Mail size={18} />
               Email
@@ -66,7 +66,7 @@ export default function Login() {
             />
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label htmlFor="password">
               <Lock size={18} />
               Contraseña
@@ -81,7 +81,7 @@ export default function Login() {
             />
           </div>
 
-          <button type="submit" className="btnprimary" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
           </button>
         </form>
@@ -90,25 +90,24 @@ export default function Login() {
           <span>o continuar con</span>
         </div>
 
-        <button onClick={handleZohoLogin} className="btnzoho">
+        <button onClick={handleZohoLogin} className="btn-zoho">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <rect width="20" height="20" rx="3" fill="#FF6B00"/>
-            <path d="M14.5 6H5.5L3 10l2.5 4h9l2.542.54z" fill="white"/>
+            <path d="M14.5 6H5.5L3 10l2.5 4h9l2.5-4-2.5-4z" fill="white"/>
             <path d="M10 7v6M7 10h6" stroke="#FF6B00" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
           Continuar con Zoho
         </button>
 
-        <div className="authfooter">
+        <div className="auth-footer">
           <p>
             ¿No tienes una cuenta? <Link to="/register">Regístrate como Usuario</Link>
           </p>
           <p>
-            ¿Eres administrador? <Link to="/registeradmin">Registro de Admin</Link>
+            ¿Eres administrador? <Link to="/register-admin">Registro de Admin</Link>
           </p>
         </div>
       </div>
     </div>
   );
 }
-

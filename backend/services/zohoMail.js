@@ -4,9 +4,9 @@
  * Servicio para enviar correos usando Zoho Mail con SMTP
  * 
  * NOTA IMPORTANTE:
- *  Zoho Mail API REST tiene limitaciones y requiere configuración adicional
- *  SMTP con OAuth2 también tiene restricciones
- *  La mejor opción es usar SMTP con contraseña de aplicación de Zoho
+ * - Zoho Mail API REST tiene limitaciones y requiere configuración adicional
+ * - SMTP con OAuth2 también tiene restricciones
+ * - La mejor opción es usar SMTP con contraseña de aplicación de Zoho
  * 
  * Configuración requerida:
  * 1. Crear una "App Password" en Zoho Mail
@@ -27,12 +27,12 @@ class ZohoMailService {
    * 1. OAuth2 (si el token tiene los scopes correctos)
    * 2. Contraseña de aplicación (más confiable)
    * 
-   * @param {Object} emailData  Datos del correo
-   * @param {string} emailData.to  Email del destinatario
-   * @param {string} emailData.subject  Asunto del correo
-   * @param {string} emailData.htmlContent  Contenido HTML del correo
-   * @param {string} emailData.textContent  Contenido en texto plano (opcional)
-   * @returns {Object}  Resultado de la operación
+   * @param {Object} emailData - Datos del correo
+   * @param {string} emailData.to - Email del destinatario
+   * @param {string} emailData.subject - Asunto del correo
+   * @param {string} emailData.htmlContent - Contenido HTML del correo
+   * @param {string} emailData.textContent - Contenido en texto plano (opcional)
+   * @returns {Object} - Resultado de la operación
    */
   async sendEmail({ to, subject, htmlContent, textContent }) {
     try {
@@ -66,7 +66,7 @@ class ZohoMailService {
         console.log('⚠️ OAuth2 falló, Zoho requiere contraseña de aplicación');
         console.log('   Error:', oauthError.message);
         
-        // OPCIÓN 2: Fallback  informar que se necesita contraseña de aplicación
+        // OPCIÓN 2: Fallback - informar que se necesita contraseña de aplicación
         return {
           success: false,
           error: 'Zoho Mail requiere una contraseña de aplicación. Ve a Zoho Mail > Configuración > Seguridad > Contraseñas de Aplicación',
@@ -157,7 +157,7 @@ class ZohoMailService {
         'https://accounts.zoho.com/oauth/user/info',
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${this.accessToken}`,
+            'Authorization': `Zoho-oauthtoken ${this.accessToken}`,
           },
         }
       );
@@ -171,4 +171,3 @@ class ZohoMailService {
 }
 
 export default ZohoMailService;
-

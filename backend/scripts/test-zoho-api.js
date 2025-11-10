@@ -11,7 +11,7 @@ async function testZohoAPI() {
       'https://calendar.zoho.com/api/v1/calendars',
       {
         headers: {
-          'Authorization': `Zohooauthtoken ${accessToken}`,
+          'Authorization': `Zoho-oauthtoken ${accessToken}`,
         },
       }
     );
@@ -32,4 +32,3 @@ async function testZohoAPI() {
 }
 
 testZohoAPI();
-

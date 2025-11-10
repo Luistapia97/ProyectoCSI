@@ -58,7 +58,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         
         let userEmail, userId, userName, userPicture;
         
-        // PASO 1: Decodificar el id_token (JWT)  Contiene la información verificada del usuario
+        // PASO 1: Decodificar el id_token (JWT) - Contiene la información verificada del usuario
         if (params.id_token) {
           console.log('🎫 ID Token recibido, decodificando...');
           try {
@@ -182,7 +182,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           zohoId: userId,
           name: userName || userEmail.split('@')[0],
           email: userEmail,
-          avatar: userPicture || `https://uiavatars.com/api/?name=${encodeURIComponent(userName || userEmail)}`,
+          avatar: userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || userEmail)}`,
           role: userRole,
           authProvider: 'zoho',
           zohoAccessToken: accessToken,
@@ -204,4 +204,3 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
 }
 
 export default passport;
-

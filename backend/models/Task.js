@@ -100,7 +100,7 @@ const taskSchema = new mongoose.Schema({
     eventId: String,
     eventLink: String,
   }],
-  // Zoho Tasks  almacenar IDs de tareas sincronizadas en Zoho
+  // Zoho Tasks - almacenar IDs de tareas sincronizadas en Zoho
   zohoTaskIds: [{
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -132,4 +132,3 @@ taskSchema.pre('save', function(next) {
 const Task = mongoose.model('Task', taskSchema);
 
 export default Task;
-

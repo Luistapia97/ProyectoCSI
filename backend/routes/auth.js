@@ -31,10 +31,10 @@ function getFrontendURL(req) {
   return process.env.FRONTEND_URL || 'http://localhost:5173';
 }
 
-// @route   POST /api/auth/registeradmin
+// @route   POST /api/auth/register-admin
 // @desc    Registrar administrador (máximo 3)
 // @access  Public
-router.post('/registeradmin', async (req, res) => {
+router.post('/register-admin', async (req, res) => {
   try {
     const { name, email, password, adminCode } = req.body;
 
@@ -69,7 +69,7 @@ router.post('/registeradmin', async (req, res) => {
       email,
       password,
       role: 'administrador',
-      avatar: `https://uiavatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
+      avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
     });
 
     res.status(201).json({
@@ -109,7 +109,7 @@ router.post('/register', async (req, res) => {
       email,
       password,
       role: 'usuario',
-      avatar: `https://uiavatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
+      avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
     });
 
     res.status(201).json({
@@ -260,10 +260,10 @@ if (isZohoConfigured) {
         
         // Si es temporal, agregar parámetro para mostrar aviso
         if (isTemporary) {
-          return res.redirect(`${frontendURL}/authsuccess?token=${token}&incomplete=true`);
+          return res.redirect(`${frontendURL}/auth-success?token=${token}&incomplete=true`);
         }
         
-        return res.redirect(`${frontendURL}/authsuccess?token=${token}`);
+        return res.redirect(`${frontendURL}/auth-success?token=${token}`);
         
       } catch (error) {
         console.error('❌ Error en callback de Zoho:', error);
@@ -385,10 +385,10 @@ router.get('/me', protect, async (req, res) => {
   });
 });
 
-// @route   POST /api/auth/addpassword
+// @route   POST /api/auth/add-password
 // @desc    Agregar contraseña a cuenta de OAuth
 // @access  Private
-router.post('/addpassword', protect, async (req, res) => {
+router.post('/add-password', protect, async (req, res) => {
   try {
     const { password } = req.body;
 
@@ -428,10 +428,10 @@ router.post('/addpassword', protect, async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/admincount
+// @route   GET /api/auth/admin-count
 // @desc    Obtener cantidad de administradores registrados
 // @access  Public
-router.get('/admincount', async (req, res) => {
+router.get('/admin-count', async (req, res) => {
   try {
     const adminCount = await User.countDocuments({ role: 'administrador' });
     res.json({
@@ -446,10 +446,10 @@ router.get('/admincount', async (req, res) => {
   }
 });
 
-// @route   GET /api/auth/debugusers (TEMPORAL)
+// @route   GET /api/auth/debug-users (TEMPORAL)
 // @desc    Ver usuarios con email info@proyectoscsi.mx
 // @access  Public
-router.get('/debugusers', async (req, res) => {
+router.get('/debug-users', async (req, res) => {
   try {
     const users = await User.find({ 
       $or: [
@@ -473,10 +473,10 @@ router.get('/debugusers', async (req, res) => {
   }
 });
 
-// @route   DELETE /api/auth/deletezohoaccounts (TEMPORAL)
+// @route   DELETE /api/auth/delete-zoho-accounts (TEMPORAL)
 // @desc    Eliminar todas las cuentas de Zoho
-// @access  Public (TEMPORAL  ELIMINAR DESPUÉS)
-router.delete('/deletezohoaccounts', async (req, res) => {
+// @access  Public (TEMPORAL - ELIMINAR DESPUÉS)
+router.delete('/delete-zoho-accounts', async (req, res) => {
   try {
     const result = await User.deleteMany({ authProvider: 'zoho' });
     res.json({
@@ -496,8 +496,8 @@ router.delete('/deletezohoaccounts', async (req, res) => {
 router.get('/users', protect, isAdmin, async (req, res) => {
   try {
     const users = await User.find()
-      .select('password')
-      .sort({ createdAt: 1 });
+      .select('-password')
+      .sort({ createdAt: -1 });
 
     res.json({
       success: true,
@@ -509,10 +509,10 @@ router.get('/users', protect, isAdmin, async (req, res) => {
   }
 });
 
-// @route   POST /api/auth/createuser
+// @route   POST /api/auth/create-user
 // @desc    Crear un usuario (solo admin)
 // @access  Private (Admin only)
-router.post('/createuser', protect, isAdmin, async (req, res) => {
+router.post('/create-user', protect, isAdmin, async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
@@ -534,7 +534,7 @@ router.post('/createuser', protect, isAdmin, async (req, res) => {
       email,
       password,
       role: role || 'usuario',
-      avatar: `https://uiavatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
+      avatar: `https://ui-avatars.com/api/?background=random&name=${encodeURIComponent(name)}`,
     });
 
     res.status(201).json({
@@ -549,4 +549,3 @@ router.post('/createuser', protect, isAdmin, async (req, res) => {
 });
 
 export default router;
-

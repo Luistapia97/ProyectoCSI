@@ -1,5 +1,5 @@
-﻿import { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Tag, Users } from 'lucidereact';
+import { useState, useEffect } from 'react';
+import { X, Calendar, Flag, Tag, Users } from 'lucide-react';
 import useTaskStore from '../store/taskStore';
 import { authAPI } from '../services/api';
 import './Modal.css';
@@ -79,23 +79,23 @@ export default function CreateCardModal({ projectId, column, onClose }) {
   };
 
   return (
-    <div className="modaloverlay" onClick={onClose}>
-      <div className="modalcontent" onClick={(e) => e.stopPropagation()}>
-        <div className="modalheader">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
           <h2>Crear Nueva Tarea</h2>
-          <button onClick={onClose} className="modalclose">
+          <button onClick={onClose} className="modal-close">
             <X size={24} />
           </button>
         </div>
 
         {error && (
-          <div className="errormessage">
+          <div className="error-message">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="modalform">
-          <div className="formgroup">
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-group">
             <label htmlFor="title">Título de la tarea *</label>
             <input
               type="text"
@@ -107,7 +107,7 @@ export default function CreateCardModal({ projectId, column, onClose }) {
             />
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label htmlFor="description">Descripción</label>
             <textarea
               id="description"
@@ -118,8 +118,8 @@ export default function CreateCardModal({ projectId, column, onClose }) {
             />
           </div>
 
-          <div className="formrow">
-            <div className="formgroup">
+          <div className="form-row">
+            <div className="form-group">
               <label htmlFor="priority">
                 <Flag size={18} />
                 Prioridad
@@ -137,7 +137,7 @@ export default function CreateCardModal({ projectId, column, onClose }) {
               </select>
             </div>
 
-            <div className="formgroup">
+            <div className="form-group">
               <label htmlFor="dueDate">
                 <Calendar size={18} />
                 Fecha límite
@@ -151,7 +151,7 @@ export default function CreateCardModal({ projectId, column, onClose }) {
             </div>
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label htmlFor="tags">
               <Tag size={18} />
               Etiquetas (separadas por coma)
@@ -165,37 +165,37 @@ export default function CreateCardModal({ projectId, column, onClose }) {
             />
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label>
               <Users size={18} />
               Asignar usuarios ({formData.assignedTo.length})
             </label>
-            <div className="userselectiongrid">
+            <div className="user-selection-grid">
               {availableUsers.map((user) => (
                 <div
                   key={user._id}
-                  className={`userselectionitem ${formData.assignedTo.includes(user._id) ? 'selected' : ''}`}
+                  className={`user-selection-item ${formData.assignedTo.includes(user._id) ? 'selected' : ''}`}
                   onClick={() => toggleUserAssignment(user._id)}
                 >
-                  <img src={user.avatar} alt={user.name} className="userselectionavatar" />
-                  <div className="userselectioninfo">
-                    <span className="userselectionname">{user.name}</span>
-                    <span className="userselectionemail">{user.email}</span>
+                  <img src={user.avatar} alt={user.name} className="user-selection-avatar" />
+                  <div className="user-selection-info">
+                    <span className="user-selection-name">{user.name}</span>
+                    <span className="user-selection-email">{user.email}</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="infobox">
+          <div className="info-box">
             📌 La tarea se creará en la columna: <strong>{column}</strong>
           </div>
 
-          <div className="modalactions">
-            <button type="button" onClick={onClose} className="btnsecondary">
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="btn-secondary">
               Cancelar
             </button>
-            <button type="submit" className="btnprimary" disabled={loading}>
+            <button type="submit" className="btn-primary" disabled={loading}>
               {loading ? 'Creando...' : 'Crear Tarea'}
             </button>
           </div>
@@ -204,4 +204,3 @@ export default function CreateCardModal({ projectId, column, onClose }) {
     </div>
   );
 }
-

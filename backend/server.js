@@ -59,7 +59,7 @@ const io = new Server(httpServer, {
       }
       
       // Permitir cualquier IP local (192.168.x.x, 10.x.x.x, 172.x.x.x)
-      const localIpPattern = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[69]|2\d|3[01])\.\d+\.\d+):\d+$/;
+      const localIpPattern = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/;
       if (localIpPattern.test(origin)) {
         return callback(null, true);
       }
@@ -76,33 +76,33 @@ app.use(cors({
     // Permitir requests sin origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
     
-    console.log('🌐 CORS  Origen solicitado:', origin);
+    console.log('🌐 CORS - Origen solicitado:', origin);
     
     // Permitir si está en la lista
     if (allowedOrigins.includes(origin)) {
-      console.log('✅ CORS  Permitido (en lista)');
+      console.log('✅ CORS - Permitido (en lista)');
       return callback(null, true);
     }
     
     // Permitir cualquier IP local (192.168.x.x, 10.x.x.x, 172.x.x.x)
-    const localIpPattern = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[69]|2\d|3[01])\.\d+\.\d+):\d+$/;
+    const localIpPattern = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/;
     if (localIpPattern.test(origin)) {
-      console.log('✅ CORS  Permitido (IP local)');
+      console.log('✅ CORS - Permitido (IP local)');
       return callback(null, true);
     }
     
-    console.log('❌ CORS  Bloqueado');
+    console.log('❌ CORS - Bloqueado');
     callback(new Error('No permitido por CORS'));
   },
   credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); // Agregar cookieparser ANTES de las rutas
+app.use(cookieParser()); // Agregar cookie-parser ANTES de las rutas
 
 // Configurar sesión para Passport
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'nexussecretkey2024',
+  secret: process.env.SESSION_SECRET || 'nexus-secret-key-2024',
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -139,13 +139,13 @@ io.on('connection', (socket) => {
   console.log('✅ Usuario conectado:', socket.id);
 
   // Unirse al room del usuario para notificaciones personales
-  socket.on('joinuser', (userId) => {
-    socket.join(`user${userId}`);
-    console.log(`Usuario ${socket.id} unido a su room personal: user${userId}`);
+  socket.on('join-user', (userId) => {
+    socket.join(`user-${userId}`);
+    console.log(`Usuario ${socket.id} unido a su room personal: user-${userId}`);
   });
 
-  socket.on('joinproject', (projectId) => {
-    socket.join(`project${projectId}`);
+  socket.on('join-project', (projectId) => {
+    socket.join(`project-${projectId}`);
     console.log(`Usuario ${socket.id} unido al proyecto ${projectId}`);
   });
 
@@ -188,7 +188,7 @@ httpServer.listen(PORT, HOST, () => {
   console.log('\n📱 Acceso desde red local:');
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
-      // Skip over internal (i.e. 127.0.0.1) and nonIPv4 addresses
+      // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses
       const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
       if (net.family === familyV4Value && !net.internal) {
         console.log(`   http://${net.address}:${PORT}`);
@@ -197,4 +197,3 @@ httpServer.listen(PORT, HOST, () => {
   }
   console.log('');
 });
-

@@ -19,9 +19,9 @@ Cuando un usuario con una cuenta de Zoho asigna una tarea:
 
 ### ❌ Si el usuario NO tiene cuenta de Zoho:
 
- **NO se enviará email** 
- La tarea se crea/asigna normalmente
- Se muestra un mensaje en los logs:
+- **NO se enviará email** 
+- La tarea se crea/asigna normalmente
+- Se muestra un mensaje en los logs:
   ```
   ⚠️ Usuario sin cuenta de Zoho conectada
   💡 El usuario debe iniciar sesión con Zoho para enviar notificaciones
@@ -34,15 +34,15 @@ Cuando un usuario con una cuenta de Zoho asigna una tarea:
 Para que el sistema funcione correctamente, necesitas los siguientes scopes en tu aplicación de Zoho:
 
 ```
- openid                        (Autenticación)
- email                         (Obtener email del usuario)
- profile                       (Obtener información del perfil)
- ZohoMail.messages.CREATE      (Enviar correos desde Zoho Mail) ✨ NUEVO
+- openid                        (Autenticación)
+- email                         (Obtener email del usuario)
+- profile                       (Obtener información del perfil)
+- ZohoMail.messages.CREATE      (Enviar correos desde Zoho Mail) ✨ NUEVO
 ```
 
 ### Configuración en Zoho API Console:
 
-1. Ve a [Zoho API Console](https://apiconsole.zoho.com/)
+1. Ve a [Zoho API Console](https://api-console.zoho.com/)
 2. Selecciona tu aplicación
 3. Ve a **Client Secret** → **Scopes**
 4. Agrega el scope: `ZohoMail.messages.CREATE`
@@ -115,7 +115,7 @@ Cuando se envía un correo, verás logs como estos:
    Email: juan.perez@example.com
    Token Zoho: No disponible
 💡 El usuario debe iniciar sesión con Zoho para enviar notificaciones
-⚠️ María García no recibirá email  El usuario no tiene cuenta de Zoho conectada
+⚠️ María García no recibirá email - El usuario no tiene cuenta de Zoho conectada
 ```
 
 **❌ Token de Zoho expirado:**
@@ -124,10 +124,10 @@ Cuando se envía un correo, verás logs como estos:
 ❌ Error al enviar email desde Zoho Mail
    Error: Token de Zoho expirado
 🔄 El token de Zoho ha expirado. El usuario debe volver a iniciar sesión.
-⚠️ Token de Zoho expirado  El usuario debe volver a iniciar sesión con Zoho
+⚠️ Token de Zoho expirado - El usuario debe volver a iniciar sesión con Zoho
 ```
 
-## 🔄 Reautenticación de Usuarios
+## 🔄 Re-autenticación de Usuarios
 
 ### ⚠️ Si un usuario NO puede enviar notificaciones:
 
@@ -153,17 +153,17 @@ Significa que **debes iniciar sesión con Zoho** para poder enviar notificacione
 
 La plantilla de email incluye:
 
- **Encabezado con gradiente morado** (Nexus branding)
- **Tarjeta de tarea** con:
-   Título de la tarea
-   Fecha límite (formateada en español)
-   Prioridad con emojis (🟢 🟡 🔴)
-   Información del asignador
-   Proyecto (si aplica)
-   Descripción completa
- **Botón de acción** con enlace directo a la tarea
- **Diseño responsive** que se ve bien en todos los dispositivos
- **Versión de texto plano** como fallback
+- **Encabezado con gradiente morado** (Nexus branding)
+- **Tarjeta de tarea** con:
+  - Título de la tarea
+  - Fecha límite (formateada en español)
+  - Prioridad con emojis (🟢 🟡 🔴)
+  - Información del asignador
+  - Proyecto (si aplica)
+  - Descripción completa
+- **Botón de acción** con enlace directo a la tarea
+- **Diseño responsive** que se ve bien en todos los dispositivos
+- **Versión de texto plano** como fallback
 
 ## 🛠️ Troubleshooting
 
@@ -181,7 +181,7 @@ La plantilla de email incluye:
 
 **Causa**: El token de acceso ha caducado
 
-**Solución**: Reautenticarse con Zoho
+**Solución**: Re-autenticarse con Zoho
 
 ```
 1. Cerrar sesión
@@ -192,7 +192,7 @@ La plantilla de email incluye:
 ### Problema: "No se pudo enviar email desde Zoho Mail"
 
 **Causas posibles**:
-1. Token de Zoho inválido o expirado → Reautenticarse
+1. Token de Zoho inválido o expirado → Re-autenticarse
 2. Permisos insuficientes (falta `ZohoMail.messages.CREATE`) → Verificar scopes
 3. Cuenta de Zoho Mail no activada → Activar Zoho Mail
 4. API de Zoho Mail temporalmente no disponible → Reintentar más tarde
@@ -225,7 +225,7 @@ if (result.success) {
 } else {
   console.error('Error:', result.error);
   if (result.needsReauth) {
-    // Usuario necesita reautenticarse
+    // Usuario necesita re-autenticarse
   }
 }
 ```
@@ -249,7 +249,7 @@ const result = await sendTaskAssignmentEmail(
 // Respuesta incluye el método usado
 {
   success: true,
-  messageId: '<messageid>',
+  messageId: '<message-id>',
   recipient: 'maria.garcia@example.com',
   method: 'zoho'  // o 'smtp' si se usó fallback
 }
@@ -257,18 +257,18 @@ const result = await sendTaskAssignmentEmail(
 
 ## 📈 Próximas Mejoras
 
- [ ] **Refresh automático de tokens**: Usar refresh tokens para renovar tokens expirados
- [ ] **Dashboard de correos enviados**: Ver estadísticas de correos enviados por usuario
- [ ] **Plantillas personalizables**: Permitir a cada usuario personalizar sus plantillas
- [ ] **Firma de correo**: Agregar firma personalizada del usuario
- [ ] **CC y BCC**: Permitir copiar a otras personas
- [ ] **Adjuntos**: Adjuntar archivos a las notificaciones
+- [ ] **Refresh automático de tokens**: Usar refresh tokens para renovar tokens expirados
+- [ ] **Dashboard de correos enviados**: Ver estadísticas de correos enviados por usuario
+- [ ] **Plantillas personalizables**: Permitir a cada usuario personalizar sus plantillas
+- [ ] **Firma de correo**: Agregar firma personalizada del usuario
+- [ ] **CC y BCC**: Permitir copiar a otras personas
+- [ ] **Adjuntos**: Adjuntar archivos a las notificaciones
 
 ## 🔗 Enlaces Útiles
 
- [Zoho Mail API Documentation](https://www.zoho.com/mail/help/api/)
- [Zoho OAuth Scopes](https://www.zoho.com/accounts/protocol/oauth/scopes.html)
- [Zoho API Console](https://apiconsole.zoho.com/)
+- [Zoho Mail API Documentation](https://www.zoho.com/mail/help/api/)
+- [Zoho OAuth Scopes](https://www.zoho.com/accounts/protocol/oauth/scopes.html)
+- [Zoho API Console](https://api-console.zoho.com/)
 
 ## ✅ Resumen
 
@@ -277,14 +277,13 @@ const result = await sendTaskAssignmentEmail(
 **Requisito**: El usuario que asigna la tarea **debe** haber iniciado sesión con Zoho
 
 **Comportamiento**:
- ✅ Usuario CON Zoho → Email enviado desde su cuenta
- ⚠️ Usuario SIN Zoho → Email NO se envía (tarea se crea normalmente)
+- ✅ Usuario CON Zoho → Email enviado desde su cuenta
+- ⚠️ Usuario SIN Zoho → Email NO se envía (tarea se crea normalmente)
 
 **Ventaja principal**: Correos auténticos y personales desde la cuenta real del asignador
 
 **Sin necesidad de**: Configurar SMTP, contraseñas de email, o cuentas adicionales
 
-
+---
 
 **¿Preguntas o problemas?** Consulta los logs del servidor o contacta al equipo de desarrollo.
-

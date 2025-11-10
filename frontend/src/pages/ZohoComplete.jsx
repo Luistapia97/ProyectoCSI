@@ -1,6 +1,6 @@
-﻿import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'reactrouterdom';
-import { Mail, User } from 'lucidereact';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Mail, User } from 'lucide-react';
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import { getBackendURL } from '../services/api';
@@ -46,10 +46,10 @@ export default function ZohoComplete() {
       setAutoSubmitting(true);
       hasSubmittedRef.current = true;
       
-      // Autosubmit UNA SOLA VEZ
+      // Auto-submit UNA SOLA VEZ
       submitEmail(savedEmail, '');
     } else if (hasEmail && existingEmail && !existingEmail.includes('@temp.nexus.local')) {
-      // Si ya tiene un email real de Zoho, prellenar el formulario
+      // Si ya tiene un email real de Zoho, pre-llenar el formulario
       setFormData(prev => ({ ...prev, email: decodeURIComponent(existingEmail) }));
     }
   }, []); // Dependencias vacías para ejecutar solo una vez
@@ -119,9 +119,9 @@ export default function ZohoComplete() {
   };
 
   return (
-    <div className="authcontainer">
-      <div className="authcard">
-        <div className="authheader">
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
           <div style={{ 
             width: '64px', 
             height: '64px', 
@@ -133,7 +133,7 @@ export default function ZohoComplete() {
             margin: '0 auto 1rem'
           }}>
             <svg width="32" height="32" viewBox="0 0 20 20" fill="none">
-              <path d="M14.5 6H5.5L3 10l2.5 4h9l2.542.54z" fill="white"/>
+              <path d="M14.5 6H5.5L3 10l2.5 4h9l2.5-4-2.5-4z" fill="white"/>
               <path d="M10 7v6M7 10h6" stroke="#FF6B00" strokeWidth="1.5" strokeLinecap="round"/>
             </svg>
           </div>
@@ -171,13 +171,13 @@ export default function ZohoComplete() {
         )}
 
         {error && (
-          <div className="errormessage">
+          <div className="error-message">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="authform">
-          <div className="formgroup">
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="form-group">
             <label htmlFor="email">
               <Mail size={18} />
               Email de Zoho
@@ -192,7 +192,7 @@ export default function ZohoComplete() {
             />
           </div>
 
-          <div className="formgroup">
+          <div className="form-group">
             <label htmlFor="name">
               <User size={18} />
               Nombre completo (opcional)
@@ -206,12 +206,12 @@ export default function ZohoComplete() {
             />
           </div>
 
-          <button type="submit" className="btnprimary" disabled={loading}>
+          <button type="submit" className="btn-primary" disabled={loading}>
             {loading ? 'Completando registro...' : 'Completar registro'}
           </button>
         </form>
 
-        <div className="authfooter">
+        <div className="auth-footer">
           <p>
             ¿Quieres usar otra cuenta? <a href="/login">Volver al inicio</a>
           </p>
@@ -220,4 +220,3 @@ export default function ZohoComplete() {
     </div>
   );
 }
-

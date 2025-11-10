@@ -32,7 +32,7 @@ async function testCreateEvent() {
     // Buscar usuario con token de Zoho más reciente (ordenar por updatedAt)
     const user = await User.findOne({ 
       zohoAccessToken: { $exists: true, $ne: null }
-    }).sort({ updatedAt: 1 }); // Obtener el más reciente
+    }).sort({ updatedAt: -1 }); // Obtener el más reciente
 
     if (!user) {
       console.error('❌ No se encontró ningún usuario con token de Zoho');
@@ -57,12 +57,12 @@ async function testCreateEvent() {
         `${apiBase}/calendars`,
         {
           headers: {
-            'Authorization': `Zohooauthtoken ${accessToken}`,
+            'Authorization': `Zoho-oauthtoken ${accessToken}`,
           },
         }
       );
 
-      console.log('✅ Token válido  Calendarios obtenidos:', calendarsResponse.data.calendars.length);
+      console.log('✅ Token válido - Calendarios obtenidos:', calendarsResponse.data.calendars.length);
       calendarUid = calendarsResponse.data.calendars[0].uid;
       console.log('📆 Calendar UID:', calendarUid);
     } catch (error) {
@@ -71,7 +71,7 @@ async function testCreateEvent() {
       console.error('   Message:', error.response?.data?.error || error.message);
       
       if (error.response?.status === 401) {
-        console.error('\n⚠️  TOKEN EXPIRADO  Debes reautenticarte con Zoho');
+        console.error('\n⚠️  TOKEN EXPIRADO - Debes re-autenticarte con Zoho');
         console.error('   1. Abre http://localhost:5173');
         console.error('   2. Ejecuta: localStorage.clear()');
         console.error('   3. Haz clic en "Continuar con Zoho"');
@@ -92,11 +92,11 @@ async function testCreateEvent() {
     console.log('   Start:', startFormatted);
     console.log('   End:', endFormatted);
 
-    // MÉTODO 1: POST /api/v1/events (calendario predeterminado  MÁS SIMPLE)
+    // MÉTODO 1: POST /api/v1/events (calendario predeterminado - MÁS SIMPLE)
     const url1 = `${apiBase}/events`;
     const payload1 = {
       eventdata: {
-        title: '🧪 Test Nexus  Método 1 (Default Calendar)',
+        title: '🧪 Test Nexus - Método 1 (Default Calendar)',
         description: 'Prueba usando endpoint /events (calendario predeterminado)',
         dateandtime: {
           start: startFormatted,
@@ -115,8 +115,8 @@ async function testCreateEvent() {
     try {
       const response1 = await axios.post(url1, payload1, {
         headers: {
-          'Authorization': `Zohooauthtoken ${accessToken}`,
-          'ContentType': 'application/json',
+          'Authorization': `Zoho-oauthtoken ${accessToken}`,
+          'Content-Type': 'application/json',
         },
       });
       console.log('✅ MÉTODO 1 EXITOSO ✅');
@@ -138,7 +138,7 @@ async function testCreateEvent() {
       const url2 = `${apiBase}/calendars/${calendarUid}/events`;
       const payload2 = {
         eventdata: {
-          title: '🧪 Test Nexus  Método 2 (Specific Calendar)',
+          title: '🧪 Test Nexus - Método 2 (Specific Calendar)',
           description: 'Prueba usando endpoint /calendars/{uid}/events',
           dateandtime: {
             start: startFormatted,
@@ -158,8 +158,8 @@ async function testCreateEvent() {
       try {
         const response2 = await axios.post(url2, payload2, {
           headers: {
-            'Authorization': `Zohooauthtoken ${accessToken}`,
-            'ContentType': 'application/json',
+            'Authorization': `Zoho-oauthtoken ${accessToken}`,
+            'Content-Type': 'application/json',
           },
         });
         console.log('✅ MÉTODO 2 EXITOSO ✅');
@@ -181,7 +181,7 @@ async function testCreateEvent() {
     // MÉTODO 3: Sin wrapper "eventdata" (intentar formato alternativo)
     const url3 = `${apiBase}/events`;
     const payload3 = {
-      title: '🧪 Test Nexus  Método 3 (Sin wrapper)',
+      title: '🧪 Test Nexus - Método 3 (Sin wrapper)',
       description: 'Prueba sin wrapper eventdata',
       dateandtime: {
         start: startFormatted,
@@ -201,8 +201,8 @@ async function testCreateEvent() {
     try {
       const response3 = await axios.post(url3, payload3, {
         headers: {
-          'Authorization': `Zohooauthtoken ${accessToken}`,
-          'ContentType': 'application/json',
+          'Authorization': `Zoho-oauthtoken ${accessToken}`,
+          'Content-Type': 'application/json',
         },
       });
       console.log('✅ MÉTODO 3 EXITOSO ✅');
@@ -229,4 +229,3 @@ async function testCreateEvent() {
 }
 
 await testCreateEvent();
-

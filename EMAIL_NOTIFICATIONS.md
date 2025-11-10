@@ -10,10 +10,10 @@ El sistema Nexus envía notificaciones por correo electrónico cuando se asignan
 
 Los correos se envían **desde la cuenta de Zoho del usuario** que asigna la tarea, haciendo las notificaciones más personales y auténticas.
 
- ✅ Sin configuración adicional necesaria
- ✅ Correos enviados desde la cuenta real del asignador
- ✅ Mejor deliverability (menos spam)
- ✅ Respuestas directas al asignador
+- ✅ Sin configuración adicional necesaria
+- ✅ Correos enviados desde la cuenta real del asignador
+- ✅ Mejor deliverability (menos spam)
+- ✅ Respuestas directas al asignador
 
 👉 **Ver documentación completa**: [ZOHO_MAIL_NOTIFICATIONS.md](./ZOHO_MAIL_NOTIFICATIONS.md)
 
@@ -25,11 +25,11 @@ Este documento describe la configuración del **método SMTP fallback**.
 
 ## ✨ Características
 
- ✅ **Email de asignación de tarea**: Se envía automáticamente cuando se asigna una tarea a un usuario
- ✅ **Diseño profesional**: Emails con formato HTML responsive
- ✅ **Deep linking**: Enlaces directos a la tarea en la plataforma
- ✅ **Información completa**: Título, descripción, fecha límite, prioridad, asignador
- ✅ **Fallback de texto plano**: Para clientes de email que no soportan HTML
+- ✅ **Email de asignación de tarea**: Se envía automáticamente cuando se asigna una tarea a un usuario
+- ✅ **Diseño profesional**: Emails con formato HTML responsive
+- ✅ **Deep linking**: Enlaces directos a la tarea en la plataforma
+- ✅ **Información completa**: Título, descripción, fecha límite, prioridad, asignador
+- ✅ **Fallback de texto plano**: Para clientes de email que no soportan HTML
 
 ## 🔧 Configuración SMTP (Opcional)
 
@@ -76,7 +76,7 @@ EMAIL_PASSWORD=abcd efgh ijkl mnop  # Contraseña de aplicación
 
 ### 3. Otros Proveedores de Email
 
-#### SendGrid (Profesional  Recomendado para producción)
+#### SendGrid (Profesional - Recomendado para producción)
 
 ```env
 EMAIL_HOST=smtp.sendgrid.net
@@ -90,7 +90,7 @@ EMAIL_PASSWORD=TU_SENDGRID_API_KEY
 ```env
 EMAIL_HOST=smtp.mailgun.org
 EMAIL_PORT=587
-EMAIL_USER=postmaster@tudominio.mailgun.org
+EMAIL_USER=postmaster@tu-dominio.mailgun.org
 EMAIL_PASSWORD=TU_MAILGUN_PASSWORD
 ```
 
@@ -106,7 +106,7 @@ EMAIL_PASSWORD=tu_password_zepto
 #### Outlook/Hotmail
 
 ```env
-EMAIL_HOST=smtpmail.outlook.com
+EMAIL_HOST=smtp-mail.outlook.com
 EMAIL_PORT=587
 EMAIL_USER=tucuenta@outlook.com
 EMAIL_PASSWORD=tu_password
@@ -126,16 +126,16 @@ Cuando un administrador asigna una tarea a un usuario, el sistema:
 
 El email incluye:
 
- **Header atractivo** con gradiente morado
- **Tarjeta de tarea** con:
-   Título de la tarea
-   Fecha límite formateada
-   Prioridad con íconos (🟢 🟡 🔴)
-   Nombre y email del asignador
-   Proyecto (si aplica)
-   Descripción completa
- **Botón de acción** para ir directo a la tarea
- **Footer** con información del sistema
+- **Header atractivo** con gradiente morado
+- **Tarjeta de tarea** con:
+  - Título de la tarea
+  - Fecha límite formateada
+  - Prioridad con íconos (🟢 🟡 🔴)
+  - Nombre y email del asignador
+  - Proyecto (si aplica)
+  - Descripción completa
+- **Botón de acción** para ir directo a la tarea
+- **Footer** con información del sistema
 
 ### Ejemplo de Email
 
@@ -186,7 +186,7 @@ Si hay error:
 
 ### Probar Envío Manual
 
-Puedes crear un script de prueba en `backend/scripts/testemail.js`:
+Puedes crear un script de prueba en `backend/scripts/test-email.js`:
 
 ```javascript
 import { sendTaskAssignmentEmail } from '../utils/emailService.js';
@@ -217,7 +217,7 @@ console.log('Resultado:', result);
 Ejecutar:
 
 ```bash
-node scripts/testemail.js
+node scripts/test-email.js
 ```
 
 ## 📊 Logs
@@ -228,7 +228,7 @@ El sistema registra todas las operaciones de email:
 
 ```bash
 📧 Enviando notificaciones por email...
-✅ Email enviado: <messageid@gmail.com>
+✅ Email enviado: <message-id@gmail.com>
    Para: usuario@ejemplo.com
    Tarea: Implementar nueva funcionalidad
 ```
@@ -258,25 +258,25 @@ El sistema registra todas las operaciones de email:
 ### Límites de Envío
 
 #### Gmail
- **500 emails/día** (cuentas gratuitas)
- **2,000 emails/día** (Google Workspace)
+- **500 emails/día** (cuentas gratuitas)
+- **2,000 emails/día** (Google Workspace)
 
 #### SendGrid
- **100 emails/día** (plan gratuito)
- Ilimitados (planes pagos)
+- **100 emails/día** (plan gratuito)
+- Ilimitados (planes pagos)
 
 ## 🐛 Solución de Problemas
 
-### "Invalid login: 5355.7.8 Username and Password not accepted"
+### "Invalid login: 535-5.7.8 Username and Password not accepted"
 
 **Solución**: Usa contraseña de aplicación, no tu contraseña normal de Gmail.
 
 ### "Timeout connecting to server"
 
 **Soluciones**:
- Verifica el `EMAIL_HOST` y `EMAIL_PORT`
- Revisa tu firewall
- Prueba con puerto 465 (SSL) o 587 (TLS)
+- Verifica el `EMAIL_HOST` y `EMAIL_PORT`
+- Revisa tu firewall
+- Prueba con puerto 465 (SSL) o 587 (TLS)
 
 ### "Self signed certificate"
 
@@ -291,23 +291,23 @@ tls: {
 ### Emails van a SPAM
 
 **Soluciones**:
- Configura registros SPF y DKIM en tu dominio
- Usa un servicio profesional de emails transaccionales
- No uses palabras spam en el asunto
- Incluye botón de "darse de baja" (requisito legal)
+- Configura registros SPF y DKIM en tu dominio
+- Usa un servicio profesional de emails transaccionales
+- No uses palabras spam en el asunto
+- Incluye botón de "darse de baja" (requisito legal)
 
 ## 📈 Mejoras Futuras
 
 Posibles mejoras a implementar:
 
- [ ] **Notificaciones de recordatorio** (1 día antes de vencimiento)
- [ ] **Digest diario** (resumen de tareas pendientes)
- [ ] **Email de actualización** cuando cambia el estado
- [ ] **Plantillas personalizables** por proyecto
- [ ] **Preferencias de usuario** (frecuencia de emails)
- [ ] **Webhooks** para integración con otros sistemas
- [ ] **Analytics** de tasas de apertura y clics
- [ ] **Soporte multiidioma** en los emails
+- [ ] **Notificaciones de recordatorio** (1 día antes de vencimiento)
+- [ ] **Digest diario** (resumen de tareas pendientes)
+- [ ] **Email de actualización** cuando cambia el estado
+- [ ] **Plantillas personalizables** por proyecto
+- [ ] **Preferencias de usuario** (frecuencia de emails)
+- [ ] **Webhooks** para integración con otros sistemas
+- [ ] **Analytics** de tasas de apertura y clics
+- [ ] **Soporte multiidioma** en los emails
 
 ## 📝 Código de Ejemplo
 
@@ -332,12 +332,11 @@ if (result.success) {
 
 ## 🔗 Referencias
 
- [Nodemailer Documentation](https://nodemailer.com/)
- [SendGrid API](https://docs.sendgrid.com/)
- [Mailgun Documentation](https://documentation.mailgun.com/)
- [Gmail SMTP Settings](https://support.google.com/mail/answer/7126229)
+- [Nodemailer Documentation](https://nodemailer.com/)
+- [SendGrid API](https://docs.sendgrid.com/)
+- [Mailgun Documentation](https://documentation.mailgun.com/)
+- [Gmail SMTP Settings](https://support.google.com/mail/answer/7126229)
 
-
+---
 
 **¿Necesitas ayuda?** Contacta al equipo de desarrollo de Nexus.
-

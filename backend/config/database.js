@@ -20,7 +20,7 @@ const connectDB = async () => {
       console.error('3. Click en "ADD IP ADDRESS"');
       console.error('4. Click en "ALLOW ACCESS FROM ANYWHERE"');
       console.error('5. Click en "Confirm"');
-      console.error('6. Espera 12 minutos y reinicia el servidor\n');
+      console.error('6. Espera 1-2 minutos y reinicia el servidor\n');
     }
     
     console.error('========================================\n');
@@ -29,4 +29,3 @@ const connectDB = async () => {
 };
 
 export default connectDB;
-

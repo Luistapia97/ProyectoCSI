@@ -1,10 +1,10 @@
-﻿# 📧 Flujo de Notificación de Tareas  Explicación Completa
+﻿# 📧 Flujo de Notificación de Tareas - Explicación Completa
 
 ## 🔍 ¿Cómo sabe el sistema dónde enviar la notificación?
 
 El sistema obtiene automáticamente el **email del usuario** cuando se asigna una tarea. Aquí está el flujo completo:
 
-
+---
 
 ## 📊 Flujo Paso a Paso
 
@@ -23,7 +23,7 @@ Cuando creas una tarea, envías un array de IDs de usuarios asignados:
     "64user002...",  // ID de Juan
     "64user003..."   // ID de Pedro
   ],
-  "dueDate": "20251115",
+  "dueDate": "2025-11-15",
   "priority": "high"
 }
 ```
@@ -40,7 +40,7 @@ const task = await Task.create({
 });
 ```
 
-### **3. Populate  Obtención de Datos Completos** ⭐
+### **3. Populate - Obtención de Datos Completos** ⭐
 
 Aquí está la **magia**. El sistema usa `.populate()` de MongoDB para obtener la información completa de los usuarios:
 
@@ -84,7 +84,7 @@ assignedTo: [
 El sistema itera por cada usuario asignado y envía el email:
 
 ```javascript
-// Código actual en backend/routes/tasks.js (líneas 166183)
+// Código actual en backend/routes/tasks.js (líneas 166-183)
 for (const userId of assignedTo) {
   // Buscar el usuario completo en el array populado
   const assignedUser = populatedTask.assignedTo.find(
@@ -107,7 +107,7 @@ for (const userId of assignedTo) {
 }
 ```
 
-
+---
 
 ## 📋 Información del Usuario en Base de Datos
 
@@ -118,7 +118,7 @@ Cada usuario en MongoDB tiene estos campos (modelo User.js):
   _id: "64user001...",
   name: "María García",
   email: "maria.garcia@example.com",  // ← Este campo se usa para enviar el email
-  avatar: "https://uiavatars.com/api/?name=Maria+Garcia",
+  avatar: "https://ui-avatars.com/api/?name=Maria+Garcia",
   role: "usuario",
   
   // Si tiene cuenta de Zoho
@@ -129,7 +129,7 @@ Cada usuario en MongoDB tiene estos campos (modelo User.js):
 }
 ```
 
-
+---
 
 ## 🎯 ¿De Dónde Sale el Email del Usuario?
 
@@ -159,7 +159,7 @@ const user = await User.create({
 Cuando un usuario inicia sesión con Zoho:
 
 ```javascript
-// Backend: passport.js (líneas 6090)
+// Backend: passport.js (líneas 60-90)
 // Zoho devuelve el token ID con la información del usuario
 const decoded = jwt.decode(params.id_token);
 const userEmail = decoded.email;  // ← Email de la cuenta de Zoho
@@ -185,7 +185,7 @@ if (!user) {
 const userEmail = googleProfile.email;
 ```
 
-
+---
 
 ## 🔄 Ejemplo Completo de Flujo
 
@@ -265,12 +265,12 @@ Método: SMTP (no tiene cuenta Zoho)
    Tarea: Revisar documentación
 
 📧 Enviando email usando SMTP...
-✅ Email enviado: <messageid>
+✅ Email enviado: <message-id>
    Para: pedro.lopez@gmail.com
    Tarea: Revisar documentación
 ```
 
-
+---
 
 ## 🛠️ ¿Qué Pasa Si...?
 
@@ -304,11 +304,11 @@ El email se actualiza cuando:
 1. El usuario edita su perfil (si implementado)
 2. Vuelve a hacer login con OAuth (actualiza automáticamente)
 
-
+---
 
 ## 📝 Código Relevante
 
-### 1. Populate en tasks.js (línea 145147):
+### 1. Populate en tasks.js (línea 145-147):
 ```javascript
 const populatedTask = await Task.findById(task._id)
   .populate('assignedTo', 'name email avatar')
@@ -322,7 +322,7 @@ const assignedUser = populatedTask.assignedTo.find(
 );
 ```
 
-### 3. Enviar email (línea 171174):
+### 3. Enviar email (línea 171-174):
 ```javascript
 const emailResult = await sendTaskAssignmentEmail(
   populatedTask,  // Tarea completa
@@ -331,7 +331,7 @@ const emailResult = await sendTaskAssignmentEmail(
 );
 ```
 
-
+---
 
 ## ✅ Resumen
 
@@ -345,19 +345,19 @@ const emailResult = await sendTaskAssignmentEmail(
 4. **Envía el correo** a ese email usando Zoho Mail o SMTP
 
 **El email siempre viene de la base de datos**, donde se guardó cuando el usuario:
- Se registró manualmente (ingresó su email)
- Inició sesión con Zoho (Zoho proporcionó su email)
- Inició sesión con Google (Google proporcionó su email)
+- Se registró manualmente (ingresó su email)
+- Inició sesión con Zoho (Zoho proporcionó su email)
+- Inició sesión con Google (Google proporcionó su email)
 
-**No necesitas configurar nada adicional**  el sistema ya tiene toda la información que necesita. ✨
+**No necesitas configurar nada adicional** - el sistema ya tiene toda la información que necesita. ✨
 
-
+---
 
 ## 🎓 Conceptos Clave
 
- **Populate**: Función de MongoDB que "rellena" referencias con objetos completos
- **ObjectId**: ID único que referencia a otro documento en MongoDB
- **Schema Reference**: Define qué campos traer cuando se hace populate
+- **Populate**: Función de MongoDB que "rellena" referencias con objetos completos
+- **ObjectId**: ID único que referencia a otro documento en MongoDB
+- **Schema Reference**: Define qué campos traer cuando se hace populate
 
 ```javascript
 // Definición en Task.js
@@ -366,4 +366,3 @@ assignedTo: [{
   ref: 'User'  // ← Indica que debe buscar en la colección User
 }]
 ```
-

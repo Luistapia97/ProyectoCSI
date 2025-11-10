@@ -1,4 +1,4 @@
-﻿# 📖 Guía de Uso  Nexus
+﻿# 📖 Guía de Uso - Nexus
 
 ## 🚀 Primeros Pasos
 
@@ -7,9 +7,9 @@
 **Opción 1: Email y Contraseña**
 1. Ve a http://localhost:5173/register
 2. Ingresa:
-    Nombre completo
-    Email
-    Contraseña (mínimo 6 caracteres)
+   - Nombre completo
+   - Email
+   - Contraseña (mínimo 6 caracteres)
 3. Click en "Crear cuenta"
 4. Serás redirigido automáticamente al Dashboard
 
@@ -31,12 +31,12 @@
 ### Ver tus Proyectos
 
 El Dashboard muestra todos tus proyectos en tarjetas con:
- 🎨 **Color** identificador
- 📝 **Nombre** y descripción
- 🏷️ **Etiquetas** (máximo 3 visibles)
- 📈 **Estadísticas**: Total tareas, Completadas, Progreso %
- 📊 **Barra de progreso** visual
- 👥 **Miembros** del proyecto (avatares)
+- 🎨 **Color** identificador
+- 📝 **Nombre** y descripción
+- 🏷️ **Etiquetas** (máximo 3 visibles)
+- 📈 **Estadísticas**: Total tareas, Completadas, Progreso %
+- 📊 **Barra de progreso** visual
+- 👥 **Miembros** del proyecto (avatares)
 
 ### Crear un Nuevo Proyecto
 
@@ -53,17 +53,17 @@ El Dashboard muestra todos tus proyectos en tarjetas con:
 
 ### Acceder a un Proyecto
 
- **Click** en cualquier tarjeta de proyecto
- Serás llevado al tablero Kanban del proyecto
+- **Click** en cualquier tarjeta de proyecto
+- Serás llevado al tablero Kanban del proyecto
 
 ## 📋 Tablero Kanban
 
 ### Estructura del Tablero
 
 Por defecto, cada proyecto tiene 3 columnas:
-1. **Pendiente** 🔵  Tareas por hacer
-2. **En Progreso** 🟡  Tareas activas
-3. **Completado** 🟢  Tareas terminadas
+1. **Pendiente** 🔵 - Tareas por hacer
+2. **En Progreso** 🟡 - Tareas activas
+3. **Completado** 🟢 - Tareas terminadas
 
 ### Crear una Tarea
 
@@ -88,8 +88,8 @@ Por defecto, cada proyecto tiene 3 columnas:
 4. ¡La tarea cambia de columna automáticamente!
 
 **Método 2: Dentro de la misma columna**
- Arrastra hacia arriba o abajo para reordenar
- La posición se guarda automáticamente
+- Arrastra hacia arriba o abajo para reordenar
+- La posición se guarda automáticamente
 
 ### Ver Detalles de una Tarea
 
@@ -97,17 +97,17 @@ Por defecto, cada proyecto tiene 3 columnas:
 2. Se abre un modal con dos secciones:
 
 **Sección Principal (Izquierda):**
- 📝 Descripción completa
- ☑️ Subtareas con checkboxes
- 💬 Comentarios tipo chat
+- 📝 Descripción completa
+- ☑️ Subtareas con checkboxes
+- 💬 Comentarios tipo chat
 
 **Sección Lateral (Derecha):**
- ✓ Botón "Completar/Marcar pendiente"
- 🚩 Prioridad
- 📅 Fecha límite
- 🏷️ Etiquetas
- ✏️ Botón "Editar"
- 🗑️ Botón "Eliminar"
+- ✓ Botón "Completar/Marcar pendiente"
+- 🚩 Prioridad
+- 📅 Fecha límite
+- 🏷️ Etiquetas
+- ✏️ Botón "Editar"
+- 🗑️ Botón "Eliminar"
 
 ## ✅ Gestión de Tareas
 
@@ -116,10 +116,10 @@ Por defecto, cada proyecto tiene 3 columnas:
 1. Abre la tarea (click en la tarjeta)
 2. Click en **"Editar tarea"** (sidebar derecho)
 3. Modifica los campos que necesites:
-    Título
-    Descripción
-    Prioridad
-    Fecha límite
+   - Título
+   - Descripción
+   - Prioridad
+   - Fecha límite
 4. Click en **"Guardar cambios"**
 
 ### Agregar Subtareas
@@ -135,9 +135,9 @@ Por defecto, cada proyecto tiene 3 columnas:
 
 ### Marcar Subtareas
 
- **Click** en el checkbox junto a cada subtarea
- Se marca como completada (tachado)
- El contador se actualiza automáticamente
+- **Click** en el checkbox junto a cada subtarea
+- Se marca como completada (tachado)
+- El contador se actualiza automáticamente
 
 ### Completar una Tarea
 
@@ -169,10 +169,10 @@ Por defecto, cada proyecto tiene 3 columnas:
 
 ### Características de Comentarios
 
- ⚡ **Tiempo Real**  Los comentarios aparecen al instante
- 👤 **Avatar**  Identifica quién comentó
- 🕐 **Timestamp**  Hora y fecha del comentario
- 💬 **Chat Style**  Diseño tipo mensajería
+- ⚡ **Tiempo Real** - Los comentarios aparecen al instante
+- 👤 **Avatar** - Identifica quién comentó
+- 🕐 **Timestamp** - Hora y fecha del comentario
+- 💬 **Chat Style** - Diseño tipo mensajería
 
 ## 👥 Colaboración
 
@@ -184,10 +184,10 @@ La funcionalidad está en el código backend, para activarla:
 2. Sección "Miembros"
 3. Ingresa el email del usuario
 4. Selecciona el rol:
-    **Owner**  Control total
-    **Admin**  Gestión completa
-    **Member**  Editar y comentar
-    **Guest**  Solo ver y comentar
+   - **Owner** - Control total
+   - **Admin** - Gestión completa
+   - **Member** - Editar y comentar
+   - **Guest** - Solo ver y comentar
 5. Click en "Agregar"
 
 ### Asignar Tareas a Usuarios
@@ -209,39 +209,39 @@ La funcionalidad está en el código backend, para activarla:
 ### Colores de Proyectos
 
 Al crear o editar un proyecto:
- Elige entre 8 colores predefinidos
- El color aparece como indicador en el Dashboard y Board
+- Elige entre 8 colores predefinidos
+- El color aparece como indicador en el Dashboard y Board
 
 ### Etiquetas Personalizadas
 
- Usa etiquetas para categorizar proyectos y tareas
- Formato: palabras separadas por comas
- Ejemplos: "urgente, marketing, diseño"
+- Usa etiquetas para categorizar proyectos y tareas
+- Formato: palabras separadas por comas
+- Ejemplos: "urgente, marketing, diseño"
 
 ## 🔍 Tips y Trucos
 
 ### Productividad
 
 1. **Prioridades**: Usa los colores para identificar rápidamente:
-    🟢 Baja  Puede esperar
-    🟡 Media  Normal
-    🟠 Alta  Importante
-    🔴 Urgente  ¡Hazlo ya!
+   - 🟢 Baja - Puede esperar
+   - 🟡 Media - Normal
+   - 🟠 Alta - Importante
+   - 🔴 Urgente - ¡Hazlo ya!
 
 2. **Subtareas**: Divide tareas grandes en pasos pequeños
-    ☑️ Más fácil de seguir
-    ☑️ Sensación de progreso
-    ☑️ Menos abrumador
+   - ☑️ Más fácil de seguir
+   - ☑️ Sensación de progreso
+   - ☑️ Menos abrumador
 
 3. **Fechas Límite**: Establece fechas realistas
-    📅 Tareas vencidas se marcan en rojo
-    ⏰ Planifica con anticipación
+   - 📅 Tareas vencidas se marcan en rojo
+   - ⏰ Planifica con anticipación
 
 4. **Comentarios**: Usa para:
-    💭 Aclaraciones
-    📎 Enlaces y recursos
-    👍 Feedback
-    📝 Notas importantes
+   - 💭 Aclaraciones
+   - 📎 Enlaces y recursos
+   - 👍 Feedback
+   - 📝 Notas importantes
 
 ### Organización
 
@@ -251,26 +251,26 @@ Al crear o editar un proyecto:
    ```
 
 2. **Un Proyecto = Un Objetivo**: 
-    No mezcles temas no relacionados
-    Crea proyectos separados
+   - No mezcles temas no relacionados
+   - Crea proyectos separados
 
 3. **Revisa Regularmente**:
-    Actualiza el progreso diariamente
-    Mueve tareas completadas
-    Limpia tareas viejas
+   - Actualiza el progreso diariamente
+   - Mueve tareas completadas
+   - Limpia tareas viejas
 
 4. **Etiquetas Consistentes**:
-    Usa las mismas etiquetas en proyectos relacionados
-    Ejemplos: #frontend, #backend, #diseño, #urgente
+   - Usa las mismas etiquetas en proyectos relacionados
+   - Ejemplos: #frontend, #backend, #diseño, #urgente
 
 ## ⌨️ Atajos (Próximamente)
 
 Atajos de teclado planeados:
- `N`  Nueva tarea
- `P`  Nuevo proyecto
- `Esc`  Cerrar modal
- `/`  Buscar
- `C`  Comentar
+- `N` - Nueva tarea
+- `P` - Nuevo proyecto
+- `Esc` - Cerrar modal
+- `/` - Buscar
+- `C` - Comentar
 
 ## 🐛 Solución de Problemas
 
@@ -303,10 +303,10 @@ Atajos de teclado planeados:
 ### Responsive Design
 
 Nexus funciona en móviles:
- 📱 Tarjetas apiladas verticalmente
- 👆 Scroll horizontal para columnas
- 🤏 Touch para drag & drop
- 📐 Interfaz adaptada
+- 📱 Tarjetas apiladas verticalmente
+- 👆 Scroll horizontal para columnas
+- 🤏 Touch para drag & drop
+- 📐 Interfaz adaptada
 
 ### Recomendaciones Móviles
 
@@ -350,11 +350,10 @@ Etiquetas: #tutorial, #proyecto, #revisión
 
 ## 📞 Ayuda Adicional
 
- 📖 Lee el [README.md](README.md) para detalles técnicos
- 🚀 Consulta [INICIO_RAPIDO.md](INICIO_RAPIDO.md) para instalación
- 🎨 Revisa [GUIA_VISUAL.md](GUIA_VISUAL.md) para el diseño
+- 📖 Lee el [README.md](README.md) para detalles técnicos
+- 🚀 Consulta [INICIO_RAPIDO.md](INICIO_RAPIDO.md) para instalación
+- 🎨 Revisa [GUIA_VISUAL.md](GUIA_VISUAL.md) para el diseño
 
-
+---
 
 **¡Disfruta gestionando tus proyectos con Nexus!** 🚀✨
-

@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: 'https://uiavatars.com/api/?background=random&name=User',
+    default: 'https://ui-avatars.com/api/?background=random&name=User',
   },
   role: {
     type: String,
@@ -108,4 +108,3 @@ userSchema.methods.toPublicJSON = function() {
 const User = mongoose.model('User', userSchema);
 
 export default User;
-

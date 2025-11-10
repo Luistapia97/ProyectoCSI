@@ -1,7 +1,7 @@
-﻿import { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell } from 'lucidereact';
-import { format, parseISO } from 'datefns';
-import { es } from 'datefns/locale';
+import { useState, useEffect } from 'react';
+import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { es } from 'date-fns/locale';
 import useTaskStore from '../store/taskStore';
 import useAuthStore from '../store/authStore';
 import { authAPI, tasksAPI } from '../services/api';
@@ -193,30 +193,30 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const isAdmin = user?.role === 'administrador';
 
   return (
-    <div className="modaloverlay" onClick={onClose}>
-      <div className="modalcontent modallarge" onClick={(e) => e.stopPropagation()}>
-        <div className="modalheader">
-          <div className="modaltitlesection">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title-section">
             {editing ? (
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="titleinput"
+                className="title-input"
               />
             ) : (
               <h2>{task.title}</h2>
             )}
           </div>
-          <button onClick={onClose} className="modalclose">
+          <button onClick={onClose} className="modal-close">
             <X size={24} />
           </button>
         </div>
 
-        <div className="modalbodysplit">
-          <div className="modalmaincontent">
+        <div className="modal-body-split">
+          <div className="modal-main-content">
             {/* Descripción */}
-            <div className="detailsection">
+            <div className="detail-section">
               <h3>Descripción</h3>
               {editing ? (
                 <textarea
@@ -231,26 +231,26 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
             </div>
 
             {/* Subtareas */}
-            <div className="detailsection">
+            <div className="detail-section">
               <h3>
                 <CheckSquare size={18} />
                 Subtareas ({task.subtasks?.filter(st => st.completed).length || 0}/{task.subtasks?.length || 0})
               </h3>
-              <div className="subtaskslist">
+              <div className="subtasks-list">
                 {task.subtasks?.map((subtask, index) => (
-                  <div key={index} className="subtaskitem">
+                  <div key={index} className="subtask-item">
                     <input
                       type="checkbox"
                       checked={subtask.completed}
                       onChange={() => handleToggleSubtask(index)}
                     />
-                    <span className={subtask.completed ? 'completedsubtask' : ''}>
+                    <span className={subtask.completed ? 'completed-subtask' : ''}>
                       {subtask.title}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="addsubtask">
+              <div className="add-subtask">
                 <input
                   type="text"
                   placeholder="Agregar subtarea..."
@@ -258,38 +258,38 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   onChange={(e) => setNewSubtask(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddSubtask()}
                 />
-                <button onClick={handleAddSubtask} className="btniconsmall">
+                <button onClick={handleAddSubtask} className="btn-icon-small">
                   <Plus size={18} />
                 </button>
               </div>
             </div>
 
             {/* Comentarios */}
-            <div className="detailsection">
+            <div className="detail-section">
               <h3>Comentarios ({comments.length})</h3>
-              <div className="commentssection">
-                <div className="commentslist">
+              <div className="comments-section">
+                <div className="comments-list">
                   {comments.map((comment) => {
                     const isAuthor = comment.user._id === user?._id;
                     const canDelete = isAuthor || isAdmin;
                     const isEditing = editingCommentId === comment._id;
 
                     return (
-                      <div key={comment._id} className="commentitem">
-                        <img src={comment.user.avatar} alt={comment.user.name} className="commentavatar" />
-                        <div className="commentcontent">
-                          <div className="commentheader">
-                            <span className="commentauthor">{comment.user.name}</span>
-                            <span className="commentdate">
+                      <div key={comment._id} className="comment-item">
+                        <img src={comment.user.avatar} alt={comment.user.name} className="comment-avatar" />
+                        <div className="comment-content">
+                          <div className="comment-header">
+                            <span className="comment-author">{comment.user.name}</span>
+                            <span className="comment-date">
                               {format(new Date(comment.createdAt), 'dd MMM HH:mm', { locale: es })}
                               {comment.edited && ' (editado)'}
                             </span>
                             {(isAuthor || canDelete) && (
-                              <div className="commentactions">
+                              <div className="comment-actions">
                                 {isAuthor && !isEditing && (
                                   <button 
                                     onClick={() => handleStartEditComment(comment)}
-                                    className="btnicontiny"
+                                    className="btn-icon-tiny"
                                     title="Editar comentario"
                                   >
                                     <Edit2 size={14} />
@@ -298,7 +298,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                                 {canDelete && !isEditing && (
                                   <button 
                                     onClick={() => handleDeleteComment(comment._id)}
-                                    className="btnicontiny btndanger"
+                                    className="btn-icon-tiny btn-danger"
                                     title="Eliminar comentario"
                                   >
                                     <Trash2 size={14} />
@@ -308,7 +308,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                             )}
                           </div>
                           {isEditing ? (
-                            <div className="commenteditform">
+                            <div className="comment-edit-form">
                               <input
                                 type="text"
                                 value={editingCommentText}
@@ -322,39 +322,39 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                                 }}
                                 autoFocus
                               />
-                              <div className="commenteditbuttons">
+                              <div className="comment-edit-buttons">
                                 <button 
                                   onClick={() => handleSaveEditComment(comment._id)}
-                                  className="btnicontiny btnsuccess"
+                                  className="btn-icon-tiny btn-success"
                                   disabled={!editingCommentText.trim()}
                                 >
                                   <Check size={14} />
                                 </button>
                                 <button 
                                   onClick={handleCancelEditComment}
-                                  className="btnicontiny"
+                                  className="btn-icon-tiny"
                                 >
                                   <X size={14} />
                                 </button>
                               </div>
                             </div>
                           ) : (
-                            <p className="commenttext">{comment.content}</p>
+                            <p className="comment-text">{comment.content}</p>
                           )}
                         </div>
                       </div>
                     );
                   })}
                 </div>
-                <form onSubmit={handleAddComment} className="commentform">
-                  <img src={user?.avatar} alt={user?.name} className="commentavatar" />
+                <form onSubmit={handleAddComment} className="comment-form">
+                  <img src={user?.avatar} alt={user?.name} className="comment-avatar" />
                   <input
                     type="text"
                     placeholder="Escribe un comentario..."
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                   />
-                  <button type="submit" className="btniconsmall" disabled={!newComment.trim()}>
+                  <button type="submit" className="btn-icon-small" disabled={!newComment.trim()}>
                     <Send size={18} />
                   </button>
                 </form>
@@ -362,23 +362,23 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
             </div>
           </div>
 
-          <div className="modalsidebar">
+          <div className="modal-sidebar">
             {/* Acciones */}
-            <div className="sidebarsection">
+            <div className="sidebar-section">
               {/* Estado de validación */}
               {task.pendingValidation && (
-                <div className="validationstatus pending">
+                <div className="validation-status pending">
                   <CheckCircle size={18} />
                   <span>Pendiente de validación</span>
                 </div>
               )}
               
               {task.completed && task.validatedBy && (
-                <div className="validationstatus approved">
+                <div className="validation-status approved">
                   <CheckCircle size={18} />
                   <span>Validado por {task.validatedBy.name}</span>
                   {task.validationComment && (
-                    <p className="validationcomment">"{task.validationComment}"</p>
+                    <p className="validation-comment">"{task.validationComment}"</p>
                   )}
                 </div>
               )}
@@ -387,7 +387,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
               {!task.completed && !task.pendingValidation && (
                 <button
                   onClick={handleRequestValidation}
-                  className="btnprimary"
+                  className="btn-primary"
                   title="Solicitar validación al administrador"
                   disabled={loading}
                 >
@@ -400,7 +400,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 <>
                   <button
                     onClick={() => setShowValidationModal(true)}
-                    className="btnsuccess"
+                    className="btn-success"
                     disabled={loading}
                   >
                     <CheckCircle size={18} />
@@ -408,7 +408,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   </button>
                   <button
                     onClick={() => handleValidateTask(false)}
-                    className="btnwarning"
+                    className="btn-warning"
                     disabled={loading}
                   >
                     <XCircle size={18} />
@@ -419,10 +419,10 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
             </div>
 
             {/* Detalles */}
-            <div className="sidebarsection">
+            <div className="sidebar-section">
               <h4>Detalles</h4>
               
-              <div className="detailitem">
+              <div className="detail-item">
                 <label>
                   <Flag size={16} />
                   Prioridad
@@ -438,11 +438,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                     <option value="urgente">Urgente</option>
                   </select>
                 ) : (
-                  <span className={`prioritybadge priority${task.priority}`}>{task.priority}</span>
+                  <span className={`priority-badge priority-${task.priority}`}>{task.priority}</span>
                 )}
               </div>
 
-              <div className="detailitem">
+              <div className="detail-item">
                 <label>
                   <Calendar size={16} />
                   Fecha límite
@@ -460,48 +460,48 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       const dateStr = task.dueDate.includes('T') 
                         ? task.dueDate.split('T')[0] 
                         : task.dueDate;
-                      const [year, month, day] = dateStr.split('');
+                      const [year, month, day] = dateStr.split('-');
                       // Crear fecha en formato local sin conversión UTC
-                      return format(new Date(year, month  1, day), 'dd MMM yyyy', { locale: es });
+                      return format(new Date(year, month - 1, day), 'dd MMM yyyy', { locale: es });
                     })() : 'Sin fecha'}
                   </span>
                 )}
               </div>
 
               {task.tags && task.tags.length > 0 && (
-                <div className="detailitem">
+                <div className="detail-item">
                   <label>
                     <Tag size={16} />
                     Etiquetas
                   </label>
-                  <div className="tagsdisplay">
+                  <div className="tags-display">
                     {task.tags.map((tag, index) => (
-                      <span key={index} className="detailtag">{tag}</span>
+                      <span key={index} className="detail-tag">{tag}</span>
                     ))}
                   </div>
                 </div>
               )}
 
               {/* Usuarios asignados */}
-              <div className="detailitem">
+              <div className="detail-item">
                 <label>
                   <Users size={16} />
                   Asignados ({task.assignedTo?.length || 0})
                 </label>
-                <div className="assigneduserslist">
+                <div className="assigned-users-list">
                   {task.assignedTo && task.assignedTo.length > 0 ? (
                     task.assignedTo.map((assignedUser) => (
-                      <div key={assignedUser._id} className="assigneduseritem">
+                      <div key={assignedUser._id} className="assigned-user-item">
                         <img 
                           src={assignedUser.avatar} 
                           alt={assignedUser.name} 
-                          className="assigneduseravatar"
+                          className="assigned-user-avatar"
                         />
-                        <span className="assignedusername">{assignedUser.name}</span>
+                        <span className="assigned-user-name">{assignedUser.name}</span>
                         {isAdmin && (
                           <button
                             onClick={() => handleAssignUser(assignedUser._id)}
-                            className="btnremoveuser"
+                            className="btn-remove-user"
                             title="Quitar usuario"
                           >
                             <X size={14} />
@@ -510,13 +510,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       </div>
                     ))
                   ) : (
-                    <p className="noassignedusers">Sin usuarios asignados</p>
+                    <p className="no-assigned-users">Sin usuarios asignados</p>
                   )}
                 </div>
                 {isAdmin && (
                   <button
                     onClick={() => setShowUserSelector(!showUserSelector)}
-                    className="btnadduser"
+                    className="btn-add-user"
                   >
                     <UserPlus size={16} />
                     Asignar usuario
@@ -525,26 +525,26 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 
                 {/* Selector de usuarios */}
                 {showUserSelector && isAdmin && (
-                  <div className="userselector">
+                  <div className="user-selector">
                     {availableUsers.map((availableUser) => {
                       const isAssigned = task.assignedTo?.some(u => u._id === availableUser._id);
                       return (
                         <div
                           key={availableUser._id}
-                          className={`useroption ${isAssigned ? 'assigned' : ''}`}
+                          className={`user-option ${isAssigned ? 'assigned' : ''}`}
                           onClick={() => handleAssignUser(availableUser._id)}
                         >
                           <img 
                             src={availableUser.avatar} 
                             alt={availableUser.name} 
-                            className="useroptionavatar"
+                            className="user-option-avatar"
                           />
-                          <div className="useroptioninfo">
-                            <span className="useroptionname">{availableUser.name}</span>
-                            <span className="useroptionemail">{availableUser.email}</span>
+                          <div className="user-option-info">
+                            <span className="user-option-name">{availableUser.name}</span>
+                            <span className="user-option-email">{availableUser.email}</span>
                           </div>
                           {isAssigned && (
-                            <Check size={16} className="useroptioncheck" />
+                            <Check size={16} className="user-option-check" />
                           )}
                         </div>
                       );
@@ -556,27 +556,27 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
             </div>
 
             {/* Botones de acción */}
-            <div className="sidebaractions">
+            <div className="sidebar-actions">
               {editing ? (
                 <>
-                  <button onClick={handleUpdate} className="btnprimary">
+                  <button onClick={handleUpdate} className="btn-primary">
                     Guardar cambios
                   </button>
-                  <button onClick={() => setEditing(false)} className="btnsecondary">
+                  <button onClick={() => setEditing(false)} className="btn-secondary">
                     Cancelar
                   </button>
                 </>
               ) : (
-                <button onClick={() => setEditing(true)} className="btnsecondary">
+                <button onClick={() => setEditing(true)} className="btn-secondary">
                   Editar tarea
                 </button>
               )}
               
-              {/* Botón de recordatorio  disponible para todos los usuarios */}
+              {/* Botón de recordatorio - disponible para todos los usuarios */}
               {task.assignedTo && task.assignedTo.length > 0 && (
                 <button 
                   onClick={handleSendReminder} 
-                  className="btnsecondary"
+                  className="btn-secondary"
                   disabled={loading}
                   title="Enviar recordatorio a los usuarios asignados"
                 >
@@ -585,7 +585,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </button>
               )}
 
-              <button onClick={handleDelete} className="btndanger">
+              <button onClick={handleDelete} className="btn-danger">
                 <Trash2 size={18} />
                 Eliminar tarea
               </button>
@@ -595,8 +595,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
 
         {/* Modal de validación */}
         {showValidationModal && (
-          <div className="validationmodaloverlay" onClick={() => setShowValidationModal(false)}>
-            <div className="validationmodal" onClick={(e) => e.stopPropagation()}>
+          <div className="validation-modal-overlay" onClick={() => setShowValidationModal(false)}>
+            <div className="validation-modal" onClick={(e) => e.stopPropagation()}>
               <h3>Validar tarea</h3>
               <p>¿Deseas aprobar esta tarea como completada?</p>
               <textarea
@@ -605,10 +605,10 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 onChange={(e) => setValidationComment(e.target.value)}
                 rows="3"
               />
-              <div className="validationmodalbuttons">
+              <div className="validation-modal-buttons">
                 <button
                   onClick={() => handleValidateTask(true)}
-                  className="btnsuccess"
+                  className="btn-success"
                   disabled={loading}
                 >
                   <CheckCircle size={18} />
@@ -616,7 +616,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </button>
                 <button
                   onClick={() => setShowValidationModal(false)}
-                  className="btnsecondary"
+                  className="btn-secondary"
                   disabled={loading}
                 >
                   Cancelar
@@ -629,4 +629,3 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     </div>
   );
 }
-

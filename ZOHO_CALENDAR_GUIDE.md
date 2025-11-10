@@ -4,23 +4,23 @@
 
 He creado un sistema completo de sincronización con Zoho Calendar. Aquí está todo lo que necesitas saber:
 
-
+---
 
 ## 🎯 Características Implementadas
 
 ### **Backend:**
- ✅ Servicio de Zoho Calendar (`backend/services/zohoCalendar.js`)
- ✅ Endpoints API para conectar/desconectar cuenta
- ✅ Sincronización de tareas con eventos de calendario
- ✅ Obtener, crear, actualizar y eliminar eventos
+- ✅ Servicio de Zoho Calendar (`backend/services/zohoCalendar.js`)
+- ✅ Endpoints API para conectar/desconectar cuenta
+- ✅ Sincronización de tareas con eventos de calendario
+- ✅ Obtener, crear, actualizar y eliminar eventos
 
 ### **Frontend:**
- ✅ Página de configuración (`/settings`)
- ✅ Componente de integración de Zoho
- ✅ Interfaz para conectar cuenta con token
- ✅ Estado de conexión visual
+- ✅ Página de configuración (`/settings`)
+- ✅ Componente de integración de Zoho
+- ✅ Interfaz para conectar cuenta con token
+- ✅ Estado de conexión visual
 
-
+---
 
 ## 🚀 Cómo Usar
 
@@ -35,25 +35,25 @@ He creado un sistema completo de sincronización con Zoho Calendar. Aquí está 
 
 ### **Paso 2: Obtén tu Token de Zoho**
 
-#### **Método Actualizado  Self Client OAuth**
+#### **Método Actualizado - Self Client OAuth**
 
 1. **Ve a la Consola de API de Zoho:**
    ```
-   https://apiconsole.zoho.com/
+   https://api-console.zoho.com/
    ```
 
 2. **Crea un Self Client:**
-    Click en **"Add Client"**
-    Selecciona **"Self Client"**
-    Client Name: `Nexus Calendar`
-    Click en **"Create"**
+   - Click en **"Add Client"**
+   - Selecciona **"Self Client"**
+   - Client Name: `Nexus Calendar`
+   - Click en **"Create"**
 
 3. **Genera el código de autorización:**
-    Una vez creado, verás el **Client ID** y **Client Secret**
-    Haz click en el botón **"Generate Code"** (o "Generate Token")
-    **Selecciona el scope:** `ZohoCalendar.calendar.ALL`
-    **Tiempo de validez:** Elige el máximo disponible (10 minutos)
-    Click en **"Generate"**
+   - Una vez creado, verás el **Client ID** y **Client Secret**
+   - Haz click en el botón **"Generate Code"** (o "Generate Token")
+   - **Selecciona el scope:** `ZohoCalendar.calendar.ALL`
+   - **Tiempo de validez:** Elige el máximo disponible (10 minutos)
+   - Click en **"Generate"**
 
 4. **Copia el código generado** (es un código temporal)
 
@@ -70,7 +70,7 @@ He creado un sistema completo de sincronización con Zoho Calendar. Aquí está 
        grant_type = "authorization_code"
    }
    
-   InvokeRestMethod Uri "https://accounts.zoho.com/oauth/v2/token" Method POST Body $body
+   Invoke-RestMethod -Uri "https://accounts.zoho.com/oauth/v2/token" -Method POST -Body $body
    ```
 
    **Opción B: Desde la consola de Zoho**
@@ -79,9 +79,9 @@ He creado un sistema completo de sincronización con Zoho Calendar. Aquí está 
 
 6. **Copia el Access Token** que comienza con `1000.xxxxxx...`
 
+---
 
-
-#### **Método Alternativo  URL Directa**
+#### **Método Alternativo - URL Directa**
 
 Si lo anterior no funciona, usa este método directo:
 
@@ -110,7 +110,7 @@ Si lo anterior no funciona, usa este método directo:
 
 Ahora tu cuenta está conectada y lista para sincronizar eventos.
 
-
+---
 
 ## 📊 Endpoints API Disponibles
 
@@ -118,7 +118,7 @@ Ahora tu cuenta está conectada y lista para sincronizar eventos.
 ```http
 POST /api/zoho/connect
 Authorization: Bearer {tu_token_jwt}
-ContentType: application/json
+Content-Type: application/json
 
 {
   "accessToken": "1000.xxxxxxxxxxxxx",
@@ -128,15 +128,15 @@ ContentType: application/json
 
 ### **2. Obtener Eventos**
 ```http
-GET /api/zoho/events?startDate=20250101&endDate=20251231
+GET /api/zoho/events?startDate=2025-01-01&endDate=2025-12-31
 Authorization: Bearer {tu_token_jwt}
 ```
 
 ### **3. Sincronizar Tarea**
 ```http
-POST /api/zoho/synctask
+POST /api/zoho/sync-task
 Authorization: Bearer {tu_token_jwt}
-ContentType: application/json
+Content-Type: application/json
 
 {
   "taskId": "task_id_here"
@@ -149,7 +149,7 @@ DELETE /api/zoho/disconnect
 Authorization: Bearer {tu_token_jwt}
 ```
 
-
+---
 
 ## 🔧 Próximos Pasos (Opcional)
 
@@ -164,23 +164,23 @@ Mostrar los eventos de Zoho Calendar directamente en el dashboard.
 ### **3. Notificaciones**
 Recibir notificaciones cuando se acerque una fecha límite.
 
-
+---
 
 ## 🐛 Solución de Problemas
 
 ### **"Token inválido o expirado"**
- Genera un nuevo token en Zoho
- Asegúrate de usar los scopes correctos: `ZohoCalendar.calendar.ALL`
+- Genera un nuevo token en Zoho
+- Asegúrate de usar los scopes correctos: `ZohoCalendar.calendar.ALL`
 
 ### **"No hay cuenta de Zoho conectada"**
- Primero conecta tu cuenta desde `/settings`
- Verifica que el token se guardó correctamente
+- Primero conecta tu cuenta desde `/settings`
+- Verifica que el token se guardó correctamente
 
 ### **"Error al sincronizar"**
- Verifica que tu cuenta de Zoho tenga acceso a Calendar
- Revisa que el token tenga permisos suficientes
+- Verifica que tu cuenta de Zoho tenga acceso a Calendar
+- Revisa que el token tenga permisos suficientes
 
-
+---
 
 ## 📝 Ejemplo de Uso Completo
 
@@ -190,7 +190,7 @@ Recibir notificaciones cuando se acerque una fecha límite.
 // 1. Crear un evento directamente
 const createEvent = async () => {
   const response = await axios.post(
-    'http://localhost:5000/api/zoho/synctask',
+    'http://localhost:5000/api/zoho/sync-task',
     {
       taskId: 'tu_task_id'
     },
@@ -207,7 +207,7 @@ const createEvent = async () => {
 // 2. Obtener eventos
 const getEvents = async () => {
   const response = await axios.get(
-    'http://localhost:5000/api/zoho/events?startDate=20250101&endDate=20251231',
+    'http://localhost:5000/api/zoho/events?startDate=2025-01-01&endDate=2025-12-31',
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -219,7 +219,7 @@ const getEvents = async () => {
 };
 ```
 
-
+---
 
 ## ✅ Resumen
 
@@ -236,7 +236,6 @@ const getEvents = async () => {
 2. Conecta tu cuenta de Zoho con un token
 3. ¡Empieza a sincronizar!
 
-
+---
 
 ¿Necesitas ayuda adicional o quieres agregar más funcionalidades? 🚀
-

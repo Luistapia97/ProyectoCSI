@@ -2,8 +2,8 @@
 
 ## ✅ Estado Actual de los Servidores
 
- ✅ **Backend**: http://localhost:5000  Corriendo con correcciones aplicadas
- ✅ **Frontend**: http://localhost:5173  Corriendo
+- ✅ **Backend**: http://localhost:5000 - Corriendo con correcciones aplicadas
+- ✅ **Frontend**: http://localhost:5173 - Corriendo
 
 ## 📋 Pasos a Seguir (EN ORDEN)
 
@@ -12,10 +12,10 @@
 1. Abre http://localhost:5173
 2. Si ya estás logueado, haz clic en tu avatar/menú
 3. Selecciona **"Cerrar Sesión"** o borra el localStorage:
-    Presiona F12 (Developer Tools)
-    Ve a la pestaña "Console"
-    Escribe: `localStorage.clear()` y presiona Enter
-    Recarga la página (F5)
+   - Presiona F12 (Developer Tools)
+   - Ve a la pestaña "Console"
+   - Escribe: `localStorage.clear()` y presiona Enter
+   - Recarga la página (F5)
 
 ### 2️⃣ Iniciar Sesión con Zoho
 
@@ -23,10 +23,10 @@
 2. Haz clic en el botón **"Continuar con Zoho"** (no uses email/contraseña)
 3. Serás redirigido a la página de autorización de Zoho
 4. **IMPORTANTE**: Autoriza la aplicación, acepta los permisos solicitados:
-    ✅ OpenID
-    ✅ Email
-    ✅ Profile
-    ✅ ZohoCalendar.calendar.ALL (permiso de calendario)
+   - ✅ OpenID
+   - ✅ Email
+   - ✅ Profile
+   - ✅ ZohoCalendar.calendar.ALL (permiso de calendario)
 
 ### 3️⃣ Verificación
 
@@ -40,8 +40,8 @@ Después de iniciar sesión, verifica que todo funciona:
    ```
 
 2. **En el frontend**:
-    Deberías estar en el dashboard
-    Tu email de Zoho debería aparecer en el perfil
+   - Deberías estar en el dashboard
+   - Tu email de Zoho debería aparecer en el perfil
 
 ### 4️⃣ Probar Sincronización de Calendar
 
@@ -49,11 +49,11 @@ Después de iniciar sesión, verifica que todo funciona:
 
 1. Ve a un proyecto
 2. Crea una nueva tarea:
-    ✅ Dale un título: "Prueba Zoho Calendar"
-    ✅ Agrégale descripción
-    ✅ **IMPORTANTE**: Establece una fecha de vencimiento (ej: mañana)
-    ✅ Asígnate a ti mismo
-    ✅ Guarda la tarea
+   - ✅ Dale un título: "Prueba Zoho Calendar"
+   - ✅ Agrégale descripción
+   - ✅ **IMPORTANTE**: Establece una fecha de vencimiento (ej: mañana)
+   - ✅ Asígnate a ti mismo
+   - ✅ Guarda la tarea
 
 3. **Verifica en la consola del backend**:
    ```
@@ -63,9 +63,9 @@ Después de iniciar sesión, verifica que todo funciona:
    ```
 
 4. **Ve a tu Zoho Calendar**:
-    Abre https://calendar.zoho.com
-    Busca el evento "📋 Prueba Zoho Calendar"
-    ¡Debería estar ahí!
+   - Abre https://calendar.zoho.com
+   - Busca el evento "📋 Prueba Zoho Calendar"
+   - ¡Debería estar ahí!
 
 #### Opción B: Verificar el Botón de Calendar
 
@@ -86,21 +86,21 @@ Después de iniciar sesión, verifica que todo funciona:
 **Causa**: Zoho no está enviando el refresh token
 
 **Solución**:
-1. Ve a https://apiconsole.zoho.com/
+1. Ve a https://api-console.zoho.com/
 2. Selecciona tu aplicación: "Proyecto Nexus"
-3. Verifica que el tipo sea "Serverbased Application"
+3. Verifica que el tipo sea "Server-based Application"
 4. Asegúrate que los scopes incluyan:
-    `ZohoCalendar.calendar.ALL`
-    `openid`
-    `email`
-    `profile`
+   - `ZohoCalendar.calendar.ALL`
+   - `openid`
+   - `email`
+   - `profile`
 
 ### ❌ Problema: "Invalid OAuth token"
 
 **Causa**: El token guardado ya expiró
 
 **Solución**:
- Vuelve a hacer el proceso de login con Zoho (pasos 13)
+- Vuelve a hacer el proceso de login con Zoho (pasos 1-3)
 
 ### ❌ Problema: El botón sigue diciendo "No conectado"
 
@@ -114,7 +114,7 @@ console.log('Token guardado:', !!token);
 
 // Luego verifica en el backend con el script:
 cd backend
-node scripts/checkusers.js
+node scripts/check-users.js
 ```
 
 Deberías ver:
@@ -147,7 +147,7 @@ Para verificar que TODO está funcionando:
 ```bash
 # 1. Verifica usuario en la base de datos
 cd backend
-node scripts/checkusers.js
+node scripts/check-users.js
 
 # Deberías ver:
 # ✅ Zoho Access Token: Sí
@@ -155,7 +155,7 @@ node scripts/checkusers.js
 # ✅ Auth Provider: zoho
 
 # 2. Prueba la API directamente
-node scripts/testcalendarsync.js
+node scripts/test-calendar-sync.js
 
 # Deberías ver:
 # ✅ Evento creado exitosamente en Zoho Calendar!
@@ -173,13 +173,12 @@ Si todo funciona correctamente, deberías:
 
 ## 📝 Notas Importantes
 
- **Solo usuarios con Zoho conectado** reciben eventos en su calendar
- **Solo tareas con fecha de vencimiento** generan eventos
- **La sincronización es automática**  no necesitas hacer nada manual
- **Cada usuario asignado** obtiene su propio evento privado
- **Los refresh tokens** permiten renovar los access tokens cuando expiran
+- **Solo usuarios con Zoho conectado** reciben eventos en su calendar
+- **Solo tareas con fecha de vencimiento** generan eventos
+- **La sincronización es automática** - no necesitas hacer nada manual
+- **Cada usuario asignado** obtiene su propio evento privado
+- **Los refresh tokens** permiten renovar los access tokens cuando expiran
 
+---
 
-
-**¡Listo para probar!** Sigue los pasos 14 y deberías ver tus tareas en Zoho Calendar 🎊
-
+**¡Listo para probar!** Sigue los pasos 1-4 y deberías ver tus tareas en Zoho Calendar 🎊

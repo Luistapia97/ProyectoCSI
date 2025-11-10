@@ -1,32 +1,32 @@
-﻿# 🔐 Sistema de Registro Separado  Admins y Usuarios
+﻿# 🔐 Sistema de Registro Separado - Admins y Usuarios
 
 ## ✅ Implementación Completada
 
 Se ha implementado un sistema de registro completamente separado con las siguientes características:
 
-
+---
 
 ## 🎯 Características Principales
 
 ### 1. **Registro de Administradores (Máximo 3)**
- ✅ Ruta exclusiva: `/registeradmin`
- ✅ Requiere **código secreto** de administrador
- ✅ Límite de **3 administradores** en total
- ✅ Muestra contador de espacios disponibles
- ✅ Validación de código en backend
+- ✅ Ruta exclusiva: `/register-admin`
+- ✅ Requiere **código secreto** de administrador
+- ✅ Límite de **3 administradores** en total
+- ✅ Muestra contador de espacios disponibles
+- ✅ Validación de código en backend
 
 ### 2. **Registro de Usuarios (Ilimitado)**
- ✅ Ruta estándar: `/register`
- ✅ Sin límite de usuarios
- ✅ No requiere código especial
- ✅ Acceso simplificado
+- ✅ Ruta estándar: `/register`
+- ✅ Sin límite de usuarios
+- ✅ No requiere código especial
+- ✅ Acceso simplificado
 
 ### 3. **Base de Datos Limpia**
- ✅ Script para borrar todos los usuarios
- ✅ Ejecutado exitosamente
- ✅ Listo para empezar desde cero
+- ✅ Script para borrar todos los usuarios
+- ✅ Ejecutado exitosamente
+- ✅ Listo para empezar desde cero
 
-
+---
 
 ## 🚀 Cómo Usar el Sistema
 
@@ -35,10 +35,10 @@ Se ha implementado un sistema de registro completamente separado con las siguien
 1. **Abre la aplicación**: http://localhost:5173
 2. **Ve a Login** y click en "Registro de Admin"
 3. **Completa el formulario**:
-    Nombre
-    Email
-    Contraseña
-    **Código de Admin**: `NEXUS2025`
+   - Nombre
+   - Email
+   - Contraseña
+   - **Código de Admin**: `NEXUS2025`
 4. Click en "Registrar Administrador"
 
 **Límite**: Solo se pueden registrar **3 administradores**.
@@ -49,20 +49,20 @@ NEXUS2025
 ```
 *Este código está configurado en `backend/.env` como `ADMIN_REGISTRATION_CODE`*
 
-
+---
 
 ### 👤 Paso 2: Registrar Usuarios
 
 1. **Ve a Login** y click en "Regístrate como Usuario"
 2. **Completa el formulario**:
-    Nombre
-    Email
-    Contraseña
+   - Nombre
+   - Email
+   - Contraseña
 3. Click en "Crear cuenta"
 
 **Sin límite**: Puedes crear usuarios ilimitados.
 
-
+---
 
 ## 📁 Archivos Creados/Modificados
 
@@ -70,55 +70,55 @@ NEXUS2025
 
 #### Backend:
 1. **`backend/scripts/clearUsers.js`**
-    Script para eliminar todos los usuarios de la BD
-    Útil para reiniciar el sistema
+   - Script para eliminar todos los usuarios de la BD
+   - Útil para reiniciar el sistema
 
 #### Frontend:
 1. **`frontend/src/pages/RegisterAdmin.jsx`**
-    Página exclusiva de registro para administradores
-    Muestra contador de espacios disponibles (X/3)
-    Campo para código secreto
-    Validación en tiempo real
+   - Página exclusiva de registro para administradores
+   - Muestra contador de espacios disponibles (X/3)
+   - Campo para código secreto
+   - Validación en tiempo real
 
-
+---
 
 ### 📝 Archivos Modificados
 
 #### Backend:
 1. **`backend/routes/auth.js`**
-    Nueva ruta: `POST /api/auth/registeradmin`
-      Valida código de administrador
-      Verifica límite de 3 admins
-      Crea admin con rol 'administrador'
-    Ruta modificada: `POST /api/auth/register`
-      Ahora solo crea usuarios regulares
-      Rol fijo: 'usuario'
-    Nueva ruta: `GET /api/auth/admincount`
-      Devuelve cantidad de admins registrados
-      Muestra espacios disponibles
+   - Nueva ruta: `POST /api/auth/register-admin`
+     - Valida código de administrador
+     - Verifica límite de 3 admins
+     - Crea admin con rol 'administrador'
+   - Ruta modificada: `POST /api/auth/register`
+     - Ahora solo crea usuarios regulares
+     - Rol fijo: 'usuario'
+   - Nueva ruta: `GET /api/auth/admin-count`
+     - Devuelve cantidad de admins registrados
+     - Muestra espacios disponibles
 
 2. **`backend/.env`**
-    Nueva variable: `ADMIN_REGISTRATION_CODE=NEXUS2025`
+   - Nueva variable: `ADMIN_REGISTRATION_CODE=NEXUS2025`
 
 #### Frontend:
 1. **`frontend/src/services/api.js`**
-    Nuevo endpoint: `registerAdmin(data)`
-    Nuevo endpoint: `getAdminCount()`
+   - Nuevo endpoint: `registerAdmin(data)`
+   - Nuevo endpoint: `getAdminCount()`
 
 2. **`frontend/src/store/authStore.js`**
-    Nueva función: `registerAdmin(userData)`
+   - Nueva función: `registerAdmin(userData)`
 
 3. **`frontend/src/App.jsx`**
-    Nueva ruta: `/registeradmin`
+   - Nueva ruta: `/register-admin`
 
 4. **`frontend/src/pages/Register.jsx`**
-    Eliminado mensaje de "primer usuario = admin"
-    Agregado enlace a registro de admin
+   - Eliminado mensaje de "primer usuario = admin"
+   - Agregado enlace a registro de admin
 
 5. **`frontend/src/pages/Login.jsx`**
-    Agregado enlace a registro de admin
+   - Agregado enlace a registro de admin
 
-
+---
 
 ## 🔒 Seguridad Implementada
 
@@ -145,10 +145,10 @@ NEXUS2025
    ```
 
 3. **Rol Fijo por Endpoint**
-    `/register` → Siempre crea 'usuario'
-    `/registeradmin` → Siempre crea 'administrador' (con validaciones)
+   - `/register` → Siempre crea 'usuario'
+   - `/register-admin` → Siempre crea 'administrador' (con validaciones)
 
-
+---
 
 ## 🎨 Interfaz de Usuario
 
@@ -202,14 +202,14 @@ NEXUS2025
 └──────────────────────────────────────────┘
 ```
 
-
+---
 
 ## 📊 Flujo de Registro
 
 ### Flujo Admin
 
 ```
-Usuario → /registeradmin
+Usuario → /register-admin
     ↓
 Completa formulario + Código
     ↓
@@ -238,13 +238,13 @@ Retorna token
 Redirect a Dashboard (vista limitada)
 ```
 
-
+---
 
 ## 🧪 Pruebas
 
 ### Test 1: Registrar Primer Admin
 ```bash
-1. Ir a: http://localhost:5173/registeradmin
+1. Ir a: http://localhost:5173/register-admin
 2. Llenar formulario
 3. Código: NEXUS2025
 4. ✅ Debería crear admin 1/3
@@ -278,7 +278,7 @@ Redirect a Dashboard (vista limitada)
 3. ❌ Debería mostrar: "Código de administrador incorrecto"
 ```
 
-
+---
 
 ## 🔧 Configuración
 
@@ -309,7 +309,7 @@ cd backend
 node scripts/clearUsers.js
 ```
 
-
+---
 
 ## 📡 Endpoints API
 
@@ -317,7 +317,7 @@ node scripts/clearUsers.js
 
 ```bash
 # Registrar administrador
-POST /api/auth/registeradmin
+POST /api/auth/register-admin
 Body: {
   "name": "Admin Principal",
   "email": "admin@empresa.com",
@@ -345,7 +345,7 @@ Response: {
 }
 
 # Obtener cantidad de admins
-GET /api/auth/admincount
+GET /api/auth/admin-count
 Response: {
   "success": true,
   "count": 2,
@@ -354,69 +354,69 @@ Response: {
 }
 ```
 
-
+---
 
 ## ✅ Ventajas del Sistema
 
 1. **Separación Clara**
-    Admins y usuarios tienen procesos de registro distintos
-    No hay confusión sobre qué tipo de cuenta crear
+   - Admins y usuarios tienen procesos de registro distintos
+   - No hay confusión sobre qué tipo de cuenta crear
 
 2. **Seguridad**
-    Solo quien tiene el código puede crear admins
-    Límite previene creación masiva de admins
+   - Solo quien tiene el código puede crear admins
+   - Límite previene creación masiva de admins
 
 3. **Control**
-    Máximo 3 administradores garantiza gobernanza
-    Usuarios ilimitados para escalar el equipo
+   - Máximo 3 administradores garantiza gobernanza
+   - Usuarios ilimitados para escalar el equipo
 
 4. **Flexibilidad**
-    Código configurable por empresa
-    Límite ajustable según necesidades
+   - Código configurable por empresa
+   - Límite ajustable según necesidades
 
 5. **UX Mejorada**
-    Contador en tiempo real (X/3 disponibles)
-    Mensajes claros de validación
-    Enlaces cruzados entre registros
+   - Contador en tiempo real (X/3 disponibles)
+   - Mensajes claros de validación
+   - Enlaces cruzados entre registros
 
-
+---
 
 ## 🎯 Casos de Uso
 
 ### Caso 1: Empresa Pequeña
- **3 fundadores** → Registran como admins
- **10 empleados** → Registran como usuarios
- Admins gestionan proyectos, usuarios ejecutan
+- **3 fundadores** → Registran como admins
+- **10 empleados** → Registran como usuarios
+- Admins gestionan proyectos, usuarios ejecutan
 
 ### Caso 2: Agencia
- **Director + 2 Project Managers** → Admins
- **Diseñadores, devs, etc.** → Usuarios
- Jerarquía clara de responsabilidades
+- **Director + 2 Project Managers** → Admins
+- **Diseñadores, devs, etc.** → Usuarios
+- Jerarquía clara de responsabilidades
 
 ### Caso 3: Startup
- **CTO + 2 leads técnicos** → Admins
- **Developers junior/mid** → Usuarios
- Control sobre arquitectura y tareas
+- **CTO + 2 leads técnicos** → Admins
+- **Developers junior/mid** → Usuarios
+- Control sobre arquitectura y tareas
 
-
+---
 
 ## 🚀 Estado Actual
 
 ✅ **Sistema completamente funcional**
- Backend con validaciones robustas
- Frontend con UI intuitiva
- Base de datos limpia y lista
- Documentación completa
+- Backend con validaciones robustas
+- Frontend con UI intuitiva
+- Base de datos limpia y lista
+- Documentación completa
 
 ### URLs Disponibles
 
- **Frontend**: http://localhost:5173
- **Backend**: http://localhost:5000
- **Login**: http://localhost:5173/login
- **Registro Usuario**: http://localhost:5173/register
- **Registro Admin**: http://localhost:5173/registeradmin
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:5000
+- **Login**: http://localhost:5173/login
+- **Registro Usuario**: http://localhost:5173/register
+- **Registro Admin**: http://localhost:5173/register-admin
 
-
+---
 
 ## 🎊 ¡Listo para Usar!
 
@@ -429,9 +429,8 @@ El sistema está **100% operativo**. Puedes:
 
 **¡Empieza creando tu primer administrador!** 🚀
 
-
+---
 
 **Fecha de implementación**: 23 de octubre de 2025  
 **Versión**: 2.0.0  
 **Estado**: ✅ Producción
-

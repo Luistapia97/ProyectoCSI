@@ -35,12 +35,12 @@ const checkZohoScopes = async () => {
             'https://tasks.zoho.com/api/v1/tasks',
             {
               headers: {
-                'Authorization': `Zohooauthtoken ${user.zohoAccessToken}`
+                'Authorization': `Zoho-oauthtoken ${user.zohoAccessToken}`
               }
             }
           );
           
-          console.log(`   ✅ Token válido  Acceso a Zoho Tasks: OK`);
+          console.log(`   ✅ Token válido - Acceso a Zoho Tasks: OK`);
           console.log(`   📋 Tareas en Zoho: ${tasksResponse.data?.tasks?.length || 0}`);
           
         } catch (error) {
@@ -52,9 +52,9 @@ const checkZohoScopes = async () => {
             console.log(`   💡 Solución: Habilitar scope ZohoTasks.tasks.ALL en Zoho API Console`);
           } else if (error.response?.status === 403) {
             console.log(`   ❌ Sin permisos para Zoho Tasks`);
-            console.log(`   💡 Solución: Reautenticar con el scope ZohoTasks.tasks.ALL`);
+            console.log(`   💡 Solución: Re-autenticar con el scope ZohoTasks.tasks.ALL`);
           } else {
-            console.log(`   ⚠️ Error: ${error.response?.status}  ${error.message}`);
+            console.log(`   ⚠️ Error: ${error.response?.status} - ${error.message}`);
           }
         }
 
@@ -66,12 +66,12 @@ const checkZohoScopes = async () => {
             `https://mail.zoho.com/api/accounts/${user.email}/tasks`,
             {
               headers: {
-                'Authorization': `Zohooauthtoken ${user.zohoAccessToken}`
+                'Authorization': `Zoho-oauthtoken ${user.zohoAccessToken}`
               }
             }
           );
           
-          console.log(`   ✅ Token válido  Acceso a Zoho Mail Tasks: OK`);
+          console.log(`   ✅ Token válido - Acceso a Zoho Mail Tasks: OK`);
           console.log(`   📧 Tareas en Zoho Mail: ${mailTasksResponse.data?.data?.length || 0}`);
           
         } catch (error) {
@@ -83,9 +83,9 @@ const checkZohoScopes = async () => {
             console.log(`   💡 Solución: Habilitar scope ZohoMail.tasks.ALL en Zoho API Console`);
           } else if (error.response?.status === 403) {
             console.log(`   ❌ Sin permisos para Zoho Mail Tasks`);
-            console.log(`   💡 Solución: Reautenticar con el scope ZohoMail.tasks.ALL`);
+            console.log(`   💡 Solución: Re-autenticar con el scope ZohoMail.tasks.ALL`);
           } else {
-            console.log(`   ⚠️ Error Mail Tasks: ${error.response?.status}  ${error.message}`);
+            console.log(`   ⚠️ Error Mail Tasks: ${error.response?.status} - ${error.message}`);
           }
         }
       }
@@ -95,9 +95,9 @@ const checkZohoScopes = async () => {
     await mongoose.connection.close();
     console.log('\n✅ Verificación completada');
     console.log('\n📚 Documentación:');
-    console.log('    Zoho Tasks: https://www.zoho.com/tasks/help/api/');
-    console.log('    Zoho Mail Tasks: https://www.zoho.com/mail/help/api/');
-    console.log('    OAuth Scopes: https://www.zoho.com/accounts/protocol/oauth/scopes.html');
+    console.log('   - Zoho Tasks: https://www.zoho.com/tasks/help/api/');
+    console.log('   - Zoho Mail Tasks: https://www.zoho.com/mail/help/api/');
+    console.log('   - OAuth Scopes: https://www.zoho.com/accounts/protocol/oauth/scopes.html');
 
   } catch (error) {
     console.error('❌ Error:', error.message);
@@ -106,4 +106,3 @@ const checkZohoScopes = async () => {
 };
 
 checkZohoScopes();
-

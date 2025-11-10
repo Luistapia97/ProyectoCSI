@@ -50,7 +50,7 @@ async function testCalendarSync() {
     dueDate.setDate(dueDate.getDate() + 3); // 3 días en el futuro
     
     const task = await Task.create({
-      title: 'Tarea de Prueba  Sincronización Zoho Calendar',
+      title: 'Tarea de Prueba - Sincronización Zoho Calendar',
       description: 'Esta es una tarea de prueba para verificar la sincronización automática con Zoho Calendar',
       project: project._id,
       column: 'Pendiente',
@@ -93,9 +93,9 @@ async function testCalendarSync() {
       console.log('📋 Detalles del evento:');
       updatedTask.zohoCalendarEventIds.forEach((event, index) => {
         console.log(`   Evento ${index + 1}:`);
-        console.log(`    Usuario ID: ${event.userId}`);
-        console.log(`    Event ID: ${event.eventId}`);
-        console.log(`    Link: ${event.eventLink || 'N/A'}`);
+        console.log(`   - Usuario ID: ${event.userId}`);
+        console.log(`   - Event ID: ${event.eventId}`);
+        console.log(`   - Link: ${event.eventLink || 'N/A'}`);
       });
       console.log('');
       console.log('🎉 Revisa tu calendario de Zoho para ver el evento!');
@@ -120,4 +120,3 @@ console.log('='.repeat(50));
 console.log('');
 
 testCalendarSync();
-

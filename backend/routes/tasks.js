@@ -5,15 +5,15 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
-// Zoho Tasks desactivado  API no disponible públicamente
+// Zoho Tasks desactivado - API no disponible públicamente
 // import { syncTaskToZoho, updateZohoTask, deleteZohoTask, completeZohoTask } from '../middleware/zohoTasksSync.js';
 
 const router = express.Router();
 
-// @route   POST /api/tasks/testreminders/24h
+// @route   POST /api/tasks/test-reminders/24h
 // @desc    Ejecutar verificación de recordatorios de 24h manualmente (testing)
 // @access  Private
-router.post('/testreminders/24h', protect, async (req, res) => {
+router.post('/test-reminders/24h', protect, async (req, res) => {
   try {
     const reminderService = req.app.get('reminderService');
     if (!reminderService) {
@@ -28,10 +28,10 @@ router.post('/testreminders/24h', protect, async (req, res) => {
   }
 });
 
-// @route   POST /api/tasks/testreminders/1h
+// @route   POST /api/tasks/test-reminders/1h
 // @desc    Ejecutar verificación de recordatorios de 1h manualmente (testing)
 // @access  Private
-router.post('/testreminders/1h', protect, async (req, res) => {
+router.post('/test-reminders/1h', protect, async (req, res) => {
   try {
     const reminderService = req.app.get('reminderService');
     if (!reminderService) {
@@ -46,10 +46,10 @@ router.post('/testreminders/1h', protect, async (req, res) => {
   }
 });
 
-// @route   POST /api/tasks/testreminders/overdue
+// @route   POST /api/tasks/test-reminders/overdue
 // @desc    Ejecutar verificación de tareas vencidas manualmente (testing)
 // @access  Private
-router.post('/testreminders/overdue', protect, async (req, res) => {
+router.post('/test-reminders/overdue', protect, async (req, res) => {
   try {
     const reminderService = req.app.get('reminderService');
     if (!reminderService) {
@@ -64,10 +64,10 @@ router.post('/testreminders/overdue', protect, async (req, res) => {
   }
 });
 
-// @route   GET /api/tasks/pendingvalidation
+// @route   GET /api/tasks/pending-validation
 // @desc    Obtener tareas pendientes de validaciÃ³n (solo administradores)
 // @access  Private (Admin only)
-router.get('/pendingvalidation', protect, isAdmin, async (req, res) => {
+router.get('/pending-validation', protect, isAdmin, async (req, res) => {
   try {
     const tasks = await Task.find({
       pendingValidation: true,
@@ -76,7 +76,7 @@ router.get('/pendingvalidation', protect, isAdmin, async (req, res) => {
       .populate('assignedTo', 'name email avatar')
       .populate('createdBy', 'name email avatar')
       .populate('project', 'name')
-      .sort({ updatedAt: 1 });
+      .sort({ updatedAt: -1 });
 
     res.json({ success: true, tasks, count: tasks.length });
   } catch (error) {
@@ -218,13 +218,13 @@ router.post('/', protect, isAdmin, async (req, res) => {
       // Emitir notificaciones por Socket.IO a cada usuario
       const io = req.app.get('io');
       createdNotifications.forEach(notification => {
-        io.to(`user${notification.user}`).emit('notification', notification);
+        io.to(`user-${notification.user}`).emit('notification', notification);
       });
     }
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${project}`).emit('taskcreated', { task: populatedTask });
+    io.to(`project-${project}`).emit('task-created', { task: populatedTask });
 
     // Responder inmediatamente (Zoho Tasks sync desactivado)
     res.status(201).json({ 
@@ -370,7 +370,7 @@ router.put('/:id', protect, async (req, res) => {
         });
       } else if (!completed && wasCompleted) {
         await Project.findByIdAndUpdate(task.project, {
-          $inc: { 'stats.completedTasks': 1 },
+          $inc: { 'stats.completedTasks': -1 },
         });
       }
     }
@@ -384,7 +384,7 @@ router.put('/:id', protect, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${task.project}`).emit('taskupdated', { task: updatedTask });
+    io.to(`project-${task.project}`).emit('task-updated', { task: updatedTask });
 
     // Responder inmediatamente (Zoho Tasks sync desactivado)
     res.json({ success: true, task: updatedTask });
@@ -412,8 +412,8 @@ router.delete('/:id', protect, async (req, res) => {
     // Actualizar estadÃ­sticas
     await Project.findByIdAndUpdate(task.project, {
       $inc: { 
-        'stats.totalTasks': 1,
-        'stats.completedTasks': task.completed ? 1 : 0,
+        'stats.totalTasks': -1,
+        'stats.completedTasks': task.completed ? -1 : 0,
       },
     });
 
@@ -452,7 +452,7 @@ router.post('/:id/comments', protect, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${task.project}`).emit('commentadded', { 
+    io.to(`project-${task.project}`).emit('comment-added', { 
       comment: populatedComment,
       taskId: req.params.id,
     });
@@ -513,7 +513,7 @@ router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
     // Emitir evento
     const io = req.app.get('io');
     const task = await Task.findById(req.params.taskId);
-    io.to(`project${task.project}`).emit('commentupdated', { 
+    io.to(`project-${task.project}`).emit('comment-updated', { 
       comment: populatedComment,
       taskId: req.params.taskId,
     });
@@ -548,7 +548,7 @@ router.delete('/:taskId/comments/:commentId', protect, async (req, res) => {
     // Emitir evento
     const io = req.app.get('io');
     const task = await Task.findById(req.params.taskId);
-    io.to(`project${task.project}`).emit('commentdeleted', { 
+    io.to(`project-${task.project}`).emit('comment-deleted', { 
       commentId: req.params.commentId,
       taskId: req.params.taskId,
     });
@@ -573,7 +573,7 @@ router.post('/reorder', protect, async (req, res) => {
     }
 
     if (sourceColumn === destColumn) {
-      // Mismo columna  solo reordenar
+      // Mismo columna - solo reordenar
       const tasks = await Task.find({ 
         project: task.project, 
         column: sourceColumn,
@@ -589,7 +589,7 @@ router.post('/reorder', protect, async (req, res) => {
         await tasks[i].save();
       }
     } else {
-      // Diferente columna  mover y reordenar
+      // Diferente columna - mover y reordenar
       task.column = destColumn;
       
       // Actualizar posiciones en columna origen
@@ -626,7 +626,7 @@ router.post('/reorder', protect, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${task.project}`).emit('taskmoved', { 
+    io.to(`project-${task.project}`).emit('task-moved', { 
       task: updatedTask,
       sourceColumn,
       destColumn,
@@ -639,10 +639,10 @@ router.post('/reorder', protect, async (req, res) => {
   }
 });
 
-// @route   POST /api/tasks/:id/requestvalidation
+// @route   POST /api/tasks/:id/request-validation
 // @desc    Solicitar validaciÃ³n de tarea (usuario marca como lista para validar)
 // @access  Private
-router.post('/:id/requestvalidation', protect, async (req, res) => {
+router.post('/:id/request-validation', protect, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -690,7 +690,7 @@ router.post('/:id/requestvalidation', protect, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${task.project}`).emit('taskvalidationrequested', { task: updatedTask });
+    io.to(`project-${task.project}`).emit('task-validation-requested', { task: updatedTask });
 
     res.json({ 
       success: true, 
@@ -781,7 +781,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project${task.project}`).emit('taskvalidated', { 
+    io.to(`project-${task.project}`).emit('task-validated', { 
       task: updatedTask,
       approved,
     });
@@ -826,4 +826,3 @@ router.post('/:id/remind', protect, async (req, res) => {
 });
 
 export default router;
-

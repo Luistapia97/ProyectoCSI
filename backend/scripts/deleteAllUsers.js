@@ -45,7 +45,7 @@ const deleteAllUsers = async () => {
     console.log(`📊 Usuarios restantes: ${remainingCount}`);
     
     if (remainingCount === 0) {
-      console.log('✅ Base de datos limpia  No hay usuarios\n');
+      console.log('✅ Base de datos limpia - No hay usuarios\n');
     }
 
     // Cerrar conexión
@@ -60,4 +60,3 @@ const deleteAllUsers = async () => {
 };
 
 deleteAllUsers();
-
