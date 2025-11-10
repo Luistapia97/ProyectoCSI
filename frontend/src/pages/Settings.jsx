@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Settings as SettingsIcon, User, Calendar, Bell, Shield } from 'lucide-react';
+﻿import { useState } from 'react';
+import { Settings as SettingsIcon, User, Calendar, Bell, Shield } from 'lucidereact';
 import ZohoSettings from '../components/ZohoSettings';
 import '../components/Settings.css';
 
@@ -14,20 +14,20 @@ export default function Settings() {
   ];
 
   return (
-    <div className="settings-page">
-      <div className="settings-header-main">
+    <div className="settingspage">
+      <div className="settingsheadermain">
         <SettingsIcon size={32} />
         <h1>Configuración</h1>
       </div>
 
-      <div className="settings-layout">
-        <div className="settings-sidebar">
+      <div className="settingslayout">
+        <div className="settingssidebar">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
-                className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+                className={`tabbutton ${activeTab === tab.id ? 'active' : ''}`}
                 onClick={() => setActiveTab(tab.id)}
               >
                 <Icon size={20} />
@@ -37,22 +37,22 @@ export default function Settings() {
           })}
         </div>
 
-        <div className="settings-content">
+        <div className="settingscontent">
           {activeTab === 'zoho' && <ZohoSettings />}
           {activeTab === 'profile' && (
-            <div className="tab-content">
+            <div className="tabcontent">
               <h2>Perfil de Usuario</h2>
               <p>Configuración de perfil próximamente...</p>
             </div>
           )}
           {activeTab === 'notifications' && (
-            <div className="tab-content">
+            <div className="tabcontent">
               <h2>Notificaciones</h2>
               <p>Configuración de notificaciones próximamente...</p>
             </div>
           )}
           {activeTab === 'security' && (
-            <div className="tab-content">
+            <div className="tabcontent">
               <h2>Seguridad</h2>
               <p>Configuración de seguridad próximamente...</p>
             </div>
@@ -62,3 +62,4 @@ export default function Settings() {
     </div>
   );
 }
+

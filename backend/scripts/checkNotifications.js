@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
@@ -14,7 +14,7 @@ const checkNotifications = async () => {
     const notifications = await Notification.find({})
       .populate('user', 'name email')
       .populate('relatedUser', 'name email')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .limit(20);
 
     console.log(`📋 Total de notificaciones: ${notifications.length}\n`);
@@ -33,7 +33,7 @@ const checkNotifications = async () => {
         console.log(`   Mensaje: ${notif.message}`);
         console.log(`   Tipo: ${notif.type}`);
         console.log(`   Leída: ${notif.read ? '✅ Sí' : '❌ No'}`);
-        console.log(`   Creada: ${notif.createdAt.toLocaleString('es-MX')}`);
+        console.log(`   Creada: ${notif.createdAt.toLocaleString('esMX')}`);
         console.log('');
       });
     }
@@ -62,3 +62,4 @@ const checkNotifications = async () => {
 };
 
 checkNotifications();
+

@@ -1,10 +1,10 @@
-# ✅ Inicio de Sesión con Zoho - OpenID Connect (CORREGIDO)
+﻿# ✅ Inicio de Sesión con Zoho  OpenID Connect (CORREGIDO)
 
 ## 🎯 **Implementación Correcta Basada en Documentación Oficial**
 
 He implementado el inicio de sesión con Zoho siguiendo **OpenID Connect (OIDC)**, que es el estándar correcto para autenticación.
 
----
+
 
 ## 🔑 **Scopes Correctos Implementados**
 
@@ -20,7 +20,7 @@ scope: ['openid', 'email', 'profile', 'ZohoCalendar.calendar.ALL']
 // OpenID Connect estándar + acceso al calendario
 ```
 
----
+
 
 ## 📋 **Cómo Funciona el Flujo Correcto**
 
@@ -41,9 +41,9 @@ https://accounts.zoho.com/oauth/v2/auth?
 ```
 
 ### 3. **Usuario autoriza en Zoho**
-- Inicia sesión con su cuenta de Zoho
-- Ve la pantalla de consentimiento
-- Acepta compartir: email, nombre, perfil
+ Inicia sesión con su cuenta de Zoho
+ Ve la pantalla de consentimiento
+ Acepta compartir: email, nombre, perfil
 
 ### 4. **Zoho redirige de vuelta con código**
 ```
@@ -95,22 +95,22 @@ const decoded = jwt.decode(params.id_token);
 ```
 
 ### 8. **Backend crea/actualiza usuario**
-- Busca usuario por `zohoId` (decoded.sub)
-- Si no existe, busca por email
-- Si existe, vincula la cuenta
-- Si no existe, crea nuevo usuario con el email REAL
+ Busca usuario por `zohoId` (decoded.sub)
+ Si no existe, busca por email
+ Si existe, vincula la cuenta
+ Si no existe, crea nuevo usuario con el email REAL
 
 ### 9. **Usuario es redirigido al dashboard**
 ```
 Frontend: http://localhost:5173/dashboard
 ```
 
----
+
 
 ## ✅ **Ventajas de OpenID Connect**
 
 | Característica | Valor |
-|----------------|-------|
+|||
 | ✅ Email Real | Siempre obtenido del `id_token` |
 | ✅ Nombre Completo | Incluido en el JWT |
 | ✅ ID Único | `sub` claim (no cambia nunca) |
@@ -118,7 +118,7 @@ Frontend: http://localhost:5173/dashboard
 | ✅ Estándar | Compatible con OAuth 2.0 |
 | ✅ Seguro | No necesita llamadas adicionales a APIs |
 
----
+
 
 ## 🔍 **Logs Esperados (Backend)**
 
@@ -156,7 +156,7 @@ Cuando todo funcione correctamente verás:
 ✅ Generando token y redirigiendo al dashboard
 ```
 
----
+
 
 ## 🧪 **Cómo Probar**
 
@@ -172,16 +172,16 @@ http://localhost:5173/login
 ```
 
 ### 3. **Click "Continuar con Zoho"**
-- Autoriza la aplicación
-- Acepta compartir email y perfil
+ Autoriza la aplicación
+ Acepta compartir email y perfil
 
 ### 4. **Verificar Dashboard**
 Deberías ver:
-- ✅ Tu nombre real
-- ✅ Tu email real
-- ✅ Avatar (de Zoho o generado)
+ ✅ Tu nombre real
+ ✅ Tu email real
+ ✅ Avatar (de Zoho o generado)
 
----
+
 
 ## 🔧 **Configuración en Zoho API Console**
 
@@ -198,28 +198,28 @@ http://localhost:5000/api/auth/zoho/callback
 ```
 
 ### Scopes (si te pide seleccionarlos):
-- ✅ `openid`
-- ✅ `email`
-- ✅ `profile`
-- ✅ `ZohoCalendar.calendar.ALL`
+ ✅ `openid`
+ ✅ `email`
+ ✅ `profile`
+ ✅ `ZohoCalendar.calendar.ALL`
 
-**Nota:** Con Server-based Applications, los scopes de OpenID Connect (`openid`, `email`, `profile`) están disponibles automáticamente.
+**Nota:** Con Serverbased Applications, los scopes de OpenID Connect (`openid`, `email`, `profile`) están disponibles automáticamente.
 
----
+
 
 ## ❌ **Si No Funciona**
 
 ### Problema: "No se pudo obtener email del usuario"
 
 **Solución:**
-1. Verifica que el cliente en Zoho sea **Server-based Application** (no Self Client)
+1. Verifica que el cliente en Zoho sea **Serverbased Application** (no Self Client)
 2. Asegúrate de que los scopes incluyan `openid`, `email`, `profile`
 3. Revoca el acceso previo y autoriza de nuevo
 
 ### Problema: "Invalid redirect URI"
 
 **Solución:**
-1. Ve a https://api-console.zoho.com/
+1. Ve a https://apiconsole.zoho.com/
 2. Edita tu cliente
 3. Verifica que la Redirect URI sea EXACTAMENTE:
    ```
@@ -230,27 +230,28 @@ http://localhost:5000/api/auth/zoho/callback
 ### Problema: "Cliente no válido"
 
 **Solución:**
-1. Crea un nuevo cliente Server-based Application
+1. Crea un nuevo cliente Serverbased Application
 2. Actualiza las credenciales en `backend/.env`
 3. Reinicia el servidor
 
----
+
 
 ## 📚 **Referencias**
 
-- **OpenID Connect:** https://openid.net/connect/
-- **Zoho OAuth:** https://www.zoho.com/accounts/protocol/oauth.html
-- **JWT Decoder:** https://jwt.io/
+ **OpenID Connect:** https://openid.net/connect/
+ **Zoho OAuth:** https://www.zoho.com/accounts/protocol/oauth.html
+ **JWT Decoder:** https://jwt.io/
 
----
+
 
 ## ✅ **Estado Actual**
 
-- ✅ Scopes de OpenID Connect implementados
-- ✅ Decodificación de id_token con jsonwebtoken
-- ✅ Email real siempre obtenido
-- ✅ Fallback a userinfo endpoint si no hay id_token
-- ✅ Base de datos limpiada
-- ✅ Servidores corriendo
+ ✅ Scopes de OpenID Connect implementados
+ ✅ Decodificación de id_token con jsonwebtoken
+ ✅ Email real siempre obtenido
+ ✅ Fallback a userinfo endpoint si no hay id_token
+ ✅ Base de datos limpiada
+ ✅ Servidores corriendo
 
 **¡Ahora prueba el login y deberías obtener tu email REAL!** 🎉
+

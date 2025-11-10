@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout } from 'lucide-react';
+﻿import { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'reactrouterdom';
+import { DragDropContext, Droppable, Draggable } from '@hellopangea/dnd';
+import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout } from 'lucidereact';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import useTaskStore from '../store/taskStore';
@@ -70,14 +70,14 @@ export default function Board() {
       socketService.joinProject(id);
 
       // Escuchar actualizaciones en tiempo real
-      socketService.on('task-created', () => fetchTasks(id));
-      socketService.on('task-updated', () => fetchTasks(id));
-      socketService.on('task-moved', () => fetchTasks(id));
+      socketService.on('taskcreated', () => fetchTasks(id));
+      socketService.on('taskupdated', () => fetchTasks(id));
+      socketService.on('taskmoved', () => fetchTasks(id));
 
       return () => {
-        socketService.off('task-created');
-        socketService.off('task-updated');
-        socketService.off('task-moved');
+        socketService.off('taskcreated');
+        socketService.off('taskupdated');
+        socketService.off('taskmoved');
       };
     }
   }, [id, fetchProject, fetchTasks]);
@@ -85,7 +85,7 @@ export default function Board() {
   const getTasksByColumn = (columnName) => {
     return tasks
       .filter(task => task.column === columnName)
-      .sort((a, b) => a.position - b.position);
+      .sort((a, b) => a.position  b.position);
   };
 
   const handleDragEnd = async (result) => {
@@ -118,7 +118,7 @@ export default function Board() {
 
   if (!currentProject) {
     return (
-      <div className="loading-container">
+      <div className="loadingcontainer">
         <div className="spinner"></div>
         <p>Cargando proyecto...</p>
       </div>
@@ -126,39 +126,39 @@ export default function Board() {
   }
 
   return (
-    <div className="board-container">
-      <header className="board-header">
-        <div className="board-header-left">
-          <button onClick={() => navigate('/dashboard')} className="btn-back">
+    <div className="boardcontainer">
+      <header className="boardheader">
+        <div className="boardheaderleft">
+          <button onClick={() => navigate('/dashboard')} className="btnback">
             <ArrowLeft size={20} />
           </button>
           
-          <div className="board-title">
+          <div className="boardtitle">
             <div 
-              className="project-color-indicator" 
+              className="projectcolorindicator" 
               style={{ backgroundColor: currentProject.color }}
             />
-            <div className="board-title-content">
+            <div className="boardtitlecontent">
               <h1>{currentProject.name}</h1>
-              <div className="project-progress-container">
-                <div className="project-progress-bar">
+              <div className="projectprogresscontainer">
+                <div className="projectprogressbar">
                   <div 
-                    className="project-progress-fill" 
+                    className="projectprogressfill" 
                     style={{ width: `${calculateOverallProgress()}%` }}
                   />
                 </div>
-                <span className="project-progress-text">{calculateOverallProgress()}% completado</span>
+                <span className="projectprogresstext">{calculateOverallProgress()}% completado</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="board-header-right">
+        <div className="boardheaderright">
           <NotificationBell />
           
-          <div className="view-mode-toggle">
+          <div className="viewmodetoggle">
             <button 
-              className={`view-mode-btn ${viewMode === 'board' ? 'active' : ''}`}
+              className={`viewmodebtn ${viewMode === 'board' ? 'active' : ''}`}
               onClick={() => setViewMode('board')}
               title="Vista de tablero"
             >
@@ -166,7 +166,7 @@ export default function Board() {
               <span>Tablero</span>
             </button>
             <button 
-              className={`view-mode-btn ${viewMode === 'analytics' ? 'active' : ''}`}
+              className={`viewmodebtn ${viewMode === 'analytics' ? 'active' : ''}`}
               onClick={() => setViewMode('analytics')}
               title="Vista de análisis"
             >
@@ -175,19 +175,19 @@ export default function Board() {
             </button>
           </div>
 
-          <div className="project-members-header">
+          <div className="projectmembersheader">
             {currentProject.members?.slice(0, 5).map((member) => (
               <img
                 key={member.user._id}
                 src={member.user.avatar}
                 alt={member.user.name}
-                className="member-avatar-header"
+                className="memberavatarheader"
                 title={member.user.name}
               />
             ))}
           </div>
 
-          <button className="btn-settings">
+          <button className="btnsettings">
             <Settings size={20} />
           </button>
         </div>
@@ -197,25 +197,25 @@ export default function Board() {
         <ProjectAnalytics tasks={tasks} project={currentProject} />
       ) : (
         <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="board-columns">
+        <div className="boardcolumns">
           {currentProject.columns?.map((column) => (
-            <div key={column.name} className="board-column">
-              <div className="column-header">
+            <div key={column.name} className="boardcolumn">
+              <div className="columnheader">
                 <div>
-                  <div className="column-title">
+                  <div className="columntitle">
                     <div 
-                      className="column-indicator" 
+                      className="columnindicator" 
                       style={{ backgroundColor: column.color }}
                     />
                     <h3>{column.name}</h3>
-                    <span className="task-count">
+                    <span className="taskcount">
                       {getTasksByColumn(column.name).length}
                     </span>
                   </div>
                   
                   {isAdmin && (
                     <button
-                      className="btn-add-card"
+                      className="btnaddcard"
                       onClick={() => {
                         setSelectedColumn(column.name);
                         setShowCreateModal(true);
@@ -227,8 +227,8 @@ export default function Board() {
                   )}
                 </div>
                 
-                <div className="column-progress">
-                  <span className="column-progress-percentage">
+                <div className="columnprogress">
+                  <span className="columnprogresspercentage">
                     {calculateColumnProgress(column.name)}%
                   </span>
                 </div>
@@ -239,7 +239,7 @@ export default function Board() {
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className={`column-content ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+                    className={`columncontent ${snapshot.isDraggingOver ? 'draggingover' : ''}`}
                   >
                     {getTasksByColumn(column.name).map((task, index) => (
                       <Draggable
@@ -265,7 +265,7 @@ export default function Board() {
                     {provided.placeholder}
 
                     {getTasksByColumn(column.name).length === 0 && (
-                      <div className="empty-column">
+                      <div className="emptycolumn">
                         <p>Arrastra tareas aquí o crea una nueva</p>
                       </div>
                     )}
@@ -298,3 +298,4 @@ export default function Board() {
     </div>
   );
 }
+

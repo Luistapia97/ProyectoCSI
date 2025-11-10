@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 import User from '../models/User.js';
 import dotenv from 'dotenv';
 
@@ -25,7 +25,7 @@ const listAllUsers = async () => {
         console.log(`   📧 Email:         ${user.email}`);
         console.log(`   👤 Rol:           ${user.role === 'administrador' ? '🔴 Administrador' : '🔵 Usuario'}`);
         console.log(`   🔐 Auth Provider: ${user.authProvider || 'local'}`);
-        console.log(`   📅 Creado:        ${new Date(user.createdAt).toLocaleDateString('es-MX')}`);
+        console.log(`   📅 Creado:        ${new Date(user.createdAt).toLocaleDateString('esMX')}`);
         
         // Estado de conexión con servicios
         const hasZoho = user.zohoAccessToken ? '✅ Conectado' : '❌ No conectado';
@@ -60,3 +60,4 @@ const listAllUsers = async () => {
 };
 
 listAllUsers();
+

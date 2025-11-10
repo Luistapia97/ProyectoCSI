@@ -1,8 +1,8 @@
-# 📋 Resumen del Proyecto Nexus
+﻿# 📋 Resumen del Proyecto Nexus
 
 ## Información General
 
-**Nombre:** Nexus - Plataforma de Gestión de Trabajo  
+**Nombre:** Nexus  Plataforma de Gestión de Trabajo  
 **Versión:** 1.0.0  
 **Tipo:** Aplicación Web Full Stack  
 **Estado:** ✅ Completado y Funcional
@@ -16,45 +16,45 @@ Nexus es una plataforma moderna de gestión de proyectos y tareas colaborativas,
 ### ✅ Sistema Completo
 
 #### Autenticación
-- ✅ Registro con email y contraseña
-- ✅ Login tradicional
-- ✅ Integración con Google OAuth
-- ✅ JWT para sesiones seguras
-- ✅ Roles (usuario/administrador)
+ ✅ Registro con email y contraseña
+ ✅ Login tradicional
+ ✅ Integración con Google OAuth
+ ✅ JWT para sesiones seguras
+ ✅ Roles (usuario/administrador)
 
 #### Gestión de Proyectos
-- ✅ Crear proyectos con colores personalizados
-- ✅ Editar y eliminar proyectos
-- ✅ Etiquetas personalizables
-- ✅ Vista de tablero Kanban
-- ✅ Estadísticas de progreso
-- ✅ Sistema de columnas personalizables
+ ✅ Crear proyectos con colores personalizados
+ ✅ Editar y eliminar proyectos
+ ✅ Etiquetas personalizables
+ ✅ Vista de tablero Kanban
+ ✅ Estadísticas de progreso
+ ✅ Sistema de columnas personalizables
 
 #### Gestión de Tareas
-- ✅ Crear tareas rápidas (título + fecha)
-- ✅ Drag & Drop entre columnas
-- ✅ Prioridades (baja, media, alta, urgente)
-- ✅ Fechas límite
-- ✅ Subtareas opcionales
-- ✅ Etiquetas por tarea
-- ✅ Marcar como completadas
-- ✅ Descripción detallada
+ ✅ Crear tareas rápidas (título + fecha)
+ ✅ Drag & Drop entre columnas
+ ✅ Prioridades (baja, media, alta, urgente)
+ ✅ Fechas límite
+ ✅ Subtareas opcionales
+ ✅ Etiquetas por tarea
+ ✅ Marcar como completadas
+ ✅ Descripción detallada
 
 #### Colaboración
-- ✅ Asignar tareas a usuarios
-- ✅ Comentarios tipo chat en tiempo real
-- ✅ Agregar miembros a proyectos
-- ✅ Notificaciones en tiempo real (Socket.IO)
-- ✅ Avatares de usuario
+ ✅ Asignar tareas a usuarios
+ ✅ Comentarios tipo chat en tiempo real
+ ✅ Agregar miembros a proyectos
+ ✅ Notificaciones en tiempo real (Socket.IO)
+ ✅ Avatares de usuario
 
 #### Diseño UX/UI
-- ✅ Interfaz limpia y minimalista
-- ✅ Modo claro/oscuro
-- ✅ Microinteracciones suaves
-- ✅ Responsive design (móvil y desktop)
-- ✅ Iconografía consistente (Lucide Icons)
-- ✅ Animaciones fluidas
-- ✅ 1 acción = 1 pantalla (sin saturación)
+ ✅ Interfaz limpia y minimalista
+ ✅ Modo claro/oscuro
+ ✅ Microinteracciones suaves
+ ✅ Responsive design (móvil y desktop)
+ ✅ Iconografía consistente (Lucide Icons)
+ ✅ Animaciones fluidas
+ ✅ 1 acción = 1 pantalla (sin saturación)
 
 ## Arquitectura Técnica
 
@@ -69,12 +69,12 @@ backend/
 ```
 
 **Tecnologías:**
-- Express.js para API REST
-- MongoDB + Mongoose para base de datos
-- Socket.IO para comunicación en tiempo real
-- JWT para autenticación
-- Passport.js para Google OAuth
-- Bcrypt para seguridad de contraseñas
+ Express.js para API REST
+ MongoDB + Mongoose para base de datos
+ Socket.IO para comunicación en tiempo real
+ JWT para autenticación
+ Passport.js para Google OAuth
+ Bcrypt para seguridad de contraseñas
 
 ### Frontend (React + Vite)
 ```
@@ -88,12 +88,12 @@ frontend/
 ```
 
 **Tecnologías:**
-- React 18 para UI
-- Vite para desarrollo rápido
-- Zustand para state management simple
-- @hello-pangea/dnd para drag & drop
-- Axios para HTTP requests
-- Socket.IO client para tiempo real
+ React 18 para UI
+ Vite para desarrollo rápido
+ Zustand para state management simple
+ @hellopangea/dnd para drag & drop
+ Axios para HTTP requests
+ Socket.IO client para tiempo real
 
 ## Flujo de Usuario
 
@@ -110,51 +110,51 @@ frontend/
 
 ## Principios de Diseño Aplicados
 
-1. **Simplicidad Primero** - Sin funciones innecesarias
-2. **Feedback Visual** - Cada acción tiene respuesta inmediata
-3. **Colores Suaves** - Paleta calmada con buen contraste
-4. **Microinteracciones** - Animaciones sutiles y fluidas
-5. **Responsive** - Funciona en cualquier dispositivo
-6. **Accesibilidad** - Contraste adecuado y navegación clara
+1. **Simplicidad Primero**  Sin funciones innecesarias
+2. **Feedback Visual**  Cada acción tiene respuesta inmediata
+3. **Colores Suaves**  Paleta calmada con buen contraste
+4. **Microinteracciones**  Animaciones sutiles y fluidas
+5. **Responsive**  Funciona en cualquier dispositivo
+6. **Accesibilidad**  Contraste adecuado y navegación clara
 
 ## Base de Datos
 
 ### Colecciones MongoDB
 
 **users**
-- Información de usuario
-- Autenticación (local y Google)
-- Configuraciones personales
+ Información de usuario
+ Autenticación (local y Google)
+ Configuraciones personales
 
 **projects**
-- Datos del proyecto
-- Miembros y roles
-- Columnas del tablero
-- Estadísticas
+ Datos del proyecto
+ Miembros y roles
+ Columnas del tablero
+ Estadísticas
 
 **tasks**
-- Información de tareas
-- Posición en columnas
-- Asignaciones
-- Subtareas
-- Prioridades
+ Información de tareas
+ Posición en columnas
+ Asignaciones
+ Subtareas
+ Prioridades
 
 **comments**
-- Comentarios de tareas
-- Menciones
-- Timestamps
+ Comentarios de tareas
+ Menciones
+ Timestamps
 
 **notifications**
-- Notificaciones de usuarios
-- Estado leído/no leído
-- Referencias a tareas/proyectos
+ Notificaciones de usuarios
+ Estado leído/no leído
+ Referencias a tareas/proyectos
 
 ## Instalación y Ejecución
 
 ### Requisitos
-- Node.js 18+
-- MongoDB 6+
-- Navegador moderno
+ Node.js 18+
+ MongoDB 6+
+ Navegador moderno
 
 ### Comandos
 
@@ -179,9 +179,9 @@ npm run dev
 
 ## URLs de Acceso
 
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:5000
-- **Socket.IO:** ws://localhost:5000
+ **Frontend:** http://localhost:5173
+ **Backend API:** http://localhost:5000
+ **Socket.IO:** ws://localhost:5000
 
 ## Variables de Entorno
 
@@ -200,37 +200,37 @@ GOOGLE_CLIENT_SECRET=tu_secret
 
 ## Características Futuras (Roadmap)
 
-- [ ] Vista de calendario mensual/semanal
-- [ ] Notificaciones por email
-- [ ] Sincronización con Google Calendar
-- [ ] Modo enfoque/minimal
-- [ ] Gráficos avanzados de progreso
-- [ ] Exportar a PDF
-- [ ] Aplicación móvil nativa
-- [ ] Integración con Slack/Discord
-- [ ] Plantillas de proyectos
-- [ ] Búsqueda avanzada
+ [ ] Vista de calendario mensual/semanal
+ [ ] Notificaciones por email
+ [ ] Sincronización con Google Calendar
+ [ ] Modo enfoque/minimal
+ [ ] Gráficos avanzados de progreso
+ [ ] Exportar a PDF
+ [ ] Aplicación móvil nativa
+ [ ] Integración con Slack/Discord
+ [ ] Plantillas de proyectos
+ [ ] Búsqueda avanzada
 
 ## Fortalezas del Proyecto
 
-✅ **Código Limpio** - Bien estructurado y comentado  
-✅ **Arquitectura Escalable** - Fácil agregar nuevas funciones  
-✅ **Diseño Moderno** - UI/UX profesional  
-✅ **Tiempo Real** - Colaboración instantánea  
-✅ **Seguridad** - JWT, bcrypt, validaciones  
-✅ **Documentación** - README completo y guías  
-✅ **Scripts Automáticos** - Instalación y ejecución sencilla  
+✅ **Código Limpio**  Bien estructurado y comentado  
+✅ **Arquitectura Escalable**  Fácil agregar nuevas funciones  
+✅ **Diseño Moderno**  UI/UX profesional  
+✅ **Tiempo Real**  Colaboración instantánea  
+✅ **Seguridad**  JWT, bcrypt, validaciones  
+✅ **Documentación**  README completo y guías  
+✅ **Scripts Automáticos**  Instalación y ejecución sencilla  
 
 ## Tecnologías y Patrones
 
-- **MERN Stack** (MongoDB, Express, React, Node.js)
-- **RESTful API** - Endpoints bien definidos
-- **WebSockets** - Socket.IO para tiempo real
-- **State Management** - Zustand (más simple que Redux)
-- **Component-Based** - React components reutilizables
-- **MVC Pattern** - Separación de responsabilidades
-- **JWT Authentication** - Sesiones stateless
-- **Environment Variables** - Configuración segura
+ **MERN Stack** (MongoDB, Express, React, Node.js)
+ **RESTful API**  Endpoints bien definidos
+ **WebSockets**  Socket.IO para tiempo real
+ **State Management**  Zustand (más simple que Redux)
+ **ComponentBased**  React components reutilizables
+ **MVC Pattern**  Separación de responsabilidades
+ **JWT Authentication**  Sesiones stateless
+ **Environment Variables**  Configuración segura
 
 ## Conclusión
 
@@ -246,6 +246,7 @@ Nexus es una plataforma completa y funcional que cumple todos los requisitos sol
 
 **El proyecto está listo para usar, extender y desplegar** 🚀
 
----
+
 
 *Creado con dedicación para aprender y dominar el desarrollo Full Stack*
+

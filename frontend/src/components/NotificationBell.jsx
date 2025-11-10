@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
-import { Bell, Check, Trash2, CheckCheck } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { useNavigate } from 'react-router-dom';
+﻿import { useState, useEffect, useRef } from 'react';
+import { Bell, Check, Trash2, CheckCheck } from 'lucidereact';
+import { formatDistanceToNow } from 'datefns';
+import { es } from 'datefns/locale';
+import { useNavigate } from 'reactrouterdom';
 import useNotificationStore from '../store/notificationStore';
 import socketService from '../services/socket';
 import './NotificationBell.css';
@@ -35,7 +35,7 @@ export default function NotificationBell() {
       
       // Mostrar notificación del navegador si está permitido
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Nexus - ' + notification.title, {
+        new Notification('Nexus  ' + notification.title, {
           body: notification.message,
           icon: '/logo.png'
         });
@@ -94,9 +94,9 @@ export default function NotificationBell() {
   };
 
   return (
-    <div className="notification-bell-container" ref={dropdownRef}>
+    <div className="notificationbellcontainer" ref={dropdownRef}>
       <button 
-        className="notification-bell-button"
+        className="notificationbellbutton"
         onClick={() => {
           setIsOpen(!isOpen);
           requestNotificationPermission();
@@ -105,17 +105,17 @@ export default function NotificationBell() {
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
+          <span className="notificationbadge">{unreadCount > 9 ? '9+' : unreadCount}</span>
         )}
       </button>
 
       {isOpen && (
-        <div className="notification-dropdown">
-          <div className="notification-header">
+        <div className="notificationdropdown">
+          <div className="notificationheader">
             <h3>Notificaciones</h3>
             {unreadCount > 0 && (
               <button 
-                className="mark-all-read-btn"
+                className="markallreadbtn"
                 onClick={handleMarkAllRead}
                 title="Marcar todas como leídas"
               >
@@ -125,14 +125,14 @@ export default function NotificationBell() {
             )}
           </div>
 
-          <div className="notification-list">
+          <div className="notificationlist">
             {loading ? (
-              <div className="notification-loading">
-                <div className="spinner-small"></div>
+              <div className="notificationloading">
+                <div className="spinnersmall"></div>
                 <p>Cargando notificaciones...</p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="notification-empty">
+              <div className="notificationempty">
                 <Bell size={48} />
                 <p>No tienes notificaciones</p>
               </div>
@@ -140,23 +140,23 @@ export default function NotificationBell() {
               notifications.map((notification) => (
                 <div
                   key={notification._id}
-                  className={`notification-item ${!notification.read ? 'unread' : ''}`}
+                  className={`notificationitem ${!notification.read ? 'unread' : ''}`}
                   onClick={() => handleNotificationClick(notification)}
                 >
-                  <div className="notification-content">
-                    <div className="notification-title-row">
-                      {!notification.read && <div className="notification-dot"></div>}
+                  <div className="notificationcontent">
+                    <div className="notificationtitlerow">
+                      {!notification.read && <div className="notificationdot"></div>}
                       <h4>{notification.title}</h4>
                       <button
-                        className="notification-delete-btn"
+                        className="notificationdeletebtn"
                         onClick={(e) => handleDelete(e, notification._id)}
                         title="Eliminar"
                       >
                         <Trash2 size={14} />
                       </button>
                     </div>
-                    <p className="notification-message">{notification.message}</p>
-                    <span className="notification-time">
+                    <p className="notificationmessage">{notification.message}</p>
+                    <span className="notificationtime">
                       {formatDistanceToNow(new Date(notification.createdAt), {
                         addSuffix: true,
                         locale: es
@@ -169,9 +169,9 @@ export default function NotificationBell() {
           </div>
 
           {notifications.length > 0 && (
-            <div className="notification-footer">
+            <div className="notificationfooter">
               <button 
-                className="view-all-btn"
+                className="viewallbtn"
                 onClick={() => {
                   setIsOpen(false);
                   // TODO: Navegar a página de notificaciones
@@ -186,3 +186,4 @@ export default function NotificationBell() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { authAPI } from '../services/api';
 
 const useAuthStore = create((set, get) => ({
@@ -20,7 +20,7 @@ const useAuthStore = create((set, get) => ({
       set({ user, token, isAuthenticated: true });
       
       // Notificar a otras pestañas
-      window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event('authchange'));
       
       return { success: true };
     } catch (error) {
@@ -45,7 +45,7 @@ const useAuthStore = create((set, get) => ({
       set({ user, token, isAuthenticated: true });
       
       // Notificar a otras pestañas
-      window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event('authchange'));
       
       return { success: true };
     } catch (error) {
@@ -68,7 +68,7 @@ const useAuthStore = create((set, get) => ({
       set({ user, token, isAuthenticated: true });
       
       // Notificar a otras pestañas
-      window.dispatchEvent(new Event('auth-change'));
+      window.dispatchEvent(new Event('authchange'));
       
       return { success: true, message: response.data.message };
     } catch (error) {
@@ -111,7 +111,7 @@ const useAuthStore = create((set, get) => ({
     set({ user: null, token: null, isAuthenticated: false });
     
     // Notificar a otras pestañas
-    window.dispatchEvent(new Event('auth-change'));
+    window.dispatchEvent(new Event('authchange'));
   },
 
   setTheme: (theme) => {
@@ -135,13 +135,13 @@ const useAuthStore = create((set, get) => ({
       try {
         const user = JSON.parse(userStr);
         set({ user, token, isAuthenticated: true, loading: false });
-        console.log('🔄 Sincronizado con otra pestaña - Usuario autenticado');
+        console.log('🔄 Sincronizado con otra pestaña  Usuario autenticado');
       } catch (error) {
         console.error('Error al sincronizar:', error);
       }
     } else {
       set({ user: null, token: null, isAuthenticated: false, loading: false });
-      console.log('🔄 Sincronizado con otra pestaña - Sesión cerrada');
+      console.log('🔄 Sincronizado con otra pestaña  Sesión cerrada');
     }
   },
 }));
@@ -156,9 +156,10 @@ if (typeof window !== 'undefined') {
   });
 
   // También escuchar eventos personalizados (misma pestaña)
-  window.addEventListener('auth-change', () => {
+  window.addEventListener('authchange', () => {
     console.log('📢 Cambio de autenticación en esta pestaña');
   });
 }
 
 export default useAuthStore;
+

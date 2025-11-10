@@ -1,4 +1,4 @@
-import { google } from 'googleapis';
+﻿import { google } from 'googleapis';
 
 // Crear cliente de Google Calendar
 const createCalendarClient = (accessToken, refreshToken) => {
@@ -33,7 +33,7 @@ export const createCalendarEvent = async (user, taskData) => {
       const utcYear = taskData.dueDate.getUTCFullYear();
       const utcMonth = String(taskData.dueDate.getUTCMonth() + 1).padStart(2, '0');
       const utcDay = String(taskData.dueDate.getUTCDate()).padStart(2, '0');
-      dateString = `${utcYear}-${utcMonth}-${utcDay}`;
+      dateString = `${utcYear}${utcMonth}${utcDay}`;
     } else if (typeof taskData.dueDate === 'string') {
       // Si es string, extraer solo la parte de la fecha
       if (taskData.dueDate.includes('T')) {
@@ -45,7 +45,7 @@ export const createCalendarEvent = async (user, taskData) => {
       throw new Error('Formato de fecha no válido');
     }
     
-    // dateString ahora es "2025-11-03" (sin desfase de zona horaria)
+    // dateString ahora es "20251103" (sin desfase de zona horaria)
     // Crear fecha en formato ISO con hora específica (9:00 AM hora local)
     const startDateTime = `${dateString}T09:00:00`;
     const endDateTime = `${dateString}T10:00:00`; // 1 hora después
@@ -108,7 +108,7 @@ export const updateCalendarEvent = async (user, eventId, taskData) => {
       const utcYear = taskData.dueDate.getUTCFullYear();
       const utcMonth = String(taskData.dueDate.getUTCMonth() + 1).padStart(2, '0');
       const utcDay = String(taskData.dueDate.getUTCDate()).padStart(2, '0');
-      dateString = `${utcYear}-${utcMonth}-${utcDay}`;
+      dateString = `${utcYear}${utcMonth}${utcDay}`;
     } else if (typeof taskData.dueDate === 'string') {
       // Si es string, extraer solo la parte de la fecha
       if (taskData.dueDate.includes('T')) {
@@ -230,3 +230,4 @@ export const listUpcomingEvents = async (user, maxResults = 10) => {
     };
   }
 };
+

@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
 // URLs de la API de Zoho Calendar
 const ZOHO_API_BASE = 'https://calendar.zoho.com/api/v1';
@@ -9,8 +9,8 @@ const createZohoClient = (accessToken) => {
   return axios.create({
     baseURL: ZOHO_API_BASE,
     headers: {
-      'Authorization': `Zoho-oauthtoken ${accessToken}`,
-      'Content-Type': 'application/json',
+      'Authorization': `Zohooauthtoken ${accessToken}`,
+      'ContentType': 'application/json',
     },
   });
 };
@@ -67,7 +67,7 @@ export const createCalendarEvent = async (user, taskData) => {
       const utcYear = taskData.dueDate.getUTCFullYear();
       const utcMonth = String(taskData.dueDate.getUTCMonth() + 1).padStart(2, '0');
       const utcDay = String(taskData.dueDate.getUTCDate()).padStart(2, '0');
-      dateString = `${utcYear}-${utcMonth}-${utcDay}`;
+      dateString = `${utcYear}${utcMonth}${utcDay}`;
     } else if (typeof taskData.dueDate === 'string') {
       if (taskData.dueDate.includes('T')) {
         dateString = taskData.dueDate.split('T')[0];
@@ -143,7 +143,7 @@ export const updateCalendarEvent = async (user, eventId, taskData) => {
       const utcYear = taskData.dueDate.getUTCFullYear();
       const utcMonth = String(taskData.dueDate.getUTCMonth() + 1).padStart(2, '0');
       const utcDay = String(taskData.dueDate.getUTCDate()).padStart(2, '0');
-      dateString = `${utcYear}-${utcMonth}-${utcDay}`;
+      dateString = `${utcYear}${utcMonth}${utcDay}`;
     } else if (typeof taskData.dueDate === 'string') {
       if (taskData.dueDate.includes('T')) {
         dateString = taskData.dueDate.split('T')[0];
@@ -304,3 +304,4 @@ export const getCalendarSyncStatus = async (user) => {
     };
   }
 };
+

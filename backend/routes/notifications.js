@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import { protect } from '../middleware/auth.js';
 import Notification from '../models/Notification.js';
 
@@ -11,7 +11,7 @@ router.get('/', protect, async (req, res) => {
   try {
     const notifications = await Notification.find({ user: req.user._id })
       .populate('relatedUser', 'name email avatar')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: 1 })
       .limit(50);
 
     res.json(notifications);
@@ -43,10 +43,10 @@ router.put('/:id/read', protect, async (req, res) => {
   }
 });
 
-// @route   PUT /api/notifications/mark-all-read
+// @route   PUT /api/notifications/markallread
 // @desc    Marcar todas las notificaciones como leídas
 // @access  Private
-router.put('/mark-all-read', protect, async (req, res) => {
+router.put('/markallread', protect, async (req, res) => {
   try {
     await Notification.updateMany(
       { user: req.user._id, read: false },
@@ -81,10 +81,10 @@ router.delete('/:id', protect, async (req, res) => {
   }
 });
 
-// @route   GET /api/notifications/unread-count
+// @route   GET /api/notifications/unreadcount
 // @desc    Obtener cantidad de notificaciones no leídas
 // @access  Private
-router.get('/unread-count', protect, async (req, res) => {
+router.get('/unreadcount', protect, async (req, res) => {
   try {
     const count = await Notification.countDocuments({
       user: req.user._id,

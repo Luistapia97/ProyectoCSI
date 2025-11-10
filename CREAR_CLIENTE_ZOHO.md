@@ -1,16 +1,16 @@
-# 🔧 Guía Paso a Paso: Crear Cliente OAuth en Zoho
+﻿# 🔧 Guía Paso a Paso: Crear Cliente OAuth en Zoho
 
 ## ⚠️ IMPORTANTE: El Client ID actual no es válido
 
 El error "Cliente no válido" indica que necesitas crear un nuevo cliente en Zoho API Console.
 
----
+
 
 ## 📋 Pasos para Crear un Cliente OAuth en Zoho
 
 ### Paso 1: Acceder a Zoho API Console
 
-1. Abre tu navegador y ve a: **https://api-console.zoho.com/**
+1. Abre tu navegador y ve a: **https://apiconsole.zoho.com/**
 2. Inicia sesión con tu cuenta de Zoho
 
 ### Paso 2: Crear un Nuevo Cliente
@@ -18,12 +18,12 @@ El error "Cliente no válido" indica que necesitas crear un nuevo cliente en Zoh
 1. Click en el botón **"Add Client"** (esquina superior derecha)
 
 2. Selecciona el tipo de cliente:
-   - ✅ **"Server-based Applications"** (Recomendado para producción)
-   - ✅ **"Self Client"** (Más fácil para desarrollo/testing)
+    ✅ **"Serverbased Applications"** (Recomendado para producción)
+    ✅ **"Self Client"** (Más fácil para desarrollo/testing)
 
 ### Paso 3: Configurar el Cliente
 
-#### Si elegiste "Server-based Applications":
+#### Si elegiste "Serverbased Applications":
 
 **Client Name:**
 ```
@@ -51,24 +51,24 @@ Nexus OAuth Client
 
 Después de crear el cliente, Zoho te mostrará:
 
-- **Client ID:** (algo como `1000.XXXXXXXXXXXXXXXXX`)
-- **Client Secret:** (algo como `xxxxxxxxxxxxxxxxxxxx`)
+ **Client ID:** (algo como `1000.XXXXXXXXXXXXXXXXX`)
+ **Client Secret:** (algo como `xxxxxxxxxxxxxxxxxxxx`)
 
 **⚠️ IMPORTANTE:** Guarda estas credenciales en un lugar seguro.
 
-### Paso 5: Configurar Scopes (Solo para Server-based)
+### Paso 5: Configurar Scopes (Solo para Serverbased)
 
-Si usaste "Server-based Applications":
+Si usaste "Serverbased Applications":
 
 1. Ve a la sección **"Scopes"**
 2. Busca y selecciona:
-   - ✅ `ZohoAssist.userapi.READ`
-   - ✅ `ZohoCalendar.calendar.ALL`
-   - ✅ `ZohoCalendar.event.ALL`
+    ✅ `ZohoAssist.userapi.READ`
+    ✅ `ZohoCalendar.calendar.ALL`
+    ✅ `ZohoCalendar.event.ALL`
 
 **Nota:** Para "Self Client", todos los scopes están disponibles automáticamente.
 
----
+
 
 ## 🔑 Actualizar las Credenciales en tu Proyecto
 
@@ -98,13 +98,13 @@ Ejecuta estos comandos reemplazando los valores:
 cd "c:\Users\luiso\OneDrive\Desktop\Proyecto_Nexus\backend"
 
 # Reemplazar Client ID
-(Get-Content .env) -replace 'ZOHO_CLIENT_ID=.*', 'ZOHO_CLIENT_ID=TU_NUEVO_CLIENT_ID' | Set-Content .env
+(GetContent .env) replace 'ZOHO_CLIENT_ID=.*', 'ZOHO_CLIENT_ID=TU_NUEVO_CLIENT_ID' | SetContent .env
 
 # Reemplazar Client Secret
-(Get-Content .env) -replace 'ZOHO_CLIENT_SECRET=.*', 'ZOHO_CLIENT_SECRET=TU_NUEVO_CLIENT_SECRET' | Set-Content .env
+(GetContent .env) replace 'ZOHO_CLIENT_SECRET=.*', 'ZOHO_CLIENT_SECRET=TU_NUEVO_CLIENT_SECRET' | SetContent .env
 ```
 
----
+
 
 ## 🔄 Reiniciar el Servidor
 
@@ -125,7 +125,7 @@ Deberías ver en la consola:
 ✅ Zoho OAuth Configurado
 ```
 
----
+
 
 ## ✅ Verificar que Funciona
 
@@ -133,13 +133,13 @@ Deberías ver en la consola:
 2. Click en "Continuar con Zoho"
 3. Ahora deberías ver la pantalla de autorización de Zoho (sin error de cliente)
 
----
+
 
 ## 🎯 Resumen Rápido
 
 ### Para "Self Client" (Más Fácil):
 ```
-1. https://api-console.zoho.com/
+1. https://apiconsole.zoho.com/
 2. Add Client → Self Client
 3. Name: "Nexus OAuth Client"
 4. Copiar Client ID y Client Secret
@@ -147,10 +147,10 @@ Deberías ver en la consola:
 6. Reiniciar servidor
 ```
 
-### Para "Server-based" (Producción):
+### Para "Serverbased" (Producción):
 ```
-1. https://api-console.zoho.com/
-2. Add Client → Server-based Applications
+1. https://apiconsole.zoho.com/
+2. Add Client → Serverbased Applications
 3. Name: "Nexus Project Manager"
 4. Homepage: http://localhost:5173
 5. Redirect URI: http://localhost:5000/api/auth/zoho/callback
@@ -160,16 +160,16 @@ Deberías ver en la consola:
 9. Reiniciar servidor
 ```
 
----
+
 
 ## 🐛 Si Sigues Teniendo Problemas
 
 ### Verifica que:
-- ✅ El Client ID comienza con "1000."
-- ✅ El Client Secret no tiene espacios
-- ✅ El archivo .env se guardó correctamente
-- ✅ Reiniciaste el servidor después de cambiar las credenciales
-- ✅ El cliente está "Active" en Zoho API Console
+ ✅ El Client ID comienza con "1000."
+ ✅ El Client Secret no tiene espacios
+ ✅ El archivo .env se guardó correctamente
+ ✅ Reiniciaste el servidor después de cambiar las credenciales
+ ✅ El cliente está "Active" en Zoho API Console
 
 ### Logs a Verificar:
 En la consola del backend deberías ver:
@@ -180,10 +180,11 @@ En la consola del backend deberías ver:
 ✅ Zoho OAuth Configurado
 ```
 
----
+
 
 ## 📞 Siguiente Paso
 
 Después de crear el cliente y actualizar las credenciales, **avísame** y te ayudo a probar el login nuevamente.
 
 **Dame el nuevo Client ID** (solo los primeros 20 caracteres por seguridad) y verifico que esté configurado correctamente.
+

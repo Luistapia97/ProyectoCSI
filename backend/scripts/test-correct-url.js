@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -29,7 +29,7 @@ async function testCorrectURL() {
   try {
     const user = await User.findOne({ 
       zohoAccessToken: { $exists: true, $ne: null }
-    }).sort({ updatedAt: -1 });
+    }).sort({ updatedAt: 1 });
 
     if (!user) {
       console.error('❌ No se encontró usuario con token');
@@ -47,17 +47,17 @@ async function testCorrectURL() {
     try {
       const calendarsResp = await axios.get(
         'https://calendar.zoho.com/api/v1/calendars',
-        { headers: { 'Authorization': `Zoho-oauthtoken ${token}` } }
+        { headers: { 'Authorization': `Zohooauthtoken ${token}` } }
       );
       calendarUid = calendarsResp.data.calendars[0].uid;
       console.log('✅ Calendar UID:', calendarUid);
     } catch (error) {
       console.error('❌ Error obteniendo calendarios:', error.response?.data || error.message);
       console.log('\n⚠️  El token NO tiene scope para calendarios.');
-      console.log('   Esto confirma que necesitas re-autenticarte con:');
-      console.log('   - ZohoCalendar.event.ALL (para eventos)');
+      console.log('   Esto confirma que necesitas reautenticarte con:');
+      console.log('    ZohoCalendar.event.ALL (para eventos)');
       console.log('   O mejor aún:');
-      console.log('   - ZohoCalendar.calendar.ALL (para calendarios Y eventos)');
+      console.log('    ZohoCalendar.calendar.ALL (para calendarios Y eventos)');
       process.exit(1);
     }
 
@@ -71,7 +71,7 @@ async function testCorrectURL() {
     const end = new Date(start.getTime() + 60 * 60 * 1000);
 
     const eventdataObject = {
-      title: '🎯 Test Final - Nexus (Query Param)',
+      title: '🎯 Test Final  Nexus (Query Param)',
       description: 'Prueba enviando eventdata como query parameter según documentación oficial',
       dateandtime: {
         start: formatDate(start),
@@ -93,8 +93,8 @@ async function testCorrectURL() {
             eventdata: JSON.stringify(eventdataObject) // Como query parameter
           },
           headers: {
-            'Authorization': `Zoho-oauthtoken ${token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Zohooauthtoken ${token}`,
+            'ContentType': 'application/json'
           }
         }
       );
@@ -114,7 +114,7 @@ async function testCorrectURL() {
         console.log('   1. El calendar_uid es inválido');
         console.log('   2. El token no tiene scope correcto');
         console.log('   3. El formato del query parameter es incorrecto');
-        console.log('   4. Necesitas re-autenticarte con ZohoCalendar.calendar.ALL');
+        console.log('   4. Necesitas reautenticarte con ZohoCalendar.calendar.ALL');
       } else {
         console.error('Data:', error.response?.data);
       }
@@ -137,3 +137,4 @@ async function testCorrectURL() {
 }
 
 await testCorrectURL();
+

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import api from '../services/api';
 
 const useNotificationStore = create((set, get) => ({
@@ -34,7 +34,7 @@ const useNotificationStore = create((set, get) => ({
         notifications: state.notifications.map(n =>
           n._id === notificationId ? { ...n, read: true } : n
         ),
-        unreadCount: Math.max(0, state.unreadCount - 1)
+        unreadCount: Math.max(0, state.unreadCount  1)
       }));
     } catch (error) {
       console.error('Error al marcar notificación:', error);
@@ -44,7 +44,7 @@ const useNotificationStore = create((set, get) => ({
   // Marcar todas como leídas
   markAllAsRead: async () => {
     try {
-      await api.put('/notifications/mark-all-read');
+      await api.put('/notifications/markallread');
       
       set(state => ({
         notifications: state.notifications.map(n => ({ ...n, read: true })),
@@ -66,7 +66,7 @@ const useNotificationStore = create((set, get) => ({
         
         return {
           notifications: state.notifications.filter(n => n._id !== notificationId),
-          unreadCount: wasUnread ? Math.max(0, state.unreadCount - 1) : state.unreadCount
+          unreadCount: wasUnread ? Math.max(0, state.unreadCount  1) : state.unreadCount
         };
       });
     } catch (error) {
@@ -84,3 +84,4 @@ const useNotificationStore = create((set, get) => ({
 }));
 
 export default useNotificationStore;
+

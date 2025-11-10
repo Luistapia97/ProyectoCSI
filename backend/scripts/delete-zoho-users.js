@@ -1,4 +1,4 @@
-// Script para eliminar TODOS los usuarios de Zoho
+﻿// Script para eliminar TODOS los usuarios de Zoho
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URI)
     const remaining = await usersCollection.find({}).toArray();
     console.log('\n📋 Usuarios restantes:', remaining.length);
     remaining.forEach(user => {
-      console.log(`  - ${user.email} (${user.authProvider || 'local'})`);
+      console.log(`   ${user.email} (${user.authProvider || 'local'})`);
     });
     
     console.log('\n✅ Base de datos limpiada');
@@ -36,3 +36,4 @@ mongoose.connect(process.env.MONGODB_URI)
     console.error('❌ Error:', err);
     process.exit(1);
   });
+

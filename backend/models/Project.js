@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 
 const projectSchema = new mongoose.Schema({
   name: {
@@ -64,9 +64,10 @@ const projectSchema = new mongoose.Schema({
 });
 
 // Índices para búsquedas rápidas
-projectSchema.index({ owner: 1, createdAt: -1 });
+projectSchema.index({ owner: 1, createdAt: 1 });
 projectSchema.index({ 'members.user': 1 });
 
 const Project = mongoose.model('Project', projectSchema);
 
 export default Project;
+

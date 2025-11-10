@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Palette } from 'lucide-react';
+﻿import { useState } from 'react';
+import { X, Palette } from 'lucidereact';
 import useProjectStore from '../store/projectStore';
 import './Modal.css';
 
@@ -52,23 +52,23 @@ export default function CreateProjectModal({ onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+    <div className="modaloverlay" onClick={onClose}>
+      <div className="modalcontent" onClick={(e) => e.stopPropagation()}>
+        <div className="modalheader">
           <h2>Crear Nuevo Proyecto</h2>
-          <button onClick={onClose} className="modal-close">
+          <button onClick={onClose} className="modalclose">
             <X size={24} />
           </button>
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className="errormessage">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className="modalform">
+          <div className="formgroup">
             <label htmlFor="name">Nombre del proyecto *</label>
             <input
               type="text"
@@ -80,7 +80,7 @@ export default function CreateProjectModal({ onClose }) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="description">Descripción</label>
             <textarea
               id="description"
@@ -91,17 +91,17 @@ export default function CreateProjectModal({ onClose }) {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label>
               <Palette size={18} />
               Color del proyecto
             </label>
-            <div className="color-picker">
+            <div className="colorpicker">
               {PROJECT_COLORS.map((color) => (
                 <button
                   key={color}
                   type="button"
-                  className={`color-option ${formData.color === color ? 'selected' : ''}`}
+                  className={`coloroption ${formData.color === color ? 'selected' : ''}`}
                   style={{ backgroundColor: color }}
                   onClick={() => setFormData({ ...formData, color })}
                   title={color}
@@ -110,7 +110,7 @@ export default function CreateProjectModal({ onClose }) {
             </div>
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="tags">Etiquetas (separadas por coma)</label>
             <input
               type="text"
@@ -121,11 +121,11 @@ export default function CreateProjectModal({ onClose }) {
             />
           </div>
 
-          <div className="modal-actions">
-            <button type="button" onClick={onClose} className="btn-secondary">
+          <div className="modalactions">
+            <button type="button" onClick={onClose} className="btnsecondary">
               Cancelar
             </button>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button type="submit" className="btnprimary" disabled={loading}>
               {loading ? 'Creando...' : 'Crear Proyecto'}
             </button>
           </div>
@@ -134,3 +134,4 @@ export default function CreateProjectModal({ onClose }) {
     </div>
   );
 }
+

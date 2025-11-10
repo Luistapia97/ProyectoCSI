@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import { protect } from '../middleware/auth.js';
 import { isAdmin, hasRole } from '../middleware/roleAuth.js';
 import Project from '../models/Project.js';
@@ -21,7 +21,7 @@ router.get('/', protect, async (req, res) => {
     })
       .populate('owner', 'name email avatar')
       .populate('members.user', 'name email avatar')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: 1 });
 
     res.json({ success: true, projects });
   } catch (error) {
@@ -101,7 +101,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
 
     // Emitir evento de socket
     const io = req.app.get('io');
-    io.emit('project-created', { project: populatedProject });
+    io.emit('projectcreated', { project: populatedProject });
 
     res.status(201).json({ success: true, project: populatedProject });
   } catch (error) {
@@ -145,7 +145,7 @@ router.put('/:id', protect, async (req, res) => {
 
     // Emitir evento
     const io = req.app.get('io');
-    io.to(`project-${project._id}`).emit('project-updated', { project: updatedProject });
+    io.to(`project${project._id}`).emit('projectupdated', { project: updatedProject });
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {
@@ -239,3 +239,4 @@ router.post('/:id/members', protect, async (req, res) => {
 });
 
 export default router;
+

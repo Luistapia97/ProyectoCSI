@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Calendar, Key, Link as LinkIcon, Unlink } from 'lucide-react';
+﻿import { useState } from 'react';
+import { Calendar, Key, Link as LinkIcon, Unlink } from 'lucidereact';
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
 import './Settings.css';
@@ -80,33 +80,33 @@ export default function ZohoSettings() {
   };
 
   return (
-    <div className="zoho-settings-container">
-      <div className="settings-header">
+    <div className="zohosettingscontainer">
+      <div className="settingsheader">
         <Calendar size={32} />
         <h2>Integración con Zoho Calendar</h2>
         <p>Conecta tu cuenta de Zoho para sincronizar tareas con tu calendario</p>
       </div>
 
       {message && (
-        <div className="success-message">
+        <div className="successmessage">
           {message}
         </div>
       )}
 
       {error && (
-        <div className="error-message">
+        <div className="errormessage">
           {error}
         </div>
       )}
 
       {isConnected ? (
-        <div className="connected-state">
-          <div className="status-badge connected">
+        <div className="connectedstate">
+          <div className="statusbadge connected">
             <LinkIcon size={20} />
             <span>Cuenta de Zoho conectada</span>
           </div>
 
-          <div className="connection-info">
+          <div className="connectioninfo">
             <p>Tu cuenta de Zoho está conectada y lista para sincronizar eventos.</p>
             <ul>
               <li>✅ Las tareas se sincronizarán automáticamente</li>
@@ -117,7 +117,7 @@ export default function ZohoSettings() {
 
           <button 
             onClick={handleDisconnect} 
-            className="btn-disconnect"
+            className="btndisconnect"
             disabled={loading}
           >
             <Unlink size={18} />
@@ -125,7 +125,7 @@ export default function ZohoSettings() {
           </button>
         </div>
       ) : (
-        <div className="connection-form">
+        <div className="connectionform">
           <div className="instructions">
             <h3>📝 Cómo obtener tu token de Zoho:</h3>
             <ol>
@@ -138,7 +138,7 @@ export default function ZohoSettings() {
           </div>
 
           <form onSubmit={handleConnect}>
-            <div className="form-group">
+            <div className="formgroup">
               <label htmlFor="accessToken">
                 <Key size={18} />
                 Token de Acceso de Zoho *
@@ -154,7 +154,7 @@ export default function ZohoSettings() {
               <small>Requerido: Este es el token de autenticación de Zoho</small>
             </div>
 
-            <div className="form-group">
+            <div className="formgroup">
               <label htmlFor="refreshToken">
                 <Key size={18} />
                 Token de Actualización (Opcional)
@@ -171,7 +171,7 @@ export default function ZohoSettings() {
 
             <button 
               type="submit" 
-              className="btn-connect"
+              className="btnconnect"
               disabled={loading || !accessToken}
             >
               <LinkIcon size={18} />
@@ -183,3 +183,4 @@ export default function ZohoSettings() {
     </div>
   );
 }
+

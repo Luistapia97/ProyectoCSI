@@ -1,4 +1,4 @@
-// Script para limpiar usuarios duplicados de Zoho
+﻿// Script para limpiar usuarios duplicados de Zoho
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -48,7 +48,7 @@ mongoose.connect(MONGODB_URI)
       console.log('💡 Manteniendo el más reciente y eliminando duplicados...');
       
       // Ordenar por fecha de creación (más reciente primero)
-      users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      users.sort((a, b) => new Date(b.createdAt)  new Date(a.createdAt));
       
       const keepUser = users[0];
       const deleteUsers = users.slice(1);
@@ -67,7 +67,7 @@ mongoose.connect(MONGODB_URI)
     }
     
     // Eliminar usuarios temporales antiguos (más de 1 día)
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const oneDayAgo = new Date(Date.now()  24 * 60 * 60 * 1000);
     const oldTempUsers = await usersCollection.find({
       email: { $regex: '@temp.nexus.local$' },
       createdAt: { $lt: oneDayAgo }
@@ -88,3 +88,4 @@ mongoose.connect(MONGODB_URI)
     console.error('❌ Error:', err);
     process.exit(1);
   });
+

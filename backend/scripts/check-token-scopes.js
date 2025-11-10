@@ -1,4 +1,4 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -21,7 +21,7 @@ async function checkTokenScopes() {
     // Buscar usuario más reciente con token de Zoho
     const user = await User.findOne({ 
       zohoAccessToken: { $exists: true, $ne: null }
-    }).sort({ updatedAt: -1 });
+    }).sort({ updatedAt: 1 });
 
     if (!user) {
       console.error('❌ No se encontró usuario con token de Zoho');
@@ -42,9 +42,9 @@ async function checkTokenScopes() {
     console.log('1️⃣ Test: GET /api/v1/calendars');
     try {
       const response1 = await axios.get('https://calendar.zoho.com/api/v1/calendars', {
-        headers: { 'Authorization': `Zoho-oauthtoken ${token}` }
+        headers: { 'Authorization': `Zohooauthtoken ${token}` }
       });
-      console.log('   ✅ FUNCIONA - Tiene scope para leer calendarios');
+      console.log('   ✅ FUNCIONA  Tiene scope para leer calendarios');
       console.log('   Calendarios encontrados:', response1.data.calendars?.length || 0);
     } catch (error1) {
       console.error('   ❌ FALLÓ:', error1.response?.data?.[0]?.message || error1.message);
@@ -69,7 +69,7 @@ async function checkTokenScopes() {
 
     const testPayload = {
       eventdata: {
-        title: '🧪 Test de Scope - Nexus',
+        title: '🧪 Test de Scope  Nexus',
         description: 'Verificando scopes del token',
         dateandtime: {
           start: formatDate(start),
@@ -88,12 +88,12 @@ async function checkTokenScopes() {
         testPayload,
         {
           headers: {
-            'Authorization': `Zoho-oauthtoken ${token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Zohooauthtoken ${token}`,
+            'ContentType': 'application/json'
           }
         }
       );
-      console.log('   ✅ FUNCIONA - Tiene scope para crear eventos');
+      console.log('   ✅ FUNCIONA  Tiene scope para crear eventos');
       console.log('   Evento creado:', response2.data);
     } catch (error2) {
       console.error('   ❌ FALLÓ:', error2.response?.status, error2.response?.statusText);
@@ -108,9 +108,9 @@ async function checkTokenScopes() {
     console.log('\n3️⃣ Test: GET /api/v1/events (leer eventos)');
     try {
       const response3 = await axios.get('https://calendar.zoho.com/api/v1/events', {
-        headers: { 'Authorization': `Zoho-oauthtoken ${token}` }
+        headers: { 'Authorization': `Zohooauthtoken ${token}` }
       });
-      console.log('   ✅ FUNCIONA - Tiene scope para leer eventos');
+      console.log('   ✅ FUNCIONA  Tiene scope para leer eventos');
       console.log('   Eventos encontrados:', response3.data.events?.length || 0);
     } catch (error3) {
       console.error('   ❌ FALLÓ:', error3.response?.data?.[0]?.message || error3.message);
@@ -137,3 +137,4 @@ async function checkTokenScopes() {
 }
 
 await checkTokenScopes();
+

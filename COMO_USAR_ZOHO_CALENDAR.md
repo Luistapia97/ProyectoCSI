@@ -1,4 +1,4 @@
-# 📅 Cómo Usar Zoho Calendar en Nexus
+﻿# 📅 Cómo Usar Zoho Calendar en Nexus
 
 ## 🎯 Descripción
 
@@ -8,9 +8,9 @@ La integración con Zoho Calendar permite que las tareas asignadas en Nexus se s
 
 Para usar Zoho Calendar en Nexus, necesitas:
 
-1. **Cuenta de Zoho** - Tener una cuenta activa en Zoho
-2. **Iniciar sesión con Zoho** - Haber iniciado sesión en Nexus usando el botón "Continuar con Zoho"
-3. **Permisos de Calendar** - Los permisos se solicitan automáticamente al iniciar sesión
+1. **Cuenta de Zoho**  Tener una cuenta activa en Zoho
+2. **Iniciar sesión con Zoho**  Haber iniciado sesión en Nexus usando el botón "Continuar con Zoho"
+3. **Permisos de Calendar**  Los permisos se solicitan automáticamente al iniciar sesión
 
 ## 🚀 Configuración Inicial
 
@@ -43,9 +43,9 @@ Cuando un administrador crea una tarea:
 
 ```
 ✅ Si la tarea tiene:
-   - Fecha de vencimiento
-   - Usuarios asignados
-   - Usuarios con Zoho conectado
+    Fecha de vencimiento
+    Usuarios asignados
+    Usuarios con Zoho conectado
 
 → Se crea automáticamente un evento en el calendario de cada usuario asignado
 ```
@@ -54,7 +54,7 @@ Cuando un administrador crea una tarea:
 ```
 Tarea: "Implementar login con OAuth"
 Asignado a: Juan, María
-Fecha: 2025-01-15 10:00
+Fecha: 20250115 10:00
 
 Resultado:
 📅 Juan ve el evento en su Zoho Calendar
@@ -67,17 +67,17 @@ Cuando se actualiza una tarea:
 
 ```
 ✅ Cambios sincronizados:
-   - Título de la tarea → Actualiza título del evento
-   - Descripción → Actualiza descripción del evento
-   - Fecha de vencimiento → Actualiza fecha del evento
-   - Prioridad → Actualiza detalles del evento
+    Título de la tarea → Actualiza título del evento
+    Descripción → Actualiza descripción del evento
+    Fecha de vencimiento → Actualiza fecha del evento
+    Prioridad → Actualiza detalles del evento
 ```
 
 **Ejemplo:**
 ```
 Tarea actualizada:
-- Título: "Implementar login con OAuth" → "Implementar OAuth 2.0"
-- Fecha: 2025-01-15 → 2025-01-20
+ Título: "Implementar login con OAuth" → "Implementar OAuth 2.0"
+ Fecha: 20250115 → 20250120
 
 Resultado:
 📅 El evento en Zoho Calendar se actualiza automáticamente
@@ -89,17 +89,17 @@ Cuando se modifican los usuarios asignados:
 
 ```
 ✅ Agregar usuarios:
-   - Nuevos usuarios asignados reciben el evento en su calendario
+    Nuevos usuarios asignados reciben el evento en su calendario
 
 ✅ Remover usuarios:
-   - El evento se elimina del calendario de usuarios removidos
+    El evento se elimina del calendario de usuarios removidos
 ```
 
 **Ejemplo:**
 ```
 Cambio de asignación:
-- Antes: Juan, María
-- Después: Juan, María, Pedro, Ana
+ Antes: Juan, María
+ Después: Juan, María, Pedro, Ana
 
 Resultado:
 📅 Juan y María: mantienen su evento
@@ -112,8 +112,8 @@ Cuando se elimina/archiva una tarea:
 
 ```
 ✅ Eliminación automática:
-   - Se eliminan todos los eventos del calendario
-   - Afecta a todos los usuarios que tenían el evento
+    Se eliminan todos los eventos del calendario
+    Afecta a todos los usuarios que tenían el evento
 ```
 
 ## 📱 Interfaz de Usuario
@@ -136,7 +136,7 @@ sincronizar tareas con tu calendario
 ```
 
 **Acción al hacer clic:**
-- Muestra mensaje informativo sobre cómo conectar
+ Muestra mensaje informativo sobre cómo conectar
 
 ##### 2. **Conectado** ✅
 
@@ -151,8 +151,8 @@ Estado: Sincronizado ✓
 ```
 
 **Acciones disponibles:**
-- **Sincronizar Tarea**: Sincroniza manualmente la tarea actual
-- **Eliminar de Calendar**: Elimina el evento del calendario
+ **Sincronizar Tarea**: Sincroniza manualmente la tarea actual
+ **Eliminar de Calendar**: Elimina el evento del calendario
 
 ## 🔍 Formato de Eventos en Zoho
 
@@ -182,7 +182,7 @@ Fin: 1 hora después (por defecto)
 
 ### Ubicación
 ```
-Nexus - Plataforma de Gestión
+Nexus  Plataforma de Gestión
 ```
 
 ## 🎮 Casos de Uso
@@ -201,7 +201,7 @@ Quiero asignar una tarea a mi equipo y que aparezca en sus calendarios
 **Resultado:**
 ✅ Cada usuario asignado ve la tarea en su Zoho Calendar automáticamente
 
----
+
 
 ### Caso 2: Soy Usuario Asignado
 
@@ -209,13 +209,13 @@ Quiero asignar una tarea a mi equipo y que aparezca en sus calendarios
 Me asignaron una tarea y quiero verla en mi calendario
 
 **Requisito previo:**
-- Haber iniciado sesión con Zoho en Nexus
+ Haber iniciado sesión con Zoho en Nexus
 
 **Resultado:**
 ✅ La tarea aparece automáticamente en mi Zoho Calendar
 ✅ No necesito hacer nada manualmente
 
----
+
 
 ### Caso 3: Sincronización Manual
 
@@ -230,7 +230,7 @@ La tarea no se sincronizó automáticamente o quiero forzar una sincronización
 **Resultado:**
 ✅ El evento se crea/actualiza en Zoho Calendar
 
----
+
 
 ### Caso 4: Usuario Sin Zoho
 
@@ -258,25 +258,25 @@ Iniciaste sesión con email/contraseña local
 1. Cerrar sesión
 2. Iniciar sesión con botón "Continuar con Zoho"
 
----
+
 
 ### ❓ La tarea no aparece en mi calendario
 
 **Posibles causas:**
 
 1. **No tienes Zoho conectado**
-   - Verifica que el botón diga "Zoho Calendar conectado"
+    Verifica que el botón diga "Zoho Calendar conectado"
    
 2. **La tarea no tiene fecha de vencimiento**
-   - Solo tareas con fecha generan eventos
+    Solo tareas con fecha generan eventos
    
 3. **No estás asignado a la tarea**
-   - Solo usuarios asignados reciben el evento
+    Solo usuarios asignados reciben el evento
 
 **Solución:**
-- Usa el botón "Sincronizar Tarea" manualmente
+ Usa el botón "Sincronizar Tarea" manualmente
 
----
+
 
 ### ❓ El evento no se actualizó en Zoho
 
@@ -289,7 +289,7 @@ Puede haber un error temporal en la API
 3. Guarda la tarea
 4. Esto forzará una nueva sincronización
 
----
+
 
 ### ❓ Veo eventos duplicados
 
@@ -300,13 +300,13 @@ La tarea se sincronizó múltiples veces
 1. Usa el botón "Eliminar de Calendar"
 2. Luego usa "Sincronizar Tarea" para crear uno nuevo
 
----
+
 
 ### ❓ Los tokens expiraron
 
 **Síntomas:**
-- Error al sincronizar
-- Dice "Token expired" en consola
+ Error al sincronizar
+ Dice "Token expired" en consola
 
 **Solución:**
 1. Cerrar sesión en Nexus
@@ -371,18 +371,18 @@ await api.get('/calendar/status')
 
 ### ¿Qué información se comparte con Zoho?
 
-- ✅ Título de la tarea
-- ✅ Descripción de la tarea
-- ✅ Fecha de vencimiento
-- ✅ Prioridad
-- ❌ NO se comparten archivos adjuntos
-- ❌ NO se comparten comentarios privados
+ ✅ Título de la tarea
+ ✅ Descripción de la tarea
+ ✅ Fecha de vencimiento
+ ✅ Prioridad
+ ❌ NO se comparten archivos adjuntos
+ ❌ NO se comparten comentarios privados
 
 ### ¿Quién puede ver los eventos?
 
-- Solo el usuario dueño del calendario de Zoho
-- Cada usuario tiene su propio evento privado
-- Los eventos NO son compartidos entre usuarios
+ Solo el usuario dueño del calendario de Zoho
+ Cada usuario tiene su propio evento privado
+ Los eventos NO son compartidos entre usuarios
 
 ### ¿Se pueden revocar los permisos?
 
@@ -394,9 +394,9 @@ Sí, puedes:
 
 ## 📚 Recursos Adicionales
 
-- 📄 [Documentación de Zoho Calendar API](https://www.zoho.com/calendar/help/api/)
-- 📄 [Guía de integración completa](./ZOHO_CALENDAR_INTEGRATION.md)
-- 📄 [Configuración de OpenID Connect](./ZOHO_OPENID_CONNECT.md)
+ 📄 [Documentación de Zoho Calendar API](https://www.zoho.com/calendar/help/api/)
+ 📄 [Guía de integración completa](./ZOHO_CALENDAR_INTEGRATION.md)
+ 📄 [Configuración de OpenID Connect](./ZOHO_OPENID_CONNECT.md)
 
 ## ❓ Preguntas Frecuentes
 
@@ -415,8 +415,9 @@ R: No, necesitas conexión a internet para sincronizar con Zoho.
 **P: ¿Hay límite de tareas sincronizadas?**  
 R: No hay límite definido, depende de tu plan de Zoho.
 
----
+
 
 **Última actualización:** Enero 2025  
 **Versión:** 1.0.0  
 **Soporte:** Contacta al administrador del proyecto
+

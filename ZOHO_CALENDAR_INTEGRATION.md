@@ -1,4 +1,4 @@
-# 📅 Integración con Zoho Calendar
+﻿# 📅 Integración con Zoho Calendar
 
 ## ✨ Descripción General
 
@@ -7,19 +7,19 @@ La integración con Zoho Calendar permite sincronizar automáticamente las tarea
 ## 🔑 Características Principales
 
 ### 1. **Sincronización Automática**
-- ✅ Creación automática de eventos cuando se asigna una tarea
-- ✅ Actualización de eventos cuando cambian los detalles de la tarea
-- ✅ Eliminación de eventos cuando se elimina/archiva la tarea
+ ✅ Creación automática de eventos cuando se asigna una tarea
+ ✅ Actualización de eventos cuando cambian los detalles de la tarea
+ ✅ Eliminación de eventos cuando se elimina/archiva la tarea
 
-### 2. **Multi-Usuario**
-- 📊 Cada usuario asignado a una tarea obtiene su propio evento en su calendario
-- 👥 Si una tarea tiene múltiples asignados, cada uno recibe el evento
-- 🔄 Los eventos se gestionan independientemente para cada usuario
+### 2. **MultiUsuario**
+ 📊 Cada usuario asignado a una tarea obtiene su propio evento en su calendario
+ 👥 Si una tarea tiene múltiples asignados, cada uno recibe el evento
+ 🔄 Los eventos se gestionan independientemente para cada usuario
 
 ### 3. **Sincronización Selectiva**
-- ⚡ Solo se sincronizan usuarios con cuenta Zoho conectada
-- 📆 Solo tareas con fecha de vencimiento generan eventos
-- 🎯 No bloquea la creación de tareas si falla la sincronización
+ ⚡ Solo se sincronizan usuarios con cuenta Zoho conectada
+ 📆 Solo tareas con fecha de vencimiento generan eventos
+ 🎯 No bloquea la creación de tareas si falla la sincronización
 
 ## 🏗️ Arquitectura
 
@@ -92,7 +92,7 @@ if (task.zohoCalendarEventIds && task.zohoCalendarEventIds.length > 0) {
 
 ## 📋 Estructura de Datos
 
-### Task Model - Campo `zohoCalendarEventIds`
+### Task Model  Campo `zohoCalendarEventIds`
 
 ```javascript
 zohoCalendarEventIds: [{
@@ -119,9 +119,9 @@ zohoCalendarEventIds: [{
     
     🔗 Ver en Nexus: http://localhost:5173/project/[projectId]
   `,
-  start: "2025-01-15T10:00:00Z",    // ISO 8601
-  end: "2025-01-15T11:00:00Z",      // ISO 8601 (1 hora después)
-  location: "Nexus - Plataforma de Gestión"
+  start: "20250115T10:00:00Z",    // ISO 8601
+  end: "20250115T11:00:00Z",      // ISO 8601 (1 hora después)
+  location: "Nexus  Plataforma de Gestión"
 }
 ```
 
@@ -169,14 +169,14 @@ zohoCalendarEventIds: [{
 1. Usuario admin cambia asignados de la tarea
    ↓
 2. Backend identifica:
-   - Usuarios removidos: [A, B]
-   - Usuarios nuevos: [C, D]
+    Usuarios removidos: [A, B]
+    Usuarios nuevos: [C, D]
    ↓
 3. Elimina eventos de usuarios removidos:
-   - Filtra zohoCalendarEventIds removiendo A y B
+    Filtra zohoCalendarEventIds removiendo A y B
    ↓
 4. Crea eventos para nuevos usuarios:
-   - Llama syncTaskToZohoCalendar([C, D])
+    Llama syncTaskToZohoCalendar([C, D])
    ↓
 5. Usuarios C y D ven nuevo evento
 6. Usuarios A y B ya no ven el evento
@@ -234,35 +234,35 @@ scope: [
 ### ✅ Casos Exitosos
 
 1. **Usuario con Zoho conectado + Tarea con fecha**
-   - ✅ Se crea evento automáticamente
+    ✅ Se crea evento automáticamente
 
 2. **Múltiples usuarios asignados con Zoho**
-   - ✅ Cada uno recibe su propio evento
+    ✅ Cada uno recibe su propio evento
 
 3. **Actualización de título/descripción**
-   - ✅ Eventos se actualizan automáticamente
+    ✅ Eventos se actualizan automáticamente
 
 4. **Cambio de fecha de vencimiento**
-   - ✅ Eventos se actualizan con nueva fecha
+    ✅ Eventos se actualizan con nueva fecha
 
 ### ⚠️ Casos Especiales
 
 1. **Usuario SIN Zoho conectado**
-   - ⚠️ No se crea evento (se omite silenciosamente)
-   - ✅ Tarea se crea/asigna normalmente
+    ⚠️ No se crea evento (se omite silenciosamente)
+    ✅ Tarea se crea/asigna normalmente
 
 2. **Tarea SIN fecha de vencimiento**
-   - ⚠️ No se crea evento
-   - ✅ Tarea se crea normalmente
+    ⚠️ No se crea evento
+    ✅ Tarea se crea normalmente
 
 3. **Error en API de Zoho**
-   - ❌ Se registra error en logs
-   - ✅ Tarea se crea/actualiza normalmente
-   - ✅ No se interrumpe el flujo
+    ❌ Se registra error en logs
+    ✅ Tarea se crea/actualiza normalmente
+    ✅ No se interrumpe el flujo
 
 4. **Token de Zoho expirado**
-   - ❌ Falla la sincronización
-   - 🔄 TODO: Implementar refresh token automático
+    ❌ Falla la sincronización
+    🔄 TODO: Implementar refresh token automático
 
 ## 🐛 Debugging
 
@@ -357,11 +357,11 @@ POST /api/webhooks/zoho/calendar
 
 ## 📚 Recursos
 
-- [Zoho Calendar API Documentation](https://www.zoho.com/calendar/help/api/)
-- [OpenID Connect Specification](https://openid.net/connect/)
-- Archivo interno: `ZOHO_OPENID_CONNECT.md`
-- Service: `backend/services/zohoCalendar.js`
-- Middleware: `backend/middleware/zohoCalendarSync.js`
+ [Zoho Calendar API Documentation](https://www.zoho.com/calendar/help/api/)
+ [OpenID Connect Specification](https://openid.net/connect/)
+ Archivo interno: `ZOHO_OPENID_CONNECT.md`
+ Service: `backend/services/zohoCalendar.js`
+ Middleware: `backend/middleware/zohoCalendarSync.js`
 
 ## ❓ Preguntas Frecuentes
 
@@ -380,8 +380,9 @@ Actualmente se guarda en `task.zohoCalendarEventIds[].eventLink` pero no se mues
 ### ¿Qué pasa si expira el token de Zoho?
 La sincronización falla pero no afecta la funcionalidad de tareas. El usuario debe reconectar su cuenta Zoho.
 
----
+
 
 **Última actualización:** Enero 2025
 **Versión:** 1.0.0
 **Autor:** Proyecto Nexus
+

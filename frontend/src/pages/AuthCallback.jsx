@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+﻿import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'reactrouterdom';
 import useAuthStore from '../store/authStore';
 import './AuthCallback.css';
 
@@ -69,8 +69,8 @@ export default function AuthCallback() {
   }, [searchParams, navigate, loadUser]);
 
   return (
-    <div className="auth-callback">
-      <div className="callback-card">
+    <div className="authcallback">
+      <div className="callbackcard">
         {status === 'processing' && (
           <>
             <div className="spinner"></div>
@@ -81,22 +81,23 @@ export default function AuthCallback() {
 
         {status === 'success' && (
           <>
-            <div className="success-icon">✓</div>
+            <div className="successicon">✓</div>
             <h2>¡Autenticación exitosa!</h2>
             <p>Bienvenido a Proyecto Nexus</p>
-            <p className="redirect-text">Redirigiendo al dashboard...</p>
+            <p className="redirecttext">Redirigiendo al dashboard...</p>
           </>
         )}
 
         {status === 'error' && (
           <>
-            <div className="error-icon">✕</div>
+            <div className="erroricon">✕</div>
             <h2>Error de autenticación</h2>
             <p>No se pudo completar el inicio de sesión con Google</p>
-            <p className="redirect-text">Redirigiendo al login...</p>
+            <p className="redirecttext">Redirigiendo al login...</p>
           </>
         )}
       </div>
     </div>
   );
 }
+

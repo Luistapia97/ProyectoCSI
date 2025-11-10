@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+﻿import { useState } from 'react';
+import { Link, useNavigate } from 'reactrouterdom';
+import { UserPlus, Mail, Lock, User } from 'lucidereact';
 import useAuthStore from '../store/authStore';
 import { getBackendURL } from '../services/api';
 import './Auth.css';
@@ -53,10 +53,10 @@ export default function Register() {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <div className="auth-header">
-          <UserPlus className="auth-icon" size={48} />
+    <div className="authcontainer">
+      <div className="authcard">
+        <div className="authheader">
+          <UserPlus className="authicon" size={48} />
           <h1>Crear cuenta</h1>
           <p>Únete a Nexus y gestiona tus tareas</p>
         </div>
@@ -73,19 +73,19 @@ export default function Register() {
         }}>
           <strong>👤 Registro de Usuario:</strong> Los usuarios pueden ver y completar las tareas asignadas por los administradores.
           {' '}
-          <Link to="/register-admin" style={{ color: '#1e40af', fontWeight: 'bold', textDecoration: 'underline' }}>
+          <Link to="/registeradmin" style={{ color: '#1e40af', fontWeight: 'bold', textDecoration: 'underline' }}>
             ¿Eres administrador? Click aquí
           </Link>
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className="errormessage">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
+        <form onSubmit={handleSubmit} className="authform">
+          <div className="formgroup">
             <label htmlFor="name">
               <User size={18} />
               Nombre completo
@@ -100,7 +100,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="email">
               <Mail size={18} />
               Email
@@ -115,7 +115,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="password">
               <Lock size={18} />
               Contraseña
@@ -130,7 +130,7 @@ export default function Register() {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="confirmPassword">
               <Lock size={18} />
               Confirmar contraseña
@@ -145,7 +145,7 @@ export default function Register() {
             />
           </div>
 
-          <button type="submit" className="btn-primary" disabled={loading}>
+          <button type="submit" className="btnprimary" disabled={loading}>
             {loading ? 'Creando cuenta...' : 'Crear cuenta'}
           </button>
         </form>
@@ -154,16 +154,16 @@ export default function Register() {
           <span>o continuar con</span>
         </div>
 
-        <button onClick={handleZohoRegister} className="btn-zoho">
+        <button onClick={handleZohoRegister} className="btnzoho">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <rect width="20" height="20" rx="3" fill="#FF6B00"/>
-            <path d="M14.5 6H5.5L3 10l2.5 4h9l2.5-4-2.5-4z" fill="white"/>
+            <path d="M14.5 6H5.5L3 10l2.5 4h9l2.542.54z" fill="white"/>
             <path d="M10 7v6M7 10h6" stroke="#FF6B00" strokeWidth="1.5" strokeLinecap="round"/>
           </svg>
           Continuar con Zoho
         </button>
 
-        <div className="auth-footer">
+        <div className="authfooter">
           <p>
             ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión</Link>
           </p>
@@ -172,3 +172,4 @@ export default function Register() {
     </div>
   );
 }
+

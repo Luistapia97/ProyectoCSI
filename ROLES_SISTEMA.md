@@ -1,4 +1,4 @@
-# 🔐 Sistema de Roles - Administrador y Usuario
+﻿# 🔐 Sistema de Roles  Administrador y Usuario
 
 ## ✅ Implementación Completada
 
@@ -6,68 +6,68 @@
 
 Se ha implementado un sistema completo de roles con dos niveles de acceso:
 
-1. **👑 Administrador** - Control total del sistema
-2. **👤 Usuario** - Solo puede trabajar en tareas asignadas
+1. **👑 Administrador**  Control total del sistema
+2. **👤 Usuario**  Solo puede trabajar en tareas asignadas
 
----
+
 
 ## 🎯 Funcionalidades por Rol
 
 ### 👑 Administrador
 
 **Puede hacer:**
-- ✅ Crear proyectos
-- ✅ Eliminar proyectos
-- ✅ Crear tareas
-- ✅ Editar tareas completamente (título, descripción, prioridad, fechas, etc.)
-- ✅ Asignar tareas a usuarios
-- ✅ Crear nuevos usuarios
-- ✅ Ver todos los proyectos
-- ✅ Gestionar miembros del equipo
-- ✅ Acceso completo al sistema
+ ✅ Crear proyectos
+ ✅ Eliminar proyectos
+ ✅ Crear tareas
+ ✅ Editar tareas completamente (título, descripción, prioridad, fechas, etc.)
+ ✅ Asignar tareas a usuarios
+ ✅ Crear nuevos usuarios
+ ✅ Ver todos los proyectos
+ ✅ Gestionar miembros del equipo
+ ✅ Acceso completo al sistema
 
 **Interfaz:**
-- Botón "Crear Usuario" en el Dashboard
-- Botón "Nuevo Proyecto" en el Dashboard
-- Botón "+" en cada columna del Kanban para crear tareas
-- Badge dorado "Administrador" con icono de escudo
+ Botón "Crear Usuario" en el Dashboard
+ Botón "Nuevo Proyecto" en el Dashboard
+ Botón "+" en cada columna del Kanban para crear tareas
+ Badge dorado "Administrador" con icono de escudo
 
----
+
 
 ### 👤 Usuario
 
 **Puede hacer:**
-- ✅ Ver tareas asignadas a él
-- ✅ Marcar tareas como completadas
-- ✅ Actualizar subtareas
-- ✅ Agregar comentarios
-- ✅ Ver proyectos donde está asignado
-- ✅ Mover tareas en el tablero (drag & drop)
+ ✅ Ver tareas asignadas a él
+ ✅ Marcar tareas como completadas
+ ✅ Actualizar subtareas
+ ✅ Agregar comentarios
+ ✅ Ver proyectos donde está asignado
+ ✅ Mover tareas en el tablero (drag & drop)
 
 **NO puede hacer:**
-- ❌ Crear proyectos
-- ❌ Crear tareas
-- ❌ Editar detalles de tareas (título, descripción, prioridad)
-- ❌ Asignar tareas a otros
-- ❌ Crear usuarios
+ ❌ Crear proyectos
+ ❌ Crear tareas
+ ❌ Editar detalles de tareas (título, descripción, prioridad)
+ ❌ Asignar tareas a otros
+ ❌ Crear usuarios
 
 **Interfaz:**
-- No ve botón "Crear Proyecto"
-- No ve botón "Crear Usuario"
-- No ve botón "+" en las columnas
-- Badge azul "Usuario" con icono de persona
-- Mensaje: "El administrador te asignará proyectos y tareas pronto"
+ No ve botón "Crear Proyecto"
+ No ve botón "Crear Usuario"
+ No ve botón "+" en las columnas
+ Badge azul "Usuario" con icono de persona
+ Mensaje: "El administrador te asignará proyectos y tareas pronto"
 
----
+
 
 ## 🚀 Cómo Funciona
 
 ### 1️⃣ Primer Usuario = Admin Automático
 
 Cuando el **primer usuario** se registra en el sistema:
-- Automáticamente recibe el rol de **Administrador**
-- Puede comenzar a crear proyectos y usuarios inmediatamente
-- Ve un mensaje informativo en el registro
+ Automáticamente recibe el rol de **Administrador**
+ Puede comenzar a crear proyectos y usuarios inmediatamente
+ Ve un mensaje informativo en el registro
 
 ```javascript
 // Lógica en backend/routes/auth.js
@@ -80,7 +80,7 @@ const user = await User.create({
 });
 ```
 
----
+
 
 ### 2️⃣ Admin Crea Más Usuarios
 
@@ -89,12 +89,12 @@ El administrador puede crear usuarios adicionales:
 1. Va al Dashboard
 2. Click en "Crear Usuario"
 3. Rellena el formulario:
-   - Nombre
-   - Email
-   - Contraseña
-   - **Rol**: Usuario o Administrador
+    Nombre
+    Email
+    Contraseña
+    **Rol**: Usuario o Administrador
 
----
+
 
 ### 3️⃣ Protección de Rutas Backend
 
@@ -104,7 +104,7 @@ Las rutas están protegidas con middleware:
 // Solo admins
 router.post('/projects', protect, isAdmin, async (req, res) => {...});
 router.post('/tasks', protect, isAdmin, async (req, res) => {...});
-router.post('/auth/create-user', protect, isAdmin, async (req, res) => {...});
+router.post('/auth/createuser', protect, isAdmin, async (req, res) => {...});
 
 // Usuarios pueden actualizar solo su estado
 router.put('/tasks/:id', protect, async (req, res) => {
@@ -118,7 +118,7 @@ router.put('/tasks/:id', protect, async (req, res) => {
 });
 ```
 
----
+
 
 ### 4️⃣ Interfaz Adaptativa
 
@@ -138,32 +138,32 @@ const isAdmin = user?.role === 'administrador';
 )}
 ```
 
----
+
 
 ## 📁 Archivos Modificados/Creados
 
 ### Backend
 
 ✅ **Nuevos archivos:**
-- `backend/middleware/roleAuth.js` - Middleware de autorización por roles
+ `backend/middleware/roleAuth.js`  Middleware de autorización por roles
 
 ✅ **Archivos modificados:**
-- `backend/routes/auth.js` - Registro con roles, crear usuarios, listar usuarios
-- `backend/routes/projects.js` - Protección con `isAdmin`
-- `backend/routes/tasks.js` - Protección diferenciada (admin vs usuario)
+ `backend/routes/auth.js`  Registro con roles, crear usuarios, listar usuarios
+ `backend/routes/projects.js`  Protección con `isAdmin`
+ `backend/routes/tasks.js`  Protección diferenciada (admin vs usuario)
 
 ### Frontend
 
 ✅ **Nuevos archivos:**
-- `frontend/src/components/CreateUserModal.jsx` - Modal para crear usuarios
+ `frontend/src/components/CreateUserModal.jsx`  Modal para crear usuarios
 
 ✅ **Archivos modificados:**
-- `frontend/src/services/api.js` - Nuevos endpoints (getAllUsers, createUser)
-- `frontend/src/pages/Dashboard.jsx` - Interfaz adaptativa por rol
-- `frontend/src/pages/Board.jsx` - Botón crear tarea solo para admins
-- `frontend/src/pages/Register.jsx` - Mensaje informativo primer usuario
+ `frontend/src/services/api.js`  Nuevos endpoints (getAllUsers, createUser)
+ `frontend/src/pages/Dashboard.jsx`  Interfaz adaptativa por rol
+ `frontend/src/pages/Board.jsx`  Botón crear tarea solo para admins
+ `frontend/src/pages/Register.jsx`  Mensaje informativo primer usuario
 
----
+
 
 ## 🔒 Seguridad
 
@@ -175,7 +175,7 @@ const isAdmin = user?.role === 'administrador';
 4. **Usuario solo puede editar sus tareas asignadas**
 5. **Admin tiene control total pero respeta lógica de negocio**
 
----
+
 
 ## 🧪 Cómo Probar
 
@@ -191,10 +191,10 @@ const isAdmin = user?.role === 'administrador';
 
 1. Como admin, click en "Crear Usuario"
 2. Completa el formulario:
-   - Nombre: "Usuario Test"
-   - Email: usuario@test.com
-   - Contraseña: 123456
-   - Rol: **Usuario** (no administrador)
+    Nombre: "Usuario Test"
+    Email: usuario@test.com
+    Contraseña: 123456
+    Rol: **Usuario** (no administrador)
 3. Click "Crear Usuario"
 
 ### Paso 3: Crear Proyecto y Tarea
@@ -213,23 +213,23 @@ const isAdmin = user?.role === 'administrador';
 4. Entra al tablero
 5. **No verás** el botón "+" para crear tareas
 6. Pero **SÍ puedes**:
-   - Abrir la tarea
-   - Marcar subtareas
-   - Cambiar estado a completado
-   - Agregar comentarios
-   - Mover la tarea entre columnas
+    Abrir la tarea
+    Marcar subtareas
+    Cambiar estado a completado
+    Agregar comentarios
+    Mover la tarea entre columnas
 
----
+
 
 ## 🎨 Diferencias Visuales
 
-### Dashboard - Admin
+### Dashboard  Admin
 ```
 ┌─────────────────────────────────────────┐
 │ 👑 Administrador                  [🌙] │
 ├─────────────────────────────────────────┤
 │ Bienvenido, Admin 👋                    │
-│ Panel de administración - Crea          │
+│ Panel de administración  Crea          │
 │ proyectos, tareas y gestiona usuarios   │
 │                                         │
 │      [👤 Crear Usuario] [+ Nuevo       │
@@ -237,7 +237,7 @@ const isAdmin = user?.role === 'administrador';
 └─────────────────────────────────────────┘
 ```
 
-### Dashboard - Usuario
+### Dashboard  Usuario
 ```
 ┌─────────────────────────────────────────┐
 │ 👤 Usuario                        [🌙] │
@@ -250,7 +250,7 @@ const isAdmin = user?.role === 'administrador';
 └─────────────────────────────────────────┘
 ```
 
-### Tablero Kanban - Admin
+### Tablero Kanban  Admin
 ```
 ┌────────────────────────────────────┐
 │ Pendiente              [+]         │
@@ -261,7 +261,7 @@ const isAdmin = user?.role === 'administrador';
      ↑ Botón + visible
 ```
 
-### Tablero Kanban - Usuario
+### Tablero Kanban  Usuario
 ```
 ┌────────────────────────────────────┐
 │ Pendiente                          │
@@ -271,7 +271,7 @@ const isAdmin = user?.role === 'administrador';
      ↑ Sin botón +
 ```
 
----
+
 
 ## 🔑 Endpoints API Nuevos
 
@@ -281,7 +281,7 @@ GET /api/auth/users
 Authorization: Bearer {token}
 
 # Crear usuario (solo admin)
-POST /api/auth/create-user
+POST /api/auth/createuser
 Authorization: Bearer {token}
 Body: {
   "name": "Juan Pérez",
@@ -291,36 +291,36 @@ Body: {
 }
 ```
 
----
+
 
 ## 💡 Casos de Uso
 
 ### Caso 1: Empresa con Gerente y Empleados
 
-- **Gerente** (Admin):
-  - Crea proyectos para diferentes departamentos
-  - Crea tareas y las asigna a empleados
-  - Supervisa el progreso
-  - Crea cuentas para nuevos empleados
+ **Gerente** (Admin):
+   Crea proyectos para diferentes departamentos
+   Crea tareas y las asigna a empleados
+   Supervisa el progreso
+   Crea cuentas para nuevos empleados
 
-- **Empleados** (Usuarios):
-  - Ven solo sus tareas asignadas
-  - Marcan tareas como completadas
-  - Comentan dudas o actualizaciones
+ **Empleados** (Usuarios):
+   Ven solo sus tareas asignadas
+   Marcan tareas como completadas
+   Comentan dudas o actualizaciones
 
 ### Caso 2: Freelancer con Clientes
 
-- **Freelancer** (Admin):
-  - Crea proyectos por cliente
-  - Define tareas y entregables
-  - Invita a clientes como usuarios (opcional)
+ **Freelancer** (Admin):
+   Crea proyectos por cliente
+   Define tareas y entregables
+   Invita a clientes como usuarios (opcional)
 
-- **Clientes** (Usuarios):
-  - Ven el progreso
-  - Comentan feedback
-  - No pueden modificar el proyecto
+ **Clientes** (Usuarios):
+   Ven el progreso
+   Comentan feedback
+   No pueden modificar el proyecto
 
----
+
 
 ## ✅ Ventajas del Sistema
 
@@ -330,7 +330,7 @@ Body: {
 4. **Colaboración**: Usuarios participan sin romper nada
 5. **Escalable**: Fácil agregar más roles en el futuro
 
----
+
 
 ## 🚀 Próximos Pasos Sugeridos
 
@@ -340,8 +340,9 @@ Body: {
 4. **Historial**: Ver quién hizo qué cambio
 5. **Reportes**: Dashboard de productividad por usuario
 
----
+
 
 **Estado:** ✅ Sistema de roles completamente funcional  
 **Fecha:** 23 de octubre de 2025  
 **Versión:** 1.0.0
+

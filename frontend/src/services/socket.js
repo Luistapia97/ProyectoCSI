@@ -1,4 +1,4 @@
-import { io } from 'socket.io-client';
+﻿import { io } from 'socket.ioclient';
 
 // Detectar la URL del socket automáticamente
 const getSocketUrl = () => {
@@ -56,13 +56,13 @@ class SocketService {
 
   joinUser(userId) {
     if (this.socket) {
-      this.socket.emit('join-user', userId);
+      this.socket.emit('joinuser', userId);
     }
   }
 
   joinProject(projectId) {
     if (this.socket) {
-      this.socket.emit('join-project', projectId);
+      this.socket.emit('joinproject', projectId);
     }
   }
 
@@ -80,3 +80,4 @@ class SocketService {
 }
 
 export default new SocketService();
+

@@ -1,4 +1,4 @@
-# 🚨 Problema con Zoho Mail API y Soluciones
+﻿# 🚨 Problema con Zoho Mail API y Soluciones
 
 ## ❌ Error Actual: `URL_RULE_NOT_CONFIGURED`
 
@@ -18,16 +18,16 @@ Esta es la **forma más confiable** de enviar emails desde Zoho Mail.
 
 1. **Inicia sesión en Zoho Mail**: https://mail.zoho.com
 2. **Ve a Configuración**:
-   - Haz clic en el ícono de engranaje (⚙️) arriba a la derecha
-   - Selecciona "Configuración de cuenta"
+    Haz clic en el ícono de engranaje (⚙️) arriba a la derecha
+    Selecciona "Configuración de cuenta"
 3. **Navega a Seguridad**:
-   - En el menú izquierdo, selecciona "Seguridad"
-   - Busca la sección "Contraseñas de aplicación" o "App Passwords"
+    En el menú izquierdo, selecciona "Seguridad"
+    Busca la sección "Contraseñas de aplicación" o "App Passwords"
 4. **Genera una contraseña**:
-   - Haz clic en "Generar nueva contraseña"
-   - Dale un nombre: "Nexus App"
-   - Selecciona servicio: "Mail"
-   - Copia la contraseña generada (16 caracteres)
+    Haz clic en "Generar nueva contraseña"
+    Dale un nombre: "Nexus App"
+    Selecciona servicio: "Mail"
+    Copia la contraseña generada (16 caracteres)
 
 5. **Agrega a las variables de entorno** (.env):
 ```env
@@ -46,7 +46,7 @@ Si Zoho Mail es complicado, puedes usar:
 ```env
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_USER=tu-email@gmail.com
+EMAIL_USER=tuemail@gmail.com
 EMAIL_PASSWORD=tu_app_password_de_16_caracteres
 ```
 
@@ -59,8 +59,8 @@ SENDGRID_API_KEY=tu_api_key
 
 Requiere configuración adicional en Zoho Developer Console:
 
-1. Ve a https://api-console.zoho.com/
-2. Crea un "Server-based Application"
+1. Ve a https://apiconsole.zoho.com/
+2. Crea un "Serverbased Application"
 3. Habilita específicamente "Zoho Mail API"
 4. Solicita permisos extendidos
 5. Espera aprobación de Zoho (puede tardar días)
@@ -126,7 +126,7 @@ if (process.env.ZOHO_MAIL_APP_PASSWORD) {
 ## 📊 Comparación de Métodos
 
 | Método | Confiabilidad | Configuración | OAuth | Límites |
-|--------|--------------|---------------|-------|---------|
+||||||
 | **App Password** | ⭐⭐⭐⭐⭐ | Fácil | No | 500/día |
 | **Zoho Mail API** | ⭐⭐ | Muy difícil | Sí | Limitado |
 | **OAuth2 SMTP** | ⭐⭐ | Difícil | Sí | Limitado |
@@ -142,9 +142,10 @@ if (process.env.ZOHO_MAIL_APP_PASSWORD) {
 3. **Gmail con App Password** (alternativa sólida)
 
 **Evita**:
-- ❌ Zoho Mail API REST (muy limitada)
-- ❌ OAuth2 para SMTP (no soportado bien por Zoho)
+ ❌ Zoho Mail API REST (muy limitada)
+ ❌ OAuth2 para SMTP (no soportado bien por Zoho)
 
 ## 🚀 Siguiente Paso
 
 ¿Quieres que implemente la solución con **contraseña de aplicación de Zoho** o prefieres cambiar a **SendGrid/Gmail**?
+

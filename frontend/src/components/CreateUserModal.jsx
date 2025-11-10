@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, UserPlus, Shield, User as UserIcon } from 'lucide-react';
+﻿import { useState } from 'react';
+import { X, UserPlus, Shield, User as UserIcon } from 'lucidereact';
 import { authAPI } from '../services/api';
 import './Modal.css';
 
@@ -40,21 +40,21 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="modal-title-icon">
+    <div className="modaloverlay" onClick={onClose}>
+      <div className="modalcontent" onClick={(e) => e.stopPropagation()}>
+        <div className="modalheader">
+          <div className="modaltitleicon">
             <UserPlus size={24} />
             <h2>Crear Nuevo Usuario</h2>
           </div>
-          <button className="modal-close" onClick={onClose}>
+          <button className="modalclose" onClick={onClose}>
             <X size={24} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
+        <form onSubmit={handleSubmit} className="modalform">
           {error && (
-            <div className="error-message" style={{ 
+            <div className="errormessage" style={{ 
               padding: '12px', 
               background: '#fee', 
               border: '1px solid #fcc',
@@ -66,7 +66,7 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             </div>
           )}
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="name">Nombre Completo</label>
             <input
               type="text"
@@ -80,7 +80,7 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="email">Email</label>
             <input
               type="email"
@@ -93,7 +93,7 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="password">Contraseña</label>
             <input
               type="password"
@@ -107,7 +107,7 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             />
           </div>
 
-          <div className="form-group">
+          <div className="formgroup">
             <label htmlFor="role">Rol</label>
             <select
               id="role"
@@ -125,12 +125,12 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             </select>
           </div>
 
-          <div className="role-info" style={{
+          <div className="roleinfo" style={{
             padding: '12px',
-            background: 'var(--bg-secondary)',
+            background: 'var(bgsecondary)',
             borderRadius: '8px',
             fontSize: '14px',
-            color: 'var(--text-secondary)',
+            color: 'var(textsecondary)',
             marginBottom: '20px'
           }}>
             {formData.role === 'usuario' ? (
@@ -152,10 +152,10 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             )}
           </div>
 
-          <div className="modal-actions">
+          <div className="modalactions">
             <button
               type="button"
-              className="btn-secondary"
+              className="btnsecondary"
               onClick={onClose}
               disabled={loading}
             >
@@ -163,7 +163,7 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
             </button>
             <button
               type="submit"
-              className="btn-primary"
+              className="btnprimary"
               disabled={loading}
             >
               {loading ? 'Creando...' : 'Crear Usuario'}
@@ -176,3 +176,4 @@ const CreateUserModal = ({ onClose, onUserCreated }) => {
 };
 
 export default CreateUserModal;
+
