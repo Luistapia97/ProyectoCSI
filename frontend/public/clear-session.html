@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Limpiar Sesión de Zoho</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #FF6B00;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #e55a00;
+        }
+        .success {
+            background: #22c55e;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🧹 Limpiar Sesión de Zoho</h1>
+        <p>Usa este botón antes de probar el login con Zoho para empezar con una sesión limpia.</p>
+        
+        <button onclick="clearAll()">Limpiar Todo</button>
+        <button onclick="clearZohoOnly()">Solo Limpiar Zoho</button>
+        <button onclick="goToLogin()">Ir a Login</button>
+        
+        <div id="success" class="success"></div>
+        
+        <h3>Estado Actual:</h3>
+        <div id="status"></div>
+    </div>
+    
+    <script>
+        function showStatus() {
+            const statusDiv = document.getElementById('status');
+            const zohoEmail = localStorage.getItem('zohoUserEmail');
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            statusDiv.innerHTML = `
+                <p><strong>Zoho Email:</strong> ${zohoEmail || 'No guardado'}</p>
+                <p><strong>Token:</strong> ${token ? 'Presente' : 'No presente'}</p>
+                <p><strong>Usuario:</strong> ${user ? 'Presente' : 'No presente'}</p>
+            `;
+        }
+        
+        function clearAll() {
+            localStorage.clear();
+            showSuccess('✅ Todo el localStorage ha sido limpiado');
+            showStatus();
+        }
+        
+        function clearZohoOnly() {
+            localStorage.removeItem('zohoUserEmail');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            showSuccess('✅ Datos de Zoho eliminados');
+            showStatus();
+        }
+        
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function goToLogin() {
+            window.location.href = 'http://localhost:5173/login';
+        }
+        
+        // Mostrar estado al cargar
+        showStatus();
+    </script>
+</body>
+</html>

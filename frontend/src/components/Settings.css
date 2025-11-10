@@ -1,0 +1,305 @@
+.zoho-settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.settings-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.settings-header svg {
+  color: #FF6B00;
+  margin-bottom: 1rem;
+}
+
+.settings-header h2 {
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.settings-header p {
+  color: #6b7280;
+}
+
+.success-message {
+  background: #dcfce7;
+  border: 1px solid #22c55e;
+  color: #15803d;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.error-message {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.connected-state {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.status-badge.connected {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.connection-info {
+  margin-bottom: 2rem;
+}
+
+.connection-info p {
+  color: #4b5563;
+  margin-bottom: 1rem;
+}
+
+.connection-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.connection-info li {
+  color: #6b7280;
+  padding: 0.5rem 0;
+}
+
+.btn-disconnect {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-disconnect:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-disconnect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.connection-form {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.instructions {
+  background: #f9fafb;
+  border-left: 4px solid #FF6B00;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.instructions h3 {
+  color: #1f2937;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.instructions ol {
+  color: #4b5563;
+  padding-left: 1.5rem;
+  line-height: 1.8;
+}
+
+.instructions ol li {
+  margin-bottom: 0.5rem;
+}
+
+.instructions a {
+  color: #FF6B00;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.instructions a:hover {
+  text-decoration: underline;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #FF6B00;
+}
+
+.form-group small {
+  display: block;
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.btn-connect {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem;
+  background: #FF6B00;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-connect:hover:not(:disabled) {
+  background: #e55a00;
+}
+
+.btn-connect:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estilos para la página de configuración */
+.settings-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.settings-header-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.settings-header-main svg {
+  color: #FF6B00;
+}
+
+.settings-header-main h1 {
+  color: #1f2937;
+  font-size: 2rem;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 2rem;
+}
+
+.settings-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.tab-button:hover {
+  background: #f9fafb;
+  color: #1f2937;
+}
+
+.tab-button.active {
+  background: #FF6B00;
+  color: white;
+  border-color: #FF6B00;
+}
+
+.settings-content {
+  min-height: 400px;
+}
+
+.tab-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tab-content h2 {
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.tab-content p {
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .settings-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .tab-button {
+    white-space: nowrap;
+  }
+}

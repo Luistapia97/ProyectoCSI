@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Token de Zoho - Nexus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #FF6B00;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            background: #f9fafb;
+            border-left: 4px solid #FF6B00;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+        .step h3 {
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .step p {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: #FF6B00;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #e55a00;
+        }
+
+        .btn-secondary {
+            background: #6366f1;
+        }
+
+        .btn-secondary:hover {
+            background: #4f46e5;
+        }
+
+        .url-box {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            word-break: break-all;
+            margin: 15px 0;
+            border: 2px solid #10b981;
+        }
+
+        .token-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+
+        .token-input:focus {
+            outline: none;
+            border-color: #FF6B00;
+        }
+
+        .success {
+            background: #dcfce7;
+            border-left: 4px solid #22c55e;
+            color: #15803d;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .error {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔑 Generar Token de Zoho Calendar</h1>
+        <p class="subtitle">Sigue estos pasos para obtener tu token de acceso</p>
+
+        <div class="step">
+            <h3>📋 Paso 1: Usa este Client ID</h3>
+            <p>Tu Client ID actual de Zoho:</p>
+            <div class="url-box">1000.PV5VLITLAS39ZUV6L26PDH87BFTQQK</div>
+        </div>
+
+        <div class="step">
+            <h3>🔗 Paso 2: Genera el Token</h3>
+            <p>Haz click en este botón para abrir Zoho y autorizar la aplicación:</p>
+            <a href="https://accounts.zoho.com/oauth/v2/auth?scope=ZohoCalendar.calendar.ALL,ZohoCalendar.event.ALL&client_id=1000.PV5VLITLAS39ZUV6L26PDH87BFTQQK&response_type=token&redirect_uri=http://localhost:5000/api/auth/zoho/callback&access_type=offline&prompt=consent" 
+               class="btn" 
+               target="_blank">
+                🚀 Autorizar en Zoho
+            </a>
+        </div>
+
+        <div class="info">
+            <strong>ℹ️ Importante:</strong> Después de autorizar, Zoho te redirigirá a una página. 
+            La URL contendrá tu token. Busca <code>access_token=</code> en la barra de direcciones y copia todo el texto hasta el siguiente símbolo <code>&</code>
+        </div>
+
+        <div class="step">
+            <h3>📝 Paso 3: Pega tu Token aquí</h3>
+            <p>Después de autorizar, pega el Access Token que obtuviste:</p>
+            <input type="text" 
+                   id="tokenInput" 
+                   class="token-input" 
+                   placeholder="1000.xxxxxxxxxxxxxxxxxxxxxx">
+            <button class="btn btn-secondary" onclick="saveToken()">
+                💾 Guardar Token en Nexus
+            </button>
+        </div>
+
+        <div id="successMessage" class="success"></div>
+        <div id="errorMessage" class="error"></div>
+
+        <div class="step">
+            <h3>🎯 Método Alternativo - Self Client</h3>
+            <p>Si el método anterior no funciona:</p>
+            <ol style="color: #4b5563; padding-left: 20px; line-height: 1.8;">
+                <li>Ve a <a href="https://api-console.zoho.com/" target="_blank" style="color: #FF6B00;">api-console.zoho.com</a></li>
+                <li>Click en "Add Client" → "Self Client"</li>
+                <li>Nombra el cliente: "Nexus Calendar"</li>
+                <li>Click en "Generate Token"</li>
+                <li>Scope: <code>ZohoCalendar.calendar.ALL</code></li>
+                <li>Copia el token generado</li>
+                <li>Pégalo arriba ☝️</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function saveToken() {
+            const token = document.getElementById('tokenInput').value.trim();
+            const successDiv = document.getElementById('successMessage');
+            const errorDiv = document.getElementById('errorMessage');
+            
+            // Limpiar mensajes
+            successDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            if (!token) {
+                errorDiv.textContent = '❌ Por favor ingresa un token';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            if (!token.startsWith('1000.')) {
+                errorDiv.textContent = '❌ El token debe comenzar con "1000."';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Obtener el token JWT de Nexus (debe estar logueado)
+            const nexusToken = localStorage.getItem('token');
+            
+            if (!nexusToken) {
+                errorDiv.innerHTML = '❌ No estás logueado en Nexus. <a href="http://localhost:5173/login" style="color: white; text-decoration: underline;">Inicia sesión primero</a>';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/zoho/connect', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${nexusToken}`
+                    },
+                    body: JSON.stringify({
+                        accessToken: token
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    successDiv.textContent = '✅ ¡Token guardado exitosamente! Redirigiendo al dashboard...';
+                    successDiv.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'http://localhost:5173/dashboard';
+                    }, 2000);
+                } else {
+                    errorDiv.textContent = `❌ ${data.message || 'Error al guardar el token'}`;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = `❌ Error de conexión: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        // Detectar si hay un token en la URL (después de OAuth redirect)
+        window.addEventListener('load', () => {
+            const hash = window.location.hash;
+            if (hash.includes('access_token=')) {
+                const params = new URLSearchParams(hash.substring(1));
+                const token = params.get('access_token');
+                if (token) {
+                    document.getElementById('tokenInput').value = token;
+                    document.getElementById('successMessage').textContent = '✅ Token detectado automáticamente! Ahora haz click en "Guardar Token"';
+                    document.getElementById('successMessage').style.display = 'block';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

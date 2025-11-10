@@ -1,0 +1,37 @@
+{
+  "name": "proyecto-nexus-backend",
+  "version": "1.0.0",
+  "description": "Backend para plataforma de gestión de trabajo colaborativo",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node -r dotenv/config server.js",
+    "dev": "nodemon -r dotenv/config server.js"
+  },
+  "keywords": [
+    "task-management",
+    "kanban",
+    "collaboration"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.10.1",
+    "passport": "^0.6.0",
+    "passport-oauth2": "^1.8.0",
+    "socket.io": "^4.6.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
