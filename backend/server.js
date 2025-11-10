@@ -3,9 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import session from 'expresssession';
+import session from 'express-session';
 import passport from 'passport';
-import cookieParser from 'cookieparser';
+import cookieParser from 'cookie-parser';
 import { networkInterfaces } from 'os';
 
 // Cargar variables de entorno PRIMERO

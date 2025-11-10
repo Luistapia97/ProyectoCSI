@@ -1,4 +1,4 @@
-﻿import cron from 'nodecron';
+﻿import cron from 'node-cron';
 import Task from '../models/Task.js';
 import Notification from '../models/Notification.js';
 
@@ -100,7 +100,7 @@ class ReminderService {
             relatedTask: task._id,
             type: notificationType,
             createdAt: {
-              $gte: new Date(now.getTime()  24 * 60 * 60 * 1000) // Últimas 24 horas
+              $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) // Últimas 24 horas
             }
           });
 
@@ -173,7 +173,7 @@ class ReminderService {
             relatedTask: task._id,
             type: 'task_overdue',
             createdAt: {
-              $gte: new Date(now.getTime()  24 * 60 * 60 * 1000) // Últimas 24 horas
+              $gte: new Date(now.getTime() - 24 * 60 * 60 * 1000) // Últimas 24 horas
             }
           });
 
@@ -219,7 +219,7 @@ class ReminderService {
   formatDueDate(date) {
     const now = new Date();
     const dueDate = new Date(date);
-    const diff = dueDate  now;
+    const diff = dueDate - now;
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
@@ -245,7 +245,7 @@ class ReminderService {
   formatOverdue(date) {
     const now = new Date();
     const dueDate = new Date(date);
-    const diff = now  dueDate;
+    const diff = now - dueDate;
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
 

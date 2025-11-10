@@ -1,5 +1,5 @@
 ﻿import passport from 'passport';
-import { Strategy as OAuth2Strategy } from 'passportoauth2';
+import { Strategy as OAuth2Strategy } from 'passport-oauth2';
 import User from '../models/User.js';
 import axios from 'axios';
 import dotenv from 'dotenv';

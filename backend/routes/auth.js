@@ -438,7 +438,7 @@ router.get('/admincount', async (req, res) => {
       success: true,
       count: adminCount,
       max: 3,
-      available: 3  adminCount,
+      available: 3 - adminCount,
     });
   } catch (error) {
     console.error('Error obteniendo cantidad de admins:', error);
