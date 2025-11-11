@@ -71,8 +71,26 @@ router.post('/test-reminders/overdue', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/tasks/test-reminders/today
+// @desc    Ejecutar verificación de tareas que vencen HOY manualmente (testing)
+// @access  Private
+router.post('/test-reminders/today', protect, async (req, res) => {
+  try {
+    const reminderService = req.app.get('reminderService');
+    if (!reminderService) {
+      return res.status(500).json({ message: 'Servicio de recordatorios no disponible' });
+    }
+    
+    await reminderService.testCheckToday();
+    res.json({ success: true, message: 'Verificación de tareas que vencen HOY ejecutada' });
+  } catch (error) {
+    console.error('Error en test de tareas que vencen hoy:', error);
+    res.status(500).json({ message: 'Error en verificación', error: error.message });
+  }
+});
+
 // @route   GET /api/tasks/pending-validation
-// @desc    Obtener tareas pendientes de validaciÃ³n (solo administradores)
+// @desc    Obtener tareas pendientes de validación (solo administradores)
 // @access  Private (Admin only)
 router.get('/pending-validation', protect, isAdmin, async (req, res) => {
   try {
@@ -647,7 +665,7 @@ router.post('/reorder', protect, async (req, res) => {
 });
 
 // @route   POST /api/tasks/:id/request-validation
-// @desc    Solicitar validaciÃ³n de tarea (usuario marca como lista para validar)
+// @desc    Solicitar validación de tarea (usuario marca como lista para validar)
 // @access  Private
 router.post('/:id/request-validation', protect, async (req, res) => {
   try {
@@ -664,11 +682,11 @@ router.post('/:id/request-validation', protect, async (req, res) => {
 
     if (!isAssigned && req.user.role !== 'administrador') {
       return res.status(403).json({ 
-        message: 'Solo los usuarios asignados pueden solicitar validaciÃ³n' 
+        message: 'Solo los usuarios asignados pueden solicitar validación' 
       });
     }
 
-    // Cambiar estado a pendiente de validaciÃ³n
+    // Cambiar estado a pendiente de validación
     task.pendingValidation = true;
     task.completed = false;
     await task.save();
@@ -686,8 +704,8 @@ router.post('/:id/request-validation', protect, async (req, res) => {
     const notifications = admins.map(admin => ({
       user: admin._id,
       type: 'task_validation_requested',
-      title: 'Tarea pendiente de validaciÃ³n',
-      message: `${req.user.name} solicita validaciÃ³n para: ${task.title}`,
+      title: 'Tarea pendiente de validación',
+      message: `${req.user.name} solicita validación para: ${task.title}`,
       relatedTask: task._id,
       relatedProject: project._id,
       relatedUser: req.user._id,
@@ -702,11 +720,11 @@ router.post('/:id/request-validation', protect, async (req, res) => {
     res.json({ 
       success: true, 
       task: updatedTask,
-      message: 'ValidaciÃ³n solicitada exitosamente'
+      message: 'Validación solicitada exitosamente'
     });
   } catch (error) {
-    console.error('Error solicitando validaciÃ³n:', error);
-    res.status(500).json({ message: 'Error al solicitar validaciÃ³n', error: error.message });
+    console.error('Error solicitando validación:', error);
+    res.status(500).json({ message: 'Error al solicitar validación', error: error.message });
   }
 });
 
@@ -725,7 +743,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
 
     if (!task.pendingValidation) {
       return res.status(400).json({ 
-        message: 'Esta tarea no estÃ¡ pendiente de validaciÃ³n' 
+        message: 'Esta tarea no está pendiente de validación' 
       });
     }
 
@@ -738,7 +756,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
       task.validatedAt = new Date();
       if (comment) task.validationComment = comment;
 
-      // Actualizar estadÃ­sticas del proyecto
+      // Actualizar estadísticas del proyecto
       await Project.findByIdAndUpdate(task.project, {
         $inc: { 'stats.completedTasks': 1 },
       });
@@ -758,18 +776,18 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
         await Notification.insertMany(notifications);
       }
     } else {
-      // Rechazar validaciÃ³n
+      // Rechazar validación
       task.pendingValidation = false;
       task.completed = false;
       if (comment) task.validationComment = comment;
 
-      // Crear notificaciÃ³n para usuarios asignados
+      // Crear notificación para usuarios asignados
       if (task.assignedTo && task.assignedTo.length > 0) {
         const notifications = task.assignedTo.map(userId => ({
           user: userId,
           type: 'task_validation_rejected',
-          title: 'ValidaciÃ³n rechazada',
-          message: `${req.user.name} rechazÃ³ la validaciÃ³n de: ${task.title}`,
+          title: 'Validación rechazada',
+          message: `${req.user.name} rechazó la validación de: ${task.title}`,
           relatedTask: task._id,
           relatedProject: task.project,
           relatedUser: req.user._id,
@@ -796,7 +814,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
     res.json({ 
       success: true, 
       task: updatedTask,
-      message: approved ? 'Tarea validada exitosamente' : 'ValidaciÃ³n rechazada'
+      message: approved ? 'Tarea validada exitosamente' : 'Validación rechazada'
     });
   } catch (error) {
     console.error('Error validando tarea:', error);
