@@ -71,7 +71,8 @@ export default function RegisterAdmin() {
 
   const handleZohoRegister = () => {
     // Redirigir a Zoho OAuth con parámetro para indicar que es registro de admin
-    window.location.href = `${getBackendURL()}/api/auth/zoho?register=admin`;
+    const frontendURL = window.location.origin; // Obtener la URL actual del frontend
+    window.location.href = `${getBackendURL()}/api/auth/zoho?register=admin&frontend=${encodeURIComponent(frontendURL)}`;
   };
 
   return (

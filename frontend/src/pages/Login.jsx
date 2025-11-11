@@ -32,7 +32,8 @@ export default function Login() {
   };
 
   const handleZohoLogin = () => {
-    window.location.href = `${getBackendURL()}/api/auth/zoho`;
+    const frontendURL = window.location.origin; // Obtener la URL actual del frontend
+    window.location.href = `${getBackendURL()}/api/auth/zoho?frontend=${encodeURIComponent(frontendURL)}`;
   };
 
   return (
@@ -41,7 +42,7 @@ export default function Login() {
         <div className="auth-header">
           <LogIn className="auth-icon" size={48} />
           <h1>Bienvenido de nuevo</h1>
-          <p>Inicia sesión en tu cuenta de Nexus</p>
+          <p>Inicia sesión en tu cuenta de Proyectos CSI</p>
         </div>
 
         {error && (

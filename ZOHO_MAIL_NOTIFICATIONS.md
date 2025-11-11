@@ -1,14 +1,14 @@
-﻿# 📧 Sistema de Notificaciones por Email con Zoho Mail
+﻿#  Sistema de Notificaciones por Email con Zoho Mail
 
-## 🎯 Descripción
+##  Descripción
 
 El sistema de notificaciones envía correos electrónicos **exclusivamente desde la cuenta de Zoho del usuario que asigna la tarea**. 
 
 ⚠️ **IMPORTANTE**: Solo se enviarán notificaciones si el usuario que asigna la tarea ha iniciado sesión con Zoho.
 
-## ⚙️ Cómo Funciona
+##  Cómo Funciona
 
-### 🔵 Método Único: Zoho Mail API
+###  Método Único: Zoho Mail API
 
 Cuando un usuario con una cuenta de Zoho asigna una tarea:
 
@@ -17,17 +17,17 @@ Cuando un usuario con una cuenta de Zoho asigna una tarea:
 3. **Envía el correo desde su cuenta de Zoho Mail** usando la API de Zoho
 4. **El destinatario recibe el correo desde la cuenta real** del asignador (ej: `juan.perez@zohomail.com`)
 
-### ❌ Si el usuario NO tiene cuenta de Zoho:
+###  Si el usuario NO tiene cuenta de Zoho:
 
 - **NO se enviará email** 
 - La tarea se crea/asigna normalmente
 - Se muestra un mensaje en los logs:
   ```
-  ⚠️ Usuario sin cuenta de Zoho conectada
-  💡 El usuario debe iniciar sesión con Zoho para enviar notificaciones
+   Usuario sin cuenta de Zoho conectada
+   El usuario debe iniciar sesión con Zoho para enviar notificaciones
   ```
 
-## 🔐 Permisos Necesarios
+##  Permisos Necesarios
 
 ### Scopes de OAuth de Zoho:
 
@@ -37,7 +37,7 @@ Para que el sistema funcione correctamente, necesitas los siguientes scopes en t
 - openid                        (Autenticación)
 - email                         (Obtener email del usuario)
 - profile                       (Obtener información del perfil)
-- ZohoMail.messages.CREATE      (Enviar correos desde Zoho Mail) ✨ NUEVO
+- ZohoMail.messages.CREATE      (Enviar correos desde Zoho Mail)  NUEVO
 ```
 
 ### Configuración en Zoho API Console:
@@ -48,7 +48,7 @@ Para que el sistema funcione correctamente, necesitas los siguientes scopes en t
 4. Agrega el scope: `ZohoMail.messages.CREATE`
 5. Guarda los cambios
 
-## 🚀 Configuración
+##  Configuración
 
 ### Variables de Entorno
 
@@ -64,9 +64,9 @@ ZOHO_REDIRECT_URI=http://localhost:5000/api/auth/zoho/callback
 FRONTEND_URL=http://localhost:5173
 ```
 
-⚠️ **Ya NO necesitas configurar EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD**
+ **Ya NO necesitas configurar EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASSWORD**
 
-## 📨 Flujo de Envío de Correos
+##  Flujo de Envío de Correos
 
 ```
 Usuario asigna tarea
@@ -77,14 +77,14 @@ Usuario asigna tarea
    │        ├─ ✅ Éxito → Correo enviado
    │        └─ ❌ Error → Tarea creada sin email
    │
-   └─ NO → ⚠️ No se envía email
+   └─ NO →  No se envía email
             Tarea creada sin notificación
             Usuario debe iniciar sesión con Zoho
 ```
 
-## 💡 Ventajas de Usar Solo Zoho Mail
+##  Ventajas de Usar Solo Zoho Mail
 
-### ✅ Beneficios:
+###  Beneficios:
 
 1. **Autenticidad**: Los correos llegan desde la cuenta real del asignador
 2. **Personalización**: El destinatario sabe exactamente quién le asignó la tarea
@@ -93,32 +93,32 @@ Usuario asigna tarea
 5. **Respuestas directas**: El usuario puede responder directamente al correo del asignador
 6. **Seguridad**: No almacenas contraseñas de email en el servidor
 
-### 📊 Logs del Sistema:
+###  Logs del Sistema:
 
 Cuando se envía un correo, verás logs como estos:
 
-**✅ Usuario CON cuenta de Zoho:**
+** Usuario CON cuenta de Zoho:**
 ```
-� Enviando notificaciones por email...
-🔵 Enviando email desde Zoho Mail...
+ Enviando notificaciones por email...
+ Enviando email desde Zoho Mail...
    De: juan.perez@zohomail.com
    Para: maria.garcia@example.com
-✅ Email enviado desde Zoho Mail: <message_id>
+ Email enviado desde Zoho Mail: <message_id>
    Tarea: Implementar nueva funcionalidad
 ```
 
-**⚠️ Usuario SIN cuenta de Zoho:**
+** Usuario SIN cuenta de Zoho:**
 ```
-📧 Enviando notificaciones por email...
-⚠️ Usuario que asigna no tiene cuenta de Zoho conectada
+  Enviando notificaciones por email...
+   Usuario que asigna no tiene cuenta de Zoho conectada
    Usuario: Juan Pérez
    Email: juan.perez@example.com
    Token Zoho: No disponible
-💡 El usuario debe iniciar sesión con Zoho para enviar notificaciones
-⚠️ María García no recibirá email - El usuario no tiene cuenta de Zoho conectada
+   El usuario debe iniciar sesión con Zoho para enviar notificaciones
+ María García no recibirá email - El usuario no tiene cuenta de Zoho conectada
 ```
 
-**❌ Token de Zoho expirado:**
+** Token de Zoho expirado:**
 ```
 � Enviando email desde Zoho Mail...
 ❌ Error al enviar email desde Zoho Mail
@@ -127,9 +127,9 @@ Cuando se envía un correo, verás logs como estos:
 ⚠️ Token de Zoho expirado - El usuario debe volver a iniciar sesión con Zoho
 ```
 
-## 🔄 Re-autenticación de Usuarios
+##  Re-autenticación de Usuarios
 
-### ⚠️ Si un usuario NO puede enviar notificaciones:
+###  Si un usuario NO puede enviar notificaciones:
 
 **Causa**: El usuario no ha iniciado sesión con Zoho o su token expiró.
 
@@ -140,11 +140,11 @@ Cuando se envía un correo, verás logs como estos:
 3. **Aprobar los permisos de Zoho Mail** cuando se soliciten
 4. ✅ **Listo!** Ahora las notificaciones se enviarán desde tu cuenta de Zoho
 
-### 📋 Instrucciones para Usuarios:
+###  Instrucciones para Usuarios:
 
 Si ves este mensaje en los logs:
 ```
-⚠️ Usuario que asigna no tiene cuenta de Zoho conectada
+ Usuario que asigna no tiene cuenta de Zoho conectada
 ```
 
 Significa que **debes iniciar sesión con Zoho** para poder enviar notificaciones por email.
@@ -199,7 +199,7 @@ La plantilla de email incluye:
 
 **Solución**: La tarea se crea de todas formas, solo falla el envío del email
 
-## 📊 API del Servicio
+##  API del Servicio
 
 ### ZohoMailService
 
@@ -270,15 +270,15 @@ const result = await sendTaskAssignmentEmail(
 - [Zoho OAuth Scopes](https://www.zoho.com/accounts/protocol/oauth/scopes.html)
 - [Zoho API Console](https://api-console.zoho.com/)
 
-## ✅ Resumen
+##  Resumen
 
 **Sistema**: Notificaciones por email **exclusivamente desde Zoho Mail**
 
 **Requisito**: El usuario que asigna la tarea **debe** haber iniciado sesión con Zoho
 
 **Comportamiento**:
-- ✅ Usuario CON Zoho → Email enviado desde su cuenta
-- ⚠️ Usuario SIN Zoho → Email NO se envía (tarea se crea normalmente)
+-  Usuario CON Zoho → Email enviado desde su cuenta
+-  Usuario SIN Zoho → Email NO se envía (tarea se crea normalmente)
 
 **Ventaja principal**: Correos auténticos y personales desde la cuenta real del asignador
 

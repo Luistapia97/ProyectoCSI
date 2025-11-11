@@ -6,7 +6,7 @@ El sistema obtiene automáticamente el **email del usuario** cuando se asigna un
 
 ---
 
-## 📊 Flujo Paso a Paso
+##  Flujo Paso a Paso
 
 ### **1. Creación de la Tarea** (POST /api/tasks)
 

@@ -226,12 +226,6 @@ export default function Board() {
                     </button>
                   )}
                 </div>
-                
-                <div className="column-progress">
-                  <span className="column-progress-percentage">
-                    {calculateColumnProgress(column.name)}%
-                  </span>
-                </div>
               </div>
 
               <Droppable droppableId={column.name}>

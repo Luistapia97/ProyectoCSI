@@ -4,7 +4,7 @@
 
 Después de investigación y pruebas, se ha determinado que:
 
-### ❌ Problema Principal
+###  Problema Principal
 
 1. **Zoho Mail Tasks NO tiene API pública**
    - El endpoint `https://mail.zoho.com/api/accounts/{email}/tasks` devuelve `URL_RULE_NOT_CONFIGURED`

@@ -16,35 +16,35 @@ class ReminderService {
    * Iniciar todos los trabajos cron
    */
   start() {
-    console.log('⏰ Iniciando servicio de recordatorios...');
+    console.log('Iniciando servicio de recordatorios...');
 
     // Recordatorio cada 2 horas - Tareas que vencen en 24 horas
     // Se ejecuta: 00:00, 02:00, 04:00, 06:00, 08:00, 10:00, 12:00, 14:00, 16:00, 18:00, 20:00, 22:00
     const dailyReminder = cron.schedule('0 */2 * * *', async () => {
-      console.log('\n⏰ Ejecutando verificación programada de 24h...');
+      console.log('\nEjecutando verificación programada de 24h...');
       await this.checkTasksDueSoon(24);
     });
 
     // Recordatorio cada 30 minutos - Tareas que vencen en 1 hora
     const hourlyReminder = cron.schedule('*/30 * * * *', async () => {
-      console.log('\n⏰ Ejecutando verificación programada de 1h...');
+      console.log('\nEjecutando verificación programada de 1h...');
       await this.checkTasksDueSoon(1);
     });
 
     // Verificar tareas vencidas cada 4 horas
     // Se ejecuta: 00:00, 04:00, 08:00, 12:00, 16:00, 20:00
     const overdueCheck = cron.schedule('0 */4 * * *', async () => {
-      console.log('\n⏰ Ejecutando verificación programada de tareas vencidas...');
+      console.log('\nEjecutando verificación programada de tareas vencidas...');
       await this.checkOverdueTasks();
     });
 
     this.jobs.push(dailyReminder, hourlyReminder, overdueCheck);
 
-    console.log('✅ Recordatorios programados:');
-    console.log('   📅 Cada 2 horas - Tareas que vencen en 24h');
-    console.log('   ⏰ Cada 30 minutos - Tareas que vencen en 1h');
-    console.log('   ⚠️ Cada 4 horas - Verificación de tareas vencidas');
-    console.log('\n💡 Ejecutar manualmente desde rutas:');
+    console.log('✓ Recordatorios programados:');
+    console.log('   Cada 2 horas - Tareas que vencen en 24h');
+    console.log('   Cada 30 minutos - Tareas que vencen en 1h');
+    console.log('   Cada 4 horas - Verificación de tareas vencidas');
+    console.log('\nEjecutar manualmente desde rutas:');
     console.log('   - Probar inmediatamente con recordatorio manual en cualquier tarea');
   }
 
@@ -88,7 +88,7 @@ class ReminderService {
         .populate('createdBy', 'name email')
         .populate('project', 'name');
 
-      console.log(`   📋 Encontradas ${tasks.length} tareas`);
+      console.log(`   Encontradas ${tasks.length} tareas`);
 
       let remindersSent = 0;
       const notificationType = hours === 24 ? 'task_reminder_24h' : 'task_reminder_1h';
@@ -123,20 +123,20 @@ class ReminderService {
             });
             
             remindersSent += createdNotifications.length;
-            console.log(`   ✅ "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
+            console.log(`   ✓ "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
           } else {
-            console.log(`   ⏭️ "${task.title}" - Ya se envió recordatorio recientemente`);
+            console.log(`   "${task.title}" - Ya se envió recordatorio recientemente`);
           }
         }
       }
 
       if (tasks.length > 0) {
-        console.log(`   ✅ Total recordatorios enviados: ${remindersSent}`);
+        console.log(`   ✓ Total recordatorios enviados: ${remindersSent}`);
       } else {
-        console.log(`   ℹ️ No hay tareas que vencen en este período`);
+        console.log(`   No hay tareas que vencen en este período`);
       }
     } catch (error) {
-      console.error(`   ❌ Error verificando tareas que vencen en ${hours}h:`, error);
+      console.error(`   ✗ Error verificando tareas que vencen en ${hours}h:`, error);
     }
   }
 
@@ -145,7 +145,7 @@ class ReminderService {
    */
   async checkOverdueTasks() {
     try {
-      console.log('\n⚠️ Verificando tareas vencidas...');
+      console.log('\nVerificando tareas vencidas...');
 
       const now = new Date();
 
@@ -162,7 +162,7 @@ class ReminderService {
         .populate('createdBy', 'name email')
         .populate('project', 'name');
 
-      console.log(`   📋 Encontradas ${tasks.length} tareas vencidas`);
+      console.log(`   Encontradas ${tasks.length} tareas vencidas`);
 
       let remindersSent = 0;
 
@@ -182,7 +182,7 @@ class ReminderService {
             const notifications = task.assignedTo.map(user => ({
               user: user._id,
               type: 'task_overdue',
-              title: '⚠️ Tarea Vencida',
+              title: 'Tarea Vencida',
               message: `La tarea "${task.title}" venció ${this.formatOverdue(task.dueDate)}`,
               relatedTask: task._id,
               relatedProject: task.project?._id,
@@ -196,20 +196,20 @@ class ReminderService {
             });
             
             remindersSent += createdNotifications.length;
-            console.log(`   ⚠️ "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
+            console.log(`   "${task.title}" - Enviado a ${createdNotifications.length} usuario(s)`);
           } else {
-            console.log(`   ⏭️ "${task.title}" - Ya se envió alerta recientemente`);
+            console.log(`   "${task.title}" - Ya se envió alerta recientemente`);
           }
         }
       }
 
       if (tasks.length > 0) {
-        console.log(`   ✅ Total alertas enviadas: ${remindersSent}`);
+        console.log(`   ✓ Total alertas enviadas: ${remindersSent}`);
       } else {
-        console.log(`   ℹ️ No hay tareas vencidas`);
+        console.log(`   No hay tareas vencidas`);
       }
     } catch (error) {
-      console.error('   ❌ Error verificando tareas vencidas:', error);
+      console.error('   ✗ Error verificando tareas vencidas:', error);
     }
   }
 
@@ -260,10 +260,10 @@ class ReminderService {
    * Detener todos los trabajos cron
    */
   stop() {
-    console.log('⏹️ Deteniendo servicio de recordatorios...');
+    console.log('Deteniendo servicio de recordatorios...');
     this.jobs.forEach(job => job.stop());
     this.jobs = [];
-    console.log('✅ Recordatorios detenidos');
+    console.log('✓ Recordatorios detenidos');
   }
 
   /**

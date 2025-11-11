@@ -173,25 +173,25 @@ if (isZohoConfigured) {
       // Capturar el parámetro register y guardarlo en la sesión temporalmente
       const registerType = req.query.register;
       
-      // Guardar la URL de origen del frontend para redireccionar correctamente
-      const referer = req.get('referer') || req.get('origin');
-      if (referer) {
+      // Capturar la URL del frontend desde el parámetro (más confiable que referer)
+      const frontendURL = req.query.frontend || req.get('referer') || req.get('origin');
+      if (frontendURL) {
         try {
-          const url = new URL(referer);
+          const url = new URL(frontendURL);
           const frontendOrigin = `${url.protocol}//${url.host}`;
           res.cookie('frontend_origin', frontendOrigin, {
             httpOnly: true,
             maxAge: 10 * 60 * 1000, // 10 minutos
             sameSite: 'lax'
           });
-          console.log(`🌐 Frontend origin guardado: ${frontendOrigin}`);
+          console.log(`Frontend origin guardado: ${frontendOrigin}`);
         } catch (e) {
-          console.error('Error parseando referer:', e);
+          console.error('Error parseando frontend URL:', e);
         }
       }
       
       if (registerType === 'admin') {
-        console.log('🔐 Registro de administrador solicitado via Zoho');
+        console.log('Registro de administrador solicitado via Zoho');
         // Guardar en una cookie temporal que el callback puede leer
         res.cookie('register_type', 'admin', { 
           httpOnly: true, 
@@ -199,7 +199,7 @@ if (isZohoConfigured) {
           sameSite: 'lax'
         });
       } else {
-        console.log('👤 Login/Registro de usuario regular via Zoho');
+        console.log('Login/Registro de usuario regular via Zoho');
         res.cookie('register_type', 'user', { 
           httpOnly: true, 
           maxAge: 5 * 60 * 1000,
@@ -229,7 +229,7 @@ if (isZohoConfigured) {
       try {
         // Obtener la URL del frontend dinámicamente
         const frontendURL = getFrontendURL(req);
-        console.log(`🌐 Redirigiendo a frontend: ${frontendURL}`);
+        console.log(`Redirigiendo a frontend: ${frontendURL}`);
         
         // Limpiar las cookies
         res.clearCookie('register_type');
@@ -240,9 +240,9 @@ if (isZohoConfigured) {
           return res.redirect(`${frontendURL}/login?error=no_user`);
         }
 
-        console.log('✅ Usuario autenticado con Zoho:', req.user.email);
-        console.log('🆔 ID del usuario:', req.user._id);
-        console.log('👤 Rol del usuario:', req.user.role);
+        console.log('✓ Usuario autenticado con Zoho:', req.user.email);
+        console.log('ID del usuario:', req.user._id);
+        console.log('Rol del usuario:', req.user.role);
 
         // Verificar que el usuario realmente existe en la base de datos
         const userExists = await User.findById(req.user._id);
@@ -278,13 +278,13 @@ if (isZohoConfigured) {
   // @access  Public (requiere tempToken)
   router.post('/zoho/complete', async (req, res) => {
     try {
-      console.log('📥 Solicitud de completar registro recibida');
+      console.log('Solicitud de completar registro recibida');
       const { tempToken, email, name } = req.body;
-      console.log('📧 Email recibido:', email);
-      console.log('🎫 Token recibido:', tempToken ? 'Sí' : 'No');
+      console.log('Email recibido:', email);
+      console.log('Token recibido:', tempToken ? 'Sí' : 'No');
 
       if (!tempToken || !email) {
-        console.log('❌ Faltan datos requeridos');
+        console.log('✗ Faltan datos requeridos');
         return res.status(400).json({ message: 'Token y email son requeridos' });
       }
 
@@ -293,9 +293,9 @@ if (isZohoConfigured) {
       let decoded;
       try {
         decoded = jwt.default.verify(tempToken, process.env.JWT_SECRET);
-        console.log('✅ Token verificado, ID de usuario:', decoded.id);
+        console.log('✓ Token verificado, ID de usuario:', decoded.id);
       } catch (error) {
-        console.log('❌ Error al verificar token:', error.message);
+        console.log('✗ Error al verificar token:', error.message);
         return res.status(401).json({ message: 'Token inválido o expirado' });
       }
 
@@ -303,11 +303,11 @@ if (isZohoConfigured) {
       const user = await User.findById(decoded.id);
       
       if (!user) {
-        console.log('❌ Usuario no encontrado con ID:', decoded.id);
+        console.log('✗ Usuario no encontrado con ID:', decoded.id);
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
 
-      console.log('👤 Usuario encontrado:', user.email);
+      console.log('Usuario encontrado:', user.email);
 
       // Verificar si ya existe un usuario con ese email
       const existingUser = await User.findOne({ email, _id: { $ne: user._id } });
@@ -324,12 +324,12 @@ if (isZohoConfigured) {
         
         // Eliminar el usuario temporal
         await User.findByIdAndDelete(user._id);
-        console.log('🗑️ Usuario temporal eliminado');
+        console.log('Usuario temporal eliminado');
         
         // Generar token para el usuario existente
         const token = generateToken(existingUser._id);
         
-        console.log('✅ Cuenta vinculada exitosamente');
+        console.log('✓ Cuenta vinculada exitosamente');
         return res.json({
           success: true,
           user: existingUser.toPublicJSON(),
@@ -338,7 +338,7 @@ if (isZohoConfigured) {
         });
       }
 
-      console.log('📝 Actualizando usuario con email real');
+      console.log('Actualizando usuario con email real');
       // Si no existe, actualizar el usuario actual con el email y nombre real
       user.email = email;
       if (name) {
@@ -346,7 +346,7 @@ if (isZohoConfigured) {
       }
       await user.save();
 
-      console.log('✅ Usuario actualizado con email real:', email);
+      console.log('✓ Usuario actualizado con email real:', email);
 
       // Generar nuevo token con la información actualizada
       const token = generateToken(user._id);

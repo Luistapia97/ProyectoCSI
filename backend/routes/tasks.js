@@ -5,8 +5,15 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
+import upload from '../config/multer.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 // Zoho Tasks desactivado - API no disponible públicamente
 // import { syncTaskToZoho, updateZohoTask, deleteZohoTask, completeZohoTask } from '../middleware/zohoTasksSync.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -153,7 +160,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Obtener posiciÃ³n para la nueva tarea
+    // Obtener posicion para la nueva tarea
     const tasksInColumn = await Task.countDocuments({ project, column: column || 'Pendiente' });
 
     const task = await Task.create({
@@ -170,7 +177,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       color,
     });
 
-    // Actualizar estadÃ­sticas del proyecto
+    // Actualizar estadi­sticas del proyecto
     await Project.findByIdAndUpdate(project, {
       $inc: { 'stats.totalTasks': 1 },
     });
@@ -825,4 +832,135 @@ router.post('/:id/remind', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/tasks/:id/attachments
+// @desc    Subir archivo adjunto a una tarea
+// @access  Private
+router.post('/:id/attachments', protect, upload.single('file'), async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      // Si falla, eliminar el archivo subido
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar que el usuario tenga acceso al proyecto
+    const project = await Project.findById(task.project);
+    if (!project) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isMember = project.members.some(m => m.user && m.user.toString() === req.user._id.toString());
+    const isCreator = project.createdBy && project.createdBy.toString() === req.user._id.toString();
+
+    if (!isMember && !isCreator) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se ha subido ningún archivo' });
+    }
+
+    // Crear objeto de archivo adjunto
+    const attachment = {
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      size: req.file.size,
+      url: `/uploads/${req.file.filename}`,
+      uploadedBy: req.user._id,
+      uploadedAt: new Date(),
+    };
+
+    // Agregar archivo adjunto a la tarea
+    task.attachments.push(attachment);
+    await task.save();
+
+    // Poblar información del usuario que subió el archivo
+    await task.populate('attachments.uploadedBy', 'name email');
+
+    res.status(201).json({
+      message: 'Archivo subido exitosamente',
+      attachment: task.attachments[task.attachments.length - 1],
+    });
+  } catch (error) {
+    // Si hay error, eliminar el archivo subido
+    if (req.file) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error eliminando archivo:', unlinkError);
+      }
+    }
+    console.error('Error subiendo archivo:', error);
+    res.status(500).json({ message: 'Error al subir archivo', error: error.message });
+  }
+});
+
+// @route   DELETE /api/tasks/:taskId/attachments/:attachmentId
+// @desc    Eliminar archivo adjunto de una tarea
+// @access  Private
+router.delete('/:taskId/attachments/:attachmentId', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar que el usuario tenga acceso al proyecto
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isMember = project.members.some(m => m.user && m.user.toString() === req.user._id.toString());
+    const isCreator = project.createdBy && project.createdBy.toString() === req.user._id.toString();
+
+    if (!isMember && !isCreator) {
+      return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
+    }
+
+    // Buscar el archivo adjunto
+    const attachment = task.attachments.id(req.params.attachmentId);
+
+    if (!attachment) {
+      return res.status(404).json({ message: 'Archivo adjunto no encontrado' });
+    }
+
+    // Verificar que el usuario sea quien subió el archivo o sea admin/creador del proyecto
+    const isUploader = attachment.uploadedBy && attachment.uploadedBy.toString() === req.user._id.toString();
+    if (!isUploader && !isCreator) {
+      return res.status(403).json({ message: 'No tienes permiso para eliminar este archivo' });
+    }
+
+    // Eliminar archivo físico del servidor
+    const uploadsDir = path.join(__dirname, '../uploads');
+    const filePath = path.join(uploadsDir, attachment.filename);
+    
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Eliminar del array de attachments
+    task.attachments.pull(req.params.attachmentId);
+    await task.save();
+
+    res.json({ message: 'Archivo eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error eliminando archivo:', error);
+    res.status(500).json({ message: 'Error al eliminar archivo', error: error.message });
+  }
+});
+
 export default router;
+

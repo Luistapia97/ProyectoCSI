@@ -113,6 +113,10 @@ export const tasksAPI = {
   requestValidation: (id) => api.post(`/tasks/${id}/request-validation`),
   validateTask: (id, data) => api.post(`/tasks/${id}/validate`, data),
   sendReminder: (id) => api.post(`/tasks/${id}/remind`),
+  uploadAttachment: (id, formData) => api.post(`/tasks/${id}/attachments`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  deleteAttachment: (taskId, attachmentId) => api.delete(`/tasks/${taskId}/attachments/${attachmentId}`),
 };
 
 export default api;

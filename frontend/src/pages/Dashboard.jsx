@@ -53,7 +53,7 @@ export default function Dashboard() {
         <div className="header-left">
           <h1>
             <TrendingUp size={32} />
-            Nexus
+            Proyectos CSI
           </h1>
         </div>
 

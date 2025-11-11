@@ -49,7 +49,8 @@ export default function Register() {
   };
 
   const handleZohoRegister = () => {
-    window.location.href = `${getBackendURL()}/api/auth/zoho`;
+    const frontendURL = window.location.origin; // Obtener la URL actual del frontend
+    window.location.href = `${getBackendURL()}/api/auth/zoho?frontend=${encodeURIComponent(frontendURL)}`;
   };
 
   return (
@@ -58,7 +59,7 @@ export default function Register() {
         <div className="auth-header">
           <UserPlus className="auth-icon" size={48} />
           <h1>Crear cuenta</h1>
-          <p>Únete a Nexus y gestiona tus tareas</p>
+          <p>Únete a Proyectos CSI y gestiona tus tareas</p>
         </div>
 
         <div style={{
