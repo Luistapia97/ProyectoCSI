@@ -1,4 +1,4 @@
-# 🔐 Guía de Configuración: Autenticación con Zoho OAuth
+﻿# 🔐 Guía de Configuración: Autenticación con Zoho OAuth
 
 Esta guía te ayudará a configurar la **autenticación de usuarios con Zoho** en Nexus.
 

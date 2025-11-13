@@ -1,4 +1,4 @@
-# 🎨 Guía Visual de Nexus
+﻿# 🎨 Guía Visual de Nexus
 
 ## Pantallas Principales
 

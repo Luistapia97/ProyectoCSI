@@ -1,28 +1,28 @@
-# 📅 Guía de Integración con Zoho Calendar
+﻿# Guía de Integración con Zoho Calendar
 
-## ✅ Implementación Completada
+## Implementación Completada
 
 He creado un sistema completo de sincronización con Zoho Calendar. Aquí está todo lo que necesitas saber:
 
 ---
 
-## 🎯 Características Implementadas
+## Características Implementadas
 
 ### **Backend:**
-- ✅ Servicio de Zoho Calendar (`backend/services/zohoCalendar.js`)
-- ✅ Endpoints API para conectar/desconectar cuenta
-- ✅ Sincronización de tareas con eventos de calendario
-- ✅ Obtener, crear, actualizar y eliminar eventos
+- Servicio de Zoho Calendar (`backend/services/zohoCalendar.js`)
+- Endpoints API para conectar/desconectar cuenta
+- Sincronización de tareas con eventos de calendario
+- Obtener, crear, actualizar y eliminar eventos
 
 ### **Frontend:**
-- ✅ Página de configuración (`/settings`)
-- ✅ Componente de integración de Zoho
-- ✅ Interfaz para conectar cuenta con token
-- ✅ Estado de conexión visual
+- Página de configuración (`/settings`)
+- Componente de integración de Zoho
+- Interfaz para conectar cuenta con token
+- Estado de conexión visual
 
 ---
 
-## 🚀 Cómo Usar
+## Cómo Usar
 
 ### **Paso 1: Accede a Configuración**
 
@@ -104,7 +104,7 @@ Si lo anterior no funciona, usa este método directo:
 1. En la página de configuración, pega tu token de Zoho
 2. (Opcional) Si tienes un Refresh Token, agrégalo también
 3. Haz clic en **"Conectar cuenta de Zoho"**
-4. Verás un mensaje de confirmación ✅
+4. Verás un mensaje de confirmación
 
 ### **Paso 4: ¡Listo!**
 
@@ -112,7 +112,7 @@ Ahora tu cuenta está conectada y lista para sincronizar eventos.
 
 ---
 
-## 📊 Endpoints API Disponibles
+## Endpoints API Disponibles
 
 ### **1. Conectar Cuenta**
 ```http
@@ -151,7 +151,7 @@ Authorization: Bearer {tu_token_jwt}
 
 ---
 
-## 🔧 Próximos Pasos (Opcional)
+## Próximos Pasos (Opcional)
 
 Si quieres agregar más funcionalidades:
 
@@ -166,7 +166,7 @@ Recibir notificaciones cuando se acerque una fecha límite.
 
 ---
 
-## 🐛 Solución de Problemas
+## Solución de Problemas
 
 ### **"Token inválido o expirado"**
 - Genera un nuevo token en Zoho
@@ -182,7 +182,7 @@ Recibir notificaciones cuando se acerque una fecha límite.
 
 ---
 
-## 📝 Ejemplo de Uso Completo
+## Ejemplo de Uso Completo
 
 ```javascript
 // En el frontend, después de conectar la cuenta:
@@ -221,15 +221,15 @@ const getEvents = async () => {
 
 ---
 
-## ✅ Resumen
+## Resumen
 
 **Ya está todo implementado y funcionando:**
 
-1. ✅ Backend con servicio de Zoho Calendar
-2. ✅ Endpoints API para gestionar la conexión
-3. ✅ Página de configuración en el frontend
-4. ✅ Interfaz visual para conectar cuenta
-5. ✅ Sistema listo para sincronizar tareas y eventos
+1. Backend con servicio de Zoho Calendar
+2. Endpoints API para gestionar la conexión
+3. Página de configuración en el frontend
+4. Interfaz visual para conectar cuenta
+5. Sistema listo para sincronizar tareas y eventos
 
 **Para empezar:**
 1. Ve a http://localhost:5173/settings
@@ -238,4 +238,5 @@ const getEvents = async () => {
 
 ---
 
-¿Necesitas ayuda adicional o quieres agregar más funcionalidades? 🚀
+¿Necesitas ayuda adicional o quieres agregar más funcionalidades?
+

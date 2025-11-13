@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell } from 'lucide-react';
+import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell, Paperclip, Download, FileText } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import useTaskStore from '../store/taskStore';
@@ -31,6 +31,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [loading, setLoading] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [showUserSelector, setShowUserSelector] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [fileInputRef, setFileInputRef] = useState(null);
 
   useEffect(() => {
     fetchComments(task._id);
@@ -190,6 +192,67 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     }
   };
 
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validar tamaño (10MB máximo)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('El archivo es demasiado grande. Máximo 10MB');
+      return;
+    }
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await tasksAPI.uploadAttachment(task._id, formData);
+      if (response.data.attachment) {
+        // Actualizar la tarea localmente
+        await fetchTask(task._id);
+        alert('Archivo subido exitosamente');
+      }
+    } catch (error) {
+      console.error('Error subiendo archivo:', error);
+      alert('Error al subir archivo: ' + (error.response?.data?.message || error.message));
+    } finally {
+      setUploading(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleDeleteAttachment = async (attachmentId) => {
+    if (!confirm('¿Estás seguro de eliminar este archivo?')) return;
+
+    try {
+      await tasksAPI.deleteAttachment(task._id, attachmentId);
+      await fetchTask(task._id);
+      alert('Archivo eliminado exitosamente');
+    } catch (error) {
+      console.error('Error eliminando archivo:', error);
+      alert('Error al eliminar archivo: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const getFileIcon = (mimeType) => {
+    if (mimeType.startsWith('image/')) return '🖼️';
+    if (mimeType.includes('pdf')) return '📄';
+    if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
+    if (mimeType.includes('sheet') || mimeType.includes('excel')) return '📊';
+    if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '📽️';
+    if (mimeType.includes('zip') || mimeType.includes('compressed')) return '🗜️';
+    return '📎';
+  };
+
   const isAdmin = user?.role === 'administrador';
 
   return (
@@ -261,6 +324,79 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 <button onClick={handleAddSubtask} className="btn-icon-small">
                   <Plus size={18} />
                 </button>
+              </div>
+            </div>
+
+            {/* Archivos Adjuntos */}
+            <div className="detail-section">
+              <h3>
+                <Paperclip size={18} />
+                Archivos Adjuntos ({task.attachments?.length || 0})
+              </h3>
+              <div className="attachments-list">
+                {task.attachments && task.attachments.length > 0 ? (
+                  task.attachments.map((attachment) => (
+                    <div key={attachment._id} className="attachment-item">
+                      <div className="attachment-info">
+                        <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
+                        <div className="attachment-details">
+                          <a
+                            href={`http://localhost:5000${attachment.url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="attachment-name"
+                            download
+                          >
+                            {attachment.originalName}
+                          </a>
+                          <span className="attachment-meta">
+                            {formatFileSize(attachment.size)} • {format(new Date(attachment.uploadedAt), 'dd MMM yyyy', { locale: es })}
+                            {attachment.uploadedBy && ` • ${attachment.uploadedBy.name}`}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="attachment-actions">
+                        <a
+                          href={`http://localhost:5000${attachment.url}`}
+                          download
+                          className="btn-icon-tiny"
+                          title="Descargar"
+                        >
+                          <Download size={16} />
+                        </a>
+                        {(attachment.uploadedBy?._id === user?._id || isAdmin) && (
+                          <button
+                            onClick={() => handleDeleteAttachment(attachment._id)}
+                            className="btn-icon-tiny btn-danger"
+                            title="Eliminar archivo"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-attachments">No hay archivos adjuntos</p>
+                )}
+              </div>
+              <div className="add-attachment">
+                <input
+                  type="file"
+                  ref={(ref) => setFileInputRef(ref)}
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip"
+                />
+                <button
+                  onClick={() => fileInputRef?.click()}
+                  className="btn-secondary"
+                  disabled={uploading}
+                >
+                  <Paperclip size={18} />
+                  {uploading ? 'Subiendo...' : 'Adjuntar archivo'}
+                </button>
+                <span className="attachment-hint">Máximo 10MB • Imágenes, PDFs, Office, ZIP</span>
               </div>
             </div>
 
@@ -373,7 +509,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </div>
               )}
               
-              {task.completed && task.validatedBy && (
+              {!task.pendingValidation && task.validatedBy && (
                 <div className="validation-status approved">
                   <CheckCircle size={18} />
                   <span>Validado por {task.validatedBy.name}</span>
@@ -567,7 +703,16 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   </button>
                 </>
               ) : (
-                <button onClick={() => setEditing(true)} className="btn-secondary">
+                <button 
+                  onClick={() => {
+                    if (!isAdmin) {
+                      alert('⚠️ Solo los administradores pueden editar tareas');
+                      return;
+                    }
+                    setEditing(true);
+                  }} 
+                  className="btn-secondary"
+                >
                   Editar tarea
                 </button>
               )}
@@ -585,10 +730,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </button>
               )}
 
-              <button onClick={handleDelete} className="btn-danger">
-                <Trash2 size={18} />
-                Eliminar tarea
-              </button>
+              {isAdmin && (
+                <button onClick={handleDelete} className="btn-danger">
+                  <Trash2 size={18} />
+                  Eliminar tarea
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-# Script para iniciar el proyecto Nexus
+﻿# Script para iniciar el proyecto Nexus
 Write-Host ">> Iniciando Proyecto Nexus..." -ForegroundColor Cyan
 Write-Host ""
 

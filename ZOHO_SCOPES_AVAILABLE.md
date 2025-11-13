@@ -1,4 +1,4 @@
-# Scopes Disponibles en Zoho OAuth
+﻿# Scopes Disponibles en Zoho OAuth
 
 ## Zoho Mail Scopes
 - `ZohoMail.messages.ALL` - Todos los permisos de mensajes

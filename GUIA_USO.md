@@ -1,4 +1,4 @@
-# 📖 Guía de Uso - Nexus
+﻿# 📖 Guía de Uso - Nexus
 
 ## 🚀 Primeros Pasos
 

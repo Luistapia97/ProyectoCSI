@@ -1,4 +1,4 @@
-# 🔐 Sistema de Registro Separado - Admins y Usuarios
+﻿# 🔐 Sistema de Registro Separado - Admins y Usuarios
 
 ## ✅ Implementación Completada
 
@@ -28,9 +28,9 @@ Se ha implementado un sistema de registro completamente separado con las siguien
 
 ---
 
-## 🚀 Cómo Usar el Sistema
+##  Cómo Usar el Sistema
 
-### 📋 Paso 1: Registrar Administradores
+###  Paso 1: Registrar Administradores
 
 1. **Abre la aplicación**: http://localhost:5173
 2. **Ve a Login** y click en "Registro de Admin"
@@ -43,7 +43,7 @@ Se ha implementado un sistema de registro completamente separado con las siguien
 
 **Límite**: Solo se pueden registrar **3 administradores**.
 
-#### 🔑 Código de Administrador
+####  Código de Administrador
 ```
 NEXUS2025
 ```
@@ -51,7 +51,7 @@ NEXUS2025
 
 ---
 
-### 👤 Paso 2: Registrar Usuarios
+###  Paso 2: Registrar Usuarios
 
 1. **Ve a Login** y click en "Regístrate como Usuario"
 2. **Completa el formulario**:
@@ -64,9 +64,9 @@ NEXUS2025
 
 ---
 
-## 📁 Archivos Creados/Modificados
+##  Archivos Creados/Modificados
 
-### 🆕 Nuevos Archivos
+###  Nuevos Archivos
 
 #### Backend:
 1. **`backend/scripts/clearUsers.js`**
@@ -82,7 +82,7 @@ NEXUS2025
 
 ---
 
-### 📝 Archivos Modificados
+###  Archivos Modificados
 
 #### Backend:
 1. **`backend/routes/auth.js`**
@@ -120,7 +120,7 @@ NEXUS2025
 
 ---
 
-## 🔒 Seguridad Implementada
+##  Seguridad Implementada
 
 ### Validaciones Backend
 
@@ -150,7 +150,7 @@ NEXUS2025
 
 ---
 
-## 🎨 Interfaz de Usuario
+##  Interfaz de Usuario
 
 ### Página de Registro de Admin
 
@@ -204,7 +204,7 @@ NEXUS2025
 
 ---
 
-## 📊 Flujo de Registro
+##  Flujo de Registro
 
 ### Flujo Admin
 
@@ -240,7 +240,7 @@ Redirect a Dashboard (vista limitada)
 
 ---
 
-## 🧪 Pruebas
+##  Pruebas
 
 ### Test 1: Registrar Primer Admin
 ```bash
@@ -280,7 +280,7 @@ Redirect a Dashboard (vista limitada)
 
 ---
 
-## 🔧 Configuración
+##  Configuración
 
 ### Cambiar Código de Administrador
 
@@ -311,7 +311,7 @@ node scripts/clearUsers.js
 
 ---
 
-## 📡 Endpoints API
+##  Endpoints API
 
 ### Nuevos Endpoints
 
@@ -356,7 +356,7 @@ Response: {
 
 ---
 
-## ✅ Ventajas del Sistema
+##  Ventajas del Sistema
 
 1. **Separación Clara**
    - Admins y usuarios tienen procesos de registro distintos
@@ -381,7 +381,7 @@ Response: {
 
 ---
 
-## 🎯 Casos de Uso
+##  Casos de Uso
 
 ### Caso 1: Empresa Pequeña
 - **3 fundadores** → Registran como admins
@@ -400,7 +400,7 @@ Response: {
 
 ---
 
-## 🚀 Estado Actual
+##  Estado Actual
 
 ✅ **Sistema completamente funcional**
 - Backend con validaciones robustas
@@ -418,7 +418,7 @@ Response: {
 
 ---
 
-## 🎊 ¡Listo para Usar!
+##  ¡Listo para Usar!
 
 El sistema está **100% operativo**. Puedes:
 
@@ -427,7 +427,7 @@ El sistema está **100% operativo**. Puedes:
 3. ✅ Cada tipo tiene su flujo separado
 4. ✅ Validaciones en frontend y backend
 
-**¡Empieza creando tu primer administrador!** 🚀
+**¡Empieza creando tu primer administrador!** 
 
 ---
 

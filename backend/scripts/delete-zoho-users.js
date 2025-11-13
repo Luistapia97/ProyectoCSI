@@ -1,4 +1,4 @@
-// Script para eliminar TODOS los usuarios de Zoho
+﻿// Script para eliminar TODOS los usuarios de Zoho
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 

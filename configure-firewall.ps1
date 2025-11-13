@@ -1,4 +1,4 @@
-# Script para configurar el Firewall de Windows para Nexus
+﻿# Script para configurar el Firewall de Windows para Nexus
 # Ejecutar como Administrador
 
 Write-Host "🔥 Configurando Firewall de Windows para Nexus..." -ForegroundColor Cyan

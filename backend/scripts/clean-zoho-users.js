@@ -1,4 +1,4 @@
-// Script para limpiar usuarios duplicados de Zoho
+﻿// Script para limpiar usuarios duplicados de Zoho
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 

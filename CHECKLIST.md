@@ -1,4 +1,4 @@
-# 🎯 Checklist de Proyecto Completado
+﻿# 🎯 Checklist de Proyecto Completado
 
 ## ✅ Backend Implementado
 

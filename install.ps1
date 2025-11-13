@@ -1,4 +1,4 @@
-# Script para instalar dependencias del proyecto Nexus
+﻿# Script para instalar dependencias del proyecto Nexus
 Write-Host ">> Instalando Proyecto Nexus..." -ForegroundColor Cyan
 Write-Host ""
 

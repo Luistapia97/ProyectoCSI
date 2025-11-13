@@ -1,4 +1,4 @@
-# 🔐 Sistema de Roles - Administrador y Usuario
+﻿# 🔐 Sistema de Roles - Administrador y Usuario
 
 ## ✅ Implementación Completada
 

@@ -1,4 +1,4 @@
-# 🎉 ¡Bienvenido a Nexus!
+﻿# 🎉 ¡Bienvenido a Nexus!
 
 ## Tu Nueva Plataforma de Gestión de Trabajo
 

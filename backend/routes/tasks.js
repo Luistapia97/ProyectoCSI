@@ -5,8 +5,15 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
+import upload from '../config/multer.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 // Zoho Tasks desactivado - API no disponible públicamente
 // import { syncTaskToZoho, updateZohoTask, deleteZohoTask, completeZohoTask } from '../middleware/zohoTasksSync.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
@@ -64,8 +71,26 @@ router.post('/test-reminders/overdue', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/tasks/test-reminders/today
+// @desc    Ejecutar verificación de tareas que vencen HOY manualmente (testing)
+// @access  Private
+router.post('/test-reminders/today', protect, async (req, res) => {
+  try {
+    const reminderService = req.app.get('reminderService');
+    if (!reminderService) {
+      return res.status(500).json({ message: 'Servicio de recordatorios no disponible' });
+    }
+    
+    await reminderService.testCheckToday();
+    res.json({ success: true, message: 'Verificación de tareas que vencen HOY ejecutada' });
+  } catch (error) {
+    console.error('Error en test de tareas que vencen hoy:', error);
+    res.status(500).json({ message: 'Error en verificación', error: error.message });
+  }
+});
+
 // @route   GET /api/tasks/pending-validation
-// @desc    Obtener tareas pendientes de validaciÃ³n (solo administradores)
+// @desc    Obtener tareas pendientes de validación (solo administradores)
 // @access  Private (Admin only)
 router.get('/pending-validation', protect, isAdmin, async (req, res) => {
   try {
@@ -96,6 +121,7 @@ router.get('/project/:projectId', protect, async (req, res) => {
     })
       .populate('assignedTo', 'name email avatar')
       .populate('createdBy', 'name email avatar')
+      .populate('validatedBy', 'name email avatar')
       .sort({ position: 1 });
 
     res.json({ success: true, tasks });
@@ -113,6 +139,7 @@ router.get('/:id', protect, async (req, res) => {
     const task = await Task.findById(req.params.id)
       .populate('assignedTo', 'name email avatar')
       .populate('createdBy', 'name email avatar')
+      .populate('validatedBy', 'name email avatar')
       .populate('project');
 
     if (!task) {
@@ -153,7 +180,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Obtener posiciÃ³n para la nueva tarea
+    // Obtener posicion para la nueva tarea
     const tasksInColumn = await Task.countDocuments({ project, column: column || 'Pendiente' });
 
     const task = await Task.create({
@@ -170,7 +197,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       color,
     });
 
-    // Actualizar estadÃ­sticas del proyecto
+    // Actualizar estadi­sticas del proyecto
     await Project.findByIdAndUpdate(project, {
       $inc: { 'stats.totalTasks': 1 },
     });
@@ -396,8 +423,8 @@ router.put('/:id', protect, async (req, res) => {
 
 // @route   DELETE /api/tasks/:id
 // @desc    Eliminar una tarea
-// @access  Private
-router.delete('/:id', protect, async (req, res) => {
+// @access  Private (Admin only)
+router.delete('/:id', protect, isAdmin, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -640,7 +667,7 @@ router.post('/reorder', protect, async (req, res) => {
 });
 
 // @route   POST /api/tasks/:id/request-validation
-// @desc    Solicitar validaciÃ³n de tarea (usuario marca como lista para validar)
+// @desc    Solicitar validación de tarea (usuario marca como lista para validar)
 // @access  Private
 router.post('/:id/request-validation', protect, async (req, res) => {
   try {
@@ -657,11 +684,11 @@ router.post('/:id/request-validation', protect, async (req, res) => {
 
     if (!isAssigned && req.user.role !== 'administrador') {
       return res.status(403).json({ 
-        message: 'Solo los usuarios asignados pueden solicitar validaciÃ³n' 
+        message: 'Solo los usuarios asignados pueden solicitar validación' 
       });
     }
 
-    // Cambiar estado a pendiente de validaciÃ³n
+    // Cambiar estado a pendiente de validación
     task.pendingValidation = true;
     task.completed = false;
     await task.save();
@@ -679,8 +706,8 @@ router.post('/:id/request-validation', protect, async (req, res) => {
     const notifications = admins.map(admin => ({
       user: admin._id,
       type: 'task_validation_requested',
-      title: 'Tarea pendiente de validaciÃ³n',
-      message: `${req.user.name} solicita validaciÃ³n para: ${task.title}`,
+      title: 'Tarea pendiente de validación',
+      message: `${req.user.name} solicita validación para: ${task.title}`,
       relatedTask: task._id,
       relatedProject: project._id,
       relatedUser: req.user._id,
@@ -695,11 +722,11 @@ router.post('/:id/request-validation', protect, async (req, res) => {
     res.json({ 
       success: true, 
       task: updatedTask,
-      message: 'ValidaciÃ³n solicitada exitosamente'
+      message: 'Validación solicitada exitosamente'
     });
   } catch (error) {
-    console.error('Error solicitando validaciÃ³n:', error);
-    res.status(500).json({ message: 'Error al solicitar validaciÃ³n', error: error.message });
+    console.error('Error solicitando validación:', error);
+    res.status(500).json({ message: 'Error al solicitar validación', error: error.message });
   }
 });
 
@@ -718,7 +745,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
 
     if (!task.pendingValidation) {
       return res.status(400).json({ 
-        message: 'Esta tarea no estÃ¡ pendiente de validaciÃ³n' 
+        message: 'Esta tarea no está pendiente de validación' 
       });
     }
 
@@ -731,18 +758,18 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
       task.validatedAt = new Date();
       if (comment) task.validationComment = comment;
 
-      // Actualizar estadÃ­sticas del proyecto
+      // Actualizar estadísticas del proyecto
       await Project.findByIdAndUpdate(task.project, {
         $inc: { 'stats.completedTasks': 1 },
       });
 
-      // Crear notificaciÃ³n para usuarios asignados
+      // Crear notificación para usuarios asignados
       if (task.assignedTo && task.assignedTo.length > 0) {
         const notifications = task.assignedTo.map(userId => ({
           user: userId,
-          type: 'task_validated',
+          type: 'task_validation_approved',
           title: 'Tarea validada',
-          message: `${req.user.name} validÃ³ la tarea: ${task.title}`,
+          message: `${req.user.name} validó la tarea: ${task.title}`,
           relatedTask: task._id,
           relatedProject: task.project,
           relatedUser: req.user._id,
@@ -751,18 +778,18 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
         await Notification.insertMany(notifications);
       }
     } else {
-      // Rechazar validaciÃ³n
+      // Rechazar validación
       task.pendingValidation = false;
       task.completed = false;
       if (comment) task.validationComment = comment;
 
-      // Crear notificaciÃ³n para usuarios asignados
+      // Crear notificación para usuarios asignados
       if (task.assignedTo && task.assignedTo.length > 0) {
         const notifications = task.assignedTo.map(userId => ({
           user: userId,
           type: 'task_validation_rejected',
-          title: 'ValidaciÃ³n rechazada',
-          message: `${req.user.name} rechazÃ³ la validaciÃ³n de: ${task.title}`,
+          title: 'Validación rechazada',
+          message: `${req.user.name} rechazó la validación de: ${task.title}`,
           relatedTask: task._id,
           relatedProject: task.project,
           relatedUser: req.user._id,
@@ -789,7 +816,7 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
     res.json({ 
       success: true, 
       task: updatedTask,
-      message: approved ? 'Tarea validada exitosamente' : 'ValidaciÃ³n rechazada'
+      message: approved ? 'Tarea validada exitosamente' : 'Validación rechazada'
     });
   } catch (error) {
     console.error('Error validando tarea:', error);
@@ -825,4 +852,135 @@ router.post('/:id/remind', protect, async (req, res) => {
   }
 });
 
+// @route   POST /api/tasks/:id/attachments
+// @desc    Subir archivo adjunto a una tarea
+// @access  Private
+router.post('/:id/attachments', protect, upload.single('file'), async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      // Si falla, eliminar el archivo subido
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar que el usuario tenga acceso al proyecto
+    const project = await Project.findById(task.project);
+    if (!project) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isMember = project.members.some(m => m.user && m.user.toString() === req.user._id.toString());
+    const isCreator = project.createdBy && project.createdBy.toString() === req.user._id.toString();
+
+    if (!isMember && !isCreator) {
+      if (req.file) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se ha subido ningún archivo' });
+    }
+
+    // Crear objeto de archivo adjunto
+    const attachment = {
+      filename: req.file.filename,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+      size: req.file.size,
+      url: `/uploads/${req.file.filename}`,
+      uploadedBy: req.user._id,
+      uploadedAt: new Date(),
+    };
+
+    // Agregar archivo adjunto a la tarea
+    task.attachments.push(attachment);
+    await task.save();
+
+    // Poblar información del usuario que subió el archivo
+    await task.populate('attachments.uploadedBy', 'name email');
+
+    res.status(201).json({
+      message: 'Archivo subido exitosamente',
+      attachment: task.attachments[task.attachments.length - 1],
+    });
+  } catch (error) {
+    // Si hay error, eliminar el archivo subido
+    if (req.file) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (unlinkError) {
+        console.error('Error eliminando archivo:', unlinkError);
+      }
+    }
+    console.error('Error subiendo archivo:', error);
+    res.status(500).json({ message: 'Error al subir archivo', error: error.message });
+  }
+});
+
+// @route   DELETE /api/tasks/:taskId/attachments/:attachmentId
+// @desc    Eliminar archivo adjunto de una tarea
+// @access  Private
+router.delete('/:taskId/attachments/:attachmentId', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar que el usuario tenga acceso al proyecto
+    const project = await Project.findById(task.project);
+    if (!project) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isMember = project.members.some(m => m.user && m.user.toString() === req.user._id.toString());
+    const isCreator = project.createdBy && project.createdBy.toString() === req.user._id.toString();
+
+    if (!isMember && !isCreator) {
+      return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
+    }
+
+    // Buscar el archivo adjunto
+    const attachment = task.attachments.id(req.params.attachmentId);
+
+    if (!attachment) {
+      return res.status(404).json({ message: 'Archivo adjunto no encontrado' });
+    }
+
+    // Verificar que el usuario sea quien subió el archivo o sea admin/creador del proyecto
+    const isUploader = attachment.uploadedBy && attachment.uploadedBy.toString() === req.user._id.toString();
+    if (!isUploader && !isCreator) {
+      return res.status(403).json({ message: 'No tienes permiso para eliminar este archivo' });
+    }
+
+    // Eliminar archivo físico del servidor
+    const uploadsDir = path.join(__dirname, '../uploads');
+    const filePath = path.join(uploadsDir, attachment.filename);
+    
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+
+    // Eliminar del array de attachments
+    task.attachments.pull(req.params.attachmentId);
+    await task.save();
+
+    res.json({ message: 'Archivo eliminado exitosamente' });
+  } catch (error) {
+    console.error('Error eliminando archivo:', error);
+    res.status(500).json({ message: 'Error al eliminar archivo', error: error.message });
+  }
+});
+
 export default router;
+

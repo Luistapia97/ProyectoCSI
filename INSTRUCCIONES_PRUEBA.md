@@ -1,4 +1,4 @@
-# 🧪 Instrucciones para Probar el Login con Zoho
+﻿# 🧪 Instrucciones para Probar el Login con Zoho
 
 ## Problema Resuelto
 - ✅ Se eliminó el **doble envío** de la solicitud de completar registro

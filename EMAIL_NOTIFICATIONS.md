@@ -1,4 +1,4 @@
-# 📧 Configuración de Notificaciones por Email
+﻿# 📧 Configuración de Notificaciones por Email
 
 ## Descripción General
 

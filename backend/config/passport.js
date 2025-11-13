@@ -21,7 +21,7 @@ passport.deserializeUser(async (id, done) => {
 });
 
 if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
-  console.log('🔑 Configurando Zoho OAuth con OpenID Connect');
+  console.log('Configurando Zoho OAuth con OpenID Connect');
   console.log('   Scopes: openid, email, profile');
   
   passport.use('zoho', new OAuth2Strategy({
@@ -45,68 +45,68 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
     },
     async (req, accessToken, refreshToken, params, profile, done) => {
       try {
-        console.log('✅ OAuth callback recibido de Zoho');
-        console.log('🔑 Access Token recibido');
-        console.log('🔄 Refresh Token:', refreshToken ? 'Sí' : 'No');
+        console.log('✓ OAuth callback recibido de Zoho');
+        console.log('Access Token recibido');
+        console.log('Refresh Token:', refreshToken ? 'Sí' : 'No');
         
         // Leer el tipo de registro desde la cookie
         const registerType = req.cookies?.register_type;
         const isAdminRegistration = registerType === 'admin';
         
-        console.log('📋 Register Type (cookie):', registerType);
-        console.log('🔐 Registro de admin:', isAdminRegistration ? 'Sí' : 'No');
+        console.log('Register Type (cookie):', registerType);
+        console.log('Registro de admin:', isAdminRegistration ? 'Sí' : 'No');
         
         let userEmail, userId, userName, userPicture;
         
         // PASO 1: Decodificar el id_token (JWT) - Contiene la información verificada del usuario
         if (params.id_token) {
-          console.log('🎫 ID Token recibido, decodificando...');
+          console.log('ID Token recibido, decodificando...');
           try {
             // Decodificar el JWT sin verificar (Zoho lo firma, pero para testing no verificamos)
             const decoded = jwt.decode(params.id_token);
-            console.log('📋 Información del ID Token:', JSON.stringify(decoded, null, 2));
+            console.log('Información del ID Token:', JSON.stringify(decoded, null, 2));
             
             userEmail = decoded.email;
             userId = decoded.sub; // "sub" es el ID único del usuario en OpenID Connect
             userName = decoded.name || decoded.given_name;
             userPicture = decoded.picture;
             
-            console.log('✅ Email obtenido del ID Token:', userEmail);
-            console.log('✅ Nombre obtenido:', userName);
-            console.log('✅ User ID (sub):', userId);
+            console.log('✓ Email obtenido del ID Token:', userEmail);
+            console.log('✓ Nombre obtenido:', userName);
+            console.log('✓ User ID (sub):', userId);
           } catch (decodeError) {
-            console.log('⚠️ Error al decodificar ID Token:', decodeError.message);
+            console.log('Error al decodificar ID Token:', decodeError.message);
           }
         }
         
         // PASO 2: Si no hay id_token o no se pudo decodificar, usar userinfo endpoint
         if (!userEmail) {
-          console.log('📡 Intentando obtener info del usuario con userinfo endpoint...');
+          console.log('Intentando obtener info del usuario con userinfo endpoint...');
           try {
             const response = await axios.get('https://accounts.zoho.com/oauth/user/info', {
               headers: { 'Authorization': 'Bearer ' + accessToken }
             });
             
-            console.log('✅ Respuesta de userinfo:', JSON.stringify(response.data, null, 2));
+            console.log('✓ Respuesta de userinfo:', JSON.stringify(response.data, null, 2));
             
             userEmail = response.data.email || response.data.Email;
             userId = response.data.sub || response.data.ZUID;
             userName = response.data.name || response.data.Display_Name || response.data.given_name;
             userPicture = response.data.picture;
             
-            console.log('✅ Email obtenido de userinfo:', userEmail);
+            console.log('✓ Email obtenido de userinfo:', userEmail);
           } catch (err) {
-            console.log('⚠️ Error en userinfo endpoint:', err.response?.status, err.response?.data || err.message);
+            console.log('Error en userinfo endpoint:', err.response?.status, err.response?.data || err.message);
           }
         }
         
         // PASO 3: Validar que tenemos email
         if (!userEmail) {
-          console.error('❌ No se pudo obtener el email del usuario');
+          console.error('✗ No se pudo obtener el email del usuario');
           return done(new Error('No se pudo obtener información del usuario de Zoho'), null);
         }
         
-        console.log('\n📧 Información final del usuario:');
+        console.log('\nInformación final del usuario:');
         console.log('   Email:', userEmail);
         console.log('   Nombre:', userName);
         console.log('   ID:', userId);
@@ -115,7 +115,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         let user = await User.findOne({ zohoId: userId });
         
         if (user) {
-          console.log('✅ Usuario existente encontrado por zohoId');
+          console.log('✓ Usuario existente encontrado por zohoId');
           user.zohoAccessToken = accessToken;
           user.zohoRefreshToken = refreshToken || user.zohoRefreshToken;
           
@@ -123,11 +123,11 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           if (isAdminRegistration && user.role !== 'administrador') {
             const adminCount = await User.countDocuments({ role: 'administrador' });
             if (adminCount >= 3) {
-              console.log('⚠️ Límite de administradores alcanzado (3/3)');
+              console.log('Límite de administradores alcanzado (3/3)');
               return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
             }
             user.role = 'administrador';
-            console.log(`🔐 Actualizando rol a administrador (${adminCount + 1}/3)`);
+            console.log(`Actualizando rol a administrador (${adminCount + 1}/3)`);
           }
           
           await user.save();
@@ -138,7 +138,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         user = await User.findOne({ email: userEmail });
         
         if (user) {
-          console.log('✅ Usuario existente encontrado por email, vinculando Zoho');
+          console.log('✓ Usuario existente encontrado por email, vinculando Zoho');
           user.zohoId = userId;
           user.zohoAccessToken = accessToken;
           user.zohoRefreshToken = refreshToken;
@@ -151,18 +151,18 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           if (isAdminRegistration && user.role !== 'administrador') {
             const adminCount = await User.countDocuments({ role: 'administrador' });
             if (adminCount >= 3) {
-              console.log('⚠️ Límite de administradores alcanzado (3/3)');
+              console.log('Límite de administradores alcanzado (3/3)');
               return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
             }
             user.role = 'administrador';
-            console.log(`🔐 Actualizando rol a administrador (${adminCount + 1}/3)`);
+            console.log(`Actualizando rol a administrador (${adminCount + 1}/3)`);
           }
           await user.save();
           return done(null, user);
         }
         
         // PASO 6: Crear nuevo usuario
-        console.log('📝 Creando nuevo usuario con Zoho OAuth');
+        console.log('Creando nuevo usuario con Zoho OAuth');
         
         // Determinar el rol basado en el state
         let userRole = 'usuario';
@@ -171,11 +171,11 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           // Verificar límite de administradores
           const adminCount = await User.countDocuments({ role: 'administrador' });
           if (adminCount >= 3) {
-            console.log('⚠️ Límite de administradores alcanzado (3/3)');
+            console.log('Límite de administradores alcanzado (3/3)');
             return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
           }
           userRole = 'administrador';
-          console.log(`🔐 Registrando como administrador (${adminCount + 1}/3)`);
+          console.log(`Registrando como administrador (${adminCount + 1}/3)`);
         }
         
         const newUser = await User.create({
@@ -189,18 +189,18 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           zohoRefreshToken: refreshToken
         });
         
-        console.log('✅ Nuevo usuario creado:', newUser.email);
+        console.log('✓ Nuevo usuario creado:', newUser.email);
         done(null, newUser);
         
       } catch (error) {
-        console.error('❌ Error crítico en OAuth:', error.message);
+        console.error('✗ Error crítico en OAuth:', error.message);
         console.error('   Stack:', error.stack);
         done(error, null);
       }
     }
   ));
   
-  console.log('✅ Zoho OAuth (OpenID Connect) configurado correctamente');
+  console.log('✓ Zoho OAuth (OpenID Connect) configurado correctamente');
 }
 
 export default passport;

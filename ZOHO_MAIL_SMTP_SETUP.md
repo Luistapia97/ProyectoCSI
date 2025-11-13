@@ -1,4 +1,4 @@
-# 🚨 Problema con Zoho Mail API y Soluciones
+﻿# 🚨 Problema con Zoho Mail API y Soluciones
 
 ## ❌ Error Actual: `URL_RULE_NOT_CONFIGURED`
 

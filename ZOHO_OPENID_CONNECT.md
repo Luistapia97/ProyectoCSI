@@ -1,4 +1,4 @@
-# ✅ Inicio de Sesión con Zoho - OpenID Connect (CORREGIDO)
+﻿# ✅ Inicio de Sesión con Zoho - OpenID Connect (CORREGIDO)
 
 ## 🎯 **Implementación Correcta Basada en Documentación Oficial**
 

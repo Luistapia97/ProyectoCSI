@@ -1,4 +1,4 @@
-# 🚀 Nexus - Plataforma de Gestión de Trabajo
+﻿# 🚀 Nexus - Plataforma de Gestión de Trabajo
 
 Una aplicación web moderna y simple para la gestión de tareas y proyectos colaborativos, con interfaz tipo Kanban, drag & drop, y colaboración en tiempo real.
 

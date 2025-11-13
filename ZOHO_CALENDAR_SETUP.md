@@ -1,4 +1,4 @@
-# 📅 Guía de Configuración: Zoho OAuth y Calendar
+﻿# 📅 Guía de Configuración: Zoho OAuth y Calendar
 
 Esta guía te ayudará a integrar **autenticación de usuarios con Zoho** y **sincronización con Zoho Calendar** en Nexus.
 

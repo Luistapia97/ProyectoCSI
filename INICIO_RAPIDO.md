@@ -1,4 +1,4 @@
-# 🚀 Guía de Inicio Rápido - Nexus
+﻿# 🚀 Guía de Inicio Rápido - Nexus
 
 ## Instalación en 3 pasos
 

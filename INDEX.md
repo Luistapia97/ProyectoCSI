@@ -1,4 +1,4 @@
-# 📑 Índice de Documentación - Nexus
+﻿# 📑 Índice de Documentación - Nexus
 
 ## Bienvenido a Nexus
 

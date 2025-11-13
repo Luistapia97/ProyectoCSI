@@ -1,4 +1,4 @@
-# 📋 Resumen del Proyecto Nexus
+﻿# 📋 Resumen del Proyecto Nexus
 
 ## Información General
 

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+﻿import mongoose from 'mongoose';
 
 const taskSchema = new mongoose.Schema({
   title: {
@@ -108,6 +108,38 @@ const taskSchema = new mongoose.Schema({
     },
     taskId: String, // ID de la tarea en Zoho Tasks
     syncedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  }],
+  // Archivos adjuntos
+  attachments: [{
+    filename: {
+      type: String,
+      required: true,
+    },
+    originalName: {
+      type: String,
+      required: true,
+    },
+    mimeType: {
+      type: String,
+      required: true,
+    },
+    size: {
+      type: Number,
+      required: true,
+    },
+    url: {
+      type: String,
+      required: true,
+    },
+    uploadedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    uploadedAt: {
       type: Date,
       default: Date.now,
     },

@@ -1,4 +1,4 @@
-# 🔐 Solución Error 403: access_denied - Google OAuth
+﻿# 🔐 Solución Error 403: access_denied - Google OAuth
 
 ## El Problema
 Tu aplicación está en modo de **prueba** en Google Cloud Console, lo que significa que solo los usuarios específicamente autorizados pueden iniciar sesión.

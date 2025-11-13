@@ -1,4 +1,4 @@
-import dotenv from 'dotenv';
+﻿import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
@@ -7,12 +7,17 @@ import session from 'express-session';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import { networkInterfaces } from 'os';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Cargar variables de entorno PRIMERO
 dotenv.config();
 
 // Debug: Verificar que las variables se cargaron
-console.log('🔍 Variables de entorno de Zoho:');
+console.log('Variables de entorno de Zoho:');
 console.log('   ZOHO_CLIENT_ID:', process.env.ZOHO_CLIENT_ID ? '✓ Cargado' : '✗ NO ENCONTRADO');
 console.log('   ZOHO_CLIENT_SECRET:', process.env.ZOHO_CLIENT_SECRET ? '✓ Cargado' : '✗ NO ENCONTRADO');
 console.log('   ZOHO_REDIRECT_URI:', process.env.ZOHO_REDIRECT_URI || 'No definido (usará default)');
@@ -76,22 +81,17 @@ app.use(cors({
     // Permitir requests sin origin (mobile apps, curl, etc)
     if (!origin) return callback(null, true);
     
-    console.log('🌐 CORS - Origen solicitado:', origin);
-    
     // Permitir si está en la lista
     if (allowedOrigins.includes(origin)) {
-      console.log('✅ CORS - Permitido (en lista)');
       return callback(null, true);
     }
     
     // Permitir cualquier IP local (192.168.x.x, 10.x.x.x, 172.x.x.x)
     const localIpPattern = /^http:\/\/(192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+):\d+$/;
     if (localIpPattern.test(origin)) {
-      console.log('✅ CORS - Permitido (IP local)');
       return callback(null, true);
     }
     
-    console.log('❌ CORS - Bloqueado');
     callback(new Error('No permitido por CORS'));
   },
   credentials: true,
@@ -114,6 +114,9 @@ app.use(session({
 // Inicializar Passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Servir archivos estáticos desde la carpeta uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Hacer io disponible en las rutas
 app.set('io', io);
@@ -178,14 +181,14 @@ const PORT = process.env.PORT || 5000;
 const HOST = '0.0.0.0'; // Escuchar en todas las interfaces de red
 
 httpServer.listen(PORT, HOST, () => {
-  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
-  console.log(`📡 Socket.IO listo para conexiones en tiempo real`);
-  console.log(`🌐 Acceso local: http://localhost:${PORT}`);
+  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log(`Socket.IO listo para conexiones en tiempo real`);
+  console.log(`Acceso local: http://localhost:${PORT}`);
   
   // Mostrar IPs de red local
   const nets = networkInterfaces();
   
-  console.log('\n📱 Acceso desde red local:');
+  console.log('\nAcceso desde red local:');
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
       // Skip over internal (i.e. 127.0.0.1) and non-IPv4 addresses

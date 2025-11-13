@@ -1,4 +1,4 @@
-# 🌐 Guía de Acceso desde Red Local
+﻿# 🌐 Guía de Acceso desde Red Local
 
 Esta guía te ayudará a acceder a Nexus desde otros dispositivos en tu red local (celular, tablet, otra computadora).
 
@@ -12,7 +12,7 @@ Esta guía te ayudará a acceder a Nexus desde otros dispositivos en tu red loca
 
 ---
 
-## 🚀 Cómo Acceder
+##  Cómo Acceder
 
 ### 1️⃣ **Iniciar los Servidores**
 
@@ -24,9 +24,9 @@ npm run dev
 
 Verás algo como:
 ```
-🚀 Servidor corriendo en puerto 5000
-📡 Socket.IO listo para conexiones en tiempo real
-🌐 Acceso local: http://localhost:5000
+ Servidor corriendo en puerto 5000
+ Socket.IO listo para conexiones en tiempo real
+ Acceso local: http://localhost:5000
 
 📱 Acceso desde red local:
    http://172.21.240.1:5000
