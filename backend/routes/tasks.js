@@ -121,6 +121,7 @@ router.get('/project/:projectId', protect, async (req, res) => {
     })
       .populate('assignedTo', 'name email avatar')
       .populate('createdBy', 'name email avatar')
+      .populate('validatedBy', 'name email avatar')
       .sort({ position: 1 });
 
     res.json({ success: true, tasks });
@@ -138,6 +139,7 @@ router.get('/:id', protect, async (req, res) => {
     const task = await Task.findById(req.params.id)
       .populate('assignedTo', 'name email avatar')
       .populate('createdBy', 'name email avatar')
+      .populate('validatedBy', 'name email avatar')
       .populate('project');
 
     if (!task) {
@@ -421,8 +423,8 @@ router.put('/:id', protect, async (req, res) => {
 
 // @route   DELETE /api/tasks/:id
 // @desc    Eliminar una tarea
-// @access  Private
-router.delete('/:id', protect, async (req, res) => {
+// @access  Private (Admin only)
+router.delete('/:id', protect, isAdmin, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -761,13 +763,13 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
         $inc: { 'stats.completedTasks': 1 },
       });
 
-      // Crear notificaciÃ³n para usuarios asignados
+      // Crear notificación para usuarios asignados
       if (task.assignedTo && task.assignedTo.length > 0) {
         const notifications = task.assignedTo.map(userId => ({
           user: userId,
-          type: 'task_validated',
+          type: 'task_validation_approved',
           title: 'Tarea validada',
-          message: `${req.user.name} validÃ³ la tarea: ${task.title}`,
+          message: `${req.user.name} validó la tarea: ${task.title}`,
           relatedTask: task._id,
           relatedProject: task.project,
           relatedUser: req.user._id,

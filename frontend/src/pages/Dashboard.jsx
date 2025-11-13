@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon } from 'lucide-react';
+import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2 } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import CreateProjectModal from '../components/CreateProjectModal';
@@ -12,7 +12,7 @@ import './Dashboard.css';
 export default function Dashboard() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { projects, fetchProjects, loading } = useProjectStore();
+  const { projects, fetchProjects, deleteProject, loading } = useProjectStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [theme, setTheme] = useState('light');
@@ -45,6 +45,21 @@ export default function Dashboard() {
     const completed = project.stats?.completedTasks || 0;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     return { total, completed, percentage };
+  };
+
+  const handleDeleteProject = async (e, projectId, projectName) => {
+    e.stopPropagation(); // Evitar que se abra el proyecto
+    
+    if (!confirm(`¿Estás seguro de eliminar el proyecto "${projectName}"?\n\nEsta acción archivará el proyecto y todas sus tareas.`)) {
+      return;
+    }
+
+    const result = await deleteProject(projectId);
+    if (result.success) {
+      alert('✅ Proyecto eliminado exitosamente');
+    } else {
+      alert('❌ Error: ' + result.error);
+    }
   };
 
   return (
@@ -157,6 +172,15 @@ export default function Dashboard() {
                   <div className="project-header">
                     <div className="project-color" style={{ backgroundColor: project.color }}></div>
                     <h3>{project.name}</h3>
+                    {isAdmin && (
+                      <button
+                        className="btn-delete-project"
+                        onClick={(e) => handleDeleteProject(e, project._id, project.name)}
+                        title="Eliminar proyecto"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
                   </div>
 
                   {project.description && (

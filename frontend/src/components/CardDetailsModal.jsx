@@ -509,7 +509,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </div>
               )}
               
-              {task.completed && task.validatedBy && (
+              {!task.pendingValidation && task.validatedBy && (
                 <div className="validation-status approved">
                   <CheckCircle size={18} />
                   <span>Validado por {task.validatedBy.name}</span>
@@ -703,7 +703,16 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   </button>
                 </>
               ) : (
-                <button onClick={() => setEditing(true)} className="btn-secondary">
+                <button 
+                  onClick={() => {
+                    if (!isAdmin) {
+                      alert('⚠️ Solo los administradores pueden editar tareas');
+                      return;
+                    }
+                    setEditing(true);
+                  }} 
+                  className="btn-secondary"
+                >
                   Editar tarea
                 </button>
               )}
@@ -721,10 +730,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </button>
               )}
 
-              <button onClick={handleDelete} className="btn-danger">
-                <Trash2 size={18} />
-                Eliminar tarea
-              </button>
+              {isAdmin && (
+                <button onClick={handleDelete} className="btn-danger">
+                  <Trash2 size={18} />
+                  Eliminar tarea
+                </button>
+              )}
             </div>
           </div>
         </div>

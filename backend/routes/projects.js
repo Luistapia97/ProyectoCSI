@@ -156,7 +156,7 @@ router.put('/:id', protect, async (req, res) => {
 
 // @route   DELETE /api/projects/:id
 // @desc    Eliminar (archivar) un proyecto
-// @access  Private
+// @access  Private (Admin o Owner)
 router.delete('/:id', protect, async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
@@ -165,9 +165,12 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Solo el owner puede eliminar
-    if (project.owner.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Solo el dueño puede eliminar el proyecto' });
+    // Solo el owner o un administrador pueden eliminar
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'administrador';
+    
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({ message: 'No tienes permisos para eliminar este proyecto' });
     }
 
     project.archived = true;

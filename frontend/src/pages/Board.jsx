@@ -57,7 +57,9 @@ export default function Board() {
       totalProgress += columnProgress;
     });
 
-    return Math.round(totalProgress / tasks.length);
+    const progress = Math.round(totalProgress / tasks.length);
+    // Limitar el progreso a un máximo de 100%
+    return Math.min(progress, 100);
   };
 
   useEffect(() => {
