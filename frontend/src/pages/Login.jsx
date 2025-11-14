@@ -40,7 +40,7 @@ export default function Login() {
     <div className="auth-container">
       <div className="auth-card">
         <div className="auth-header">
-          <LogIn className="auth-icon" size={48} />
+          <img src="/csi-logo.png" alt="CSI Logo" className="auth-logo" />
           <h1>Bienvenido de nuevo</h1>
           <p>Inicia sesión en tu cuenta de Proyectos CSI</p>
         </div>

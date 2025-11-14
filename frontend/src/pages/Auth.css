@@ -33,6 +33,12 @@
   margin-bottom: 2rem;
 }
 
+.auth-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+}
+
 .auth-icon {
   color: #467096;
   margin-bottom: 1rem;

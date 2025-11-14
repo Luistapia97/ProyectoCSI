@@ -41,6 +41,11 @@
   gap: 0.75rem;
 }
 
+.dashboard-logo {
+  height: 2.80rem;
+  width: auto;
+}
+
 .header-right {
   display: flex;
   align-items: center;
