@@ -4,7 +4,7 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import useTaskStore from '../store/taskStore';
 import useAuthStore from '../store/authStore';
-import { authAPI, tasksAPI } from '../services/api';
+import { authAPI, tasksAPI, getBackendURL } from '../services/api';
 import './CardDetailsModal.css';
 
 export default function CardDetailsModal({ task: initialTask, onClose }) {
@@ -341,7 +341,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                         <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
                         <div className="attachment-details">
                           <a
-                            href={`http://localhost:5000${attachment.url}`}
+                            href={`${getBackendURL()}${attachment.url}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="attachment-name"
@@ -357,7 +357,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       </div>
                       <div className="attachment-actions">
                         <a
-                          href={`http://localhost:5000${attachment.url}`}
+                          href={`${getBackendURL()}${attachment.url}`}
                           download
                           className="btn-icon-tiny"
                           title="Descargar"

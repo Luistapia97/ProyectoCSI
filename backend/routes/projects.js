@@ -23,7 +23,50 @@ router.get('/', protect, async (req, res) => {
       .populate('members.user', 'name email avatar')
       .sort({ createdAt: -1 });
 
-    res.json({ success: true, projects });
+    // Agregar estadísticas de tareas a cada proyecto
+    const projectsWithStats = await Promise.all(
+      projects.map(async (project) => {
+        const tasks = await Task.find({ project: project._id });
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(task => task.completed).length;
+        
+        // Calcular progreso basado en columnas (igual que en Board.jsx)
+        let totalProgress = 0;
+        if (totalTasks > 0) {
+          tasks.forEach(task => {
+            const columnName = task.column?.toLowerCase() || '';
+            let columnProgress = 0;
+            
+            if (columnName.includes('completad') || columnName.includes('hecho') || columnName === 'done') {
+              // En completado: 100% solo si está validada, sino 75%
+              columnProgress = (!task.pendingValidation && task.validatedBy) ? 100 : 75;
+            } else if (columnName.includes('progreso') || columnName.includes('proceso') || columnName === 'in progress') {
+              columnProgress = 50;
+            } else if (columnName.includes('pendiente') || columnName.includes('hacer') || columnName === 'to do') {
+              columnProgress = 0;
+            } else {
+              // Fallback: usar estado de completado
+              columnProgress = task.completed ? 75 : 0;
+            }
+            
+            totalProgress += columnProgress;
+          });
+        }
+        
+        const progressPercentage = totalTasks > 0 ? Math.min(Math.round(totalProgress / totalTasks), 100) : 0;
+        
+        return {
+          ...project.toObject(),
+          stats: {
+            totalTasks,
+            completedTasks,
+            progressPercentage,
+          },
+        };
+      })
+    );
+
+    res.json({ success: true, projects: projectsWithStats });
   } catch (error) {
     console.error('Error obteniendo proyectos:', error);
     res.status(500).json({ message: 'Error al obtener proyectos', error: error.message });

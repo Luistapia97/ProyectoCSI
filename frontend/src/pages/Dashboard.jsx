@@ -43,7 +43,8 @@ export default function Dashboard() {
   const getProjectStats = (project) => {
     const total = project.stats?.totalTasks || 0;
     const completed = project.stats?.completedTasks || 0;
-    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    // Usar el porcentaje calculado en el backend basado en columnas
+    const percentage = project.stats?.progressPercentage ?? 0;
     return { total, completed, percentage };
   };
 
@@ -67,7 +68,7 @@ export default function Dashboard() {
       <header className="dashboard-header">
         <div className="header-left">
           <h1>
-            <TrendingUp size={32} />
+            <img src="/csi-logo.png" alt="CSI Logo" className="dashboard-logo" />
             Proyectos CSI
           </h1>
         </div>

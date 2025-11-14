@@ -39,7 +39,18 @@ export default function Board() {
     } else if (columnNameLower.includes('progreso') || columnNameLower.includes('proceso') || columnNameLower === 'in progress') {
       return 50;
     } else if (columnNameLower.includes('completad') || columnNameLower.includes('hecho') || columnNameLower === 'done') {
-      return 100;
+      // En columna completado: 100% solo si está validada, sino 75%
+      const validatedTasks = columnTasks.filter(task => !task.pendingValidation && task.validatedBy).length;
+      const totalTasks = columnTasks.length;
+      
+      if (validatedTasks === totalTasks) {
+        return 100; // Todas validadas
+      } else if (validatedTasks === 0) {
+        return 75; // Ninguna validada
+      } else {
+        // Mezcla: calcular promedio
+        return Math.round((validatedTasks * 100 + (totalTasks - validatedTasks) * 75) / totalTasks);
+      }
     }
     
     // Por defecto, usar lógica basada en tareas completadas
