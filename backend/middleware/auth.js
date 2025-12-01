@@ -22,6 +22,21 @@ export const protect = async (req, res, next) => {
         return res.status(401).json({ message: 'Usuario no encontrado' });
       }
 
+      // Verificar si el usuario está pendiente o rechazado
+      if (req.user.status === 'pending') {
+        return res.status(403).json({ 
+          message: 'Tu cuenta está pendiente de aprobación por un administrador',
+          status: 'pending'
+        });
+      }
+
+      if (req.user.status === 'rejected') {
+        return res.status(403).json({ 
+          message: 'Tu cuenta ha sido rechazada. Contacta al administrador.',
+          status: 'rejected'
+        });
+      }
+
       next();
     } catch (error) {
       console.error('Error en autenticación:', error);

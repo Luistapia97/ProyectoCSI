@@ -25,7 +25,30 @@ export default function ProjectAnalytics({ tasks, project }) {
       return new Date(t.dueDate) < new Date();
     }).length;
 
-    const progresoGeneral = total > 0 ? Math.round((completadas / total) * 100) : 0;
+    // Calcular progreso basado en columnas (igual que en Board.jsx)
+    let totalProgress = 0;
+    if (total > 0) {
+      tasks.forEach(task => {
+        const columnName = task.column?.toLowerCase() || '';
+        let columnProgress = 0;
+        
+        if (columnName.includes('completad') || columnName.includes('hecho') || columnName === 'done') {
+          // En completado: 100% solo si está validada, sino 75%
+          columnProgress = (!task.pendingValidation && task.validatedBy) ? 100 : 75;
+        } else if (columnName.includes('progreso') || columnName.includes('proceso') || columnName === 'in progress') {
+          columnProgress = 50;
+        } else if (columnName.includes('pendiente') || columnName.includes('hacer') || columnName === 'to do') {
+          columnProgress = 0;
+        } else {
+          // Fallback: usar estado de completado
+          columnProgress = task.completed ? 75 : 0;
+        }
+        
+        totalProgress += columnProgress;
+      });
+    }
+
+    const progresoGeneral = total > 0 ? Math.min(Math.round(totalProgress / total), 100) : 0;
 
     return {
       total,

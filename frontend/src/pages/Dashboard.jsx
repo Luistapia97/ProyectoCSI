@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2 } from 'lucide-react';
+import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2, AlertCircle, UserCheck } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import CreateProjectModal from '../components/CreateProjectModal';
 import CreateUserModal from '../components/CreateUserModal';
+import PendingUsersModal from '../components/PendingUsersModal';
 import NotificationBell from '../components/NotificationBell';
 import socketService from '../services/socket';
+import { authAPI } from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
@@ -15,6 +17,8 @@ export default function Dashboard() {
   const { projects, fetchProjects, deleteProject, loading } = useProjectStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [showPendingUsersModal, setShowPendingUsersModal] = useState(false);
+  const [pendingUsersCount, setPendingUsersCount] = useState(0);
   const [theme, setTheme] = useState('light');
   
   const isAdmin = user?.role === 'administrador';
@@ -27,7 +31,21 @@ export default function Dashboard() {
       const socket = socketService.connect();
       socketService.joinUser(user._id);
     }
-  }, [fetchProjects, user]);
+
+    // Si es admin, obtener usuarios pendientes
+    if (isAdmin) {
+      fetchPendingUsers();
+    }
+  }, [fetchProjects, user, isAdmin]);
+
+  const fetchPendingUsers = async () => {
+    try {
+      const response = await authAPI.getPendingUsers();
+      setPendingUsersCount(response.data.count || 0);
+    } catch (error) {
+      console.error('Error obteniendo usuarios pendientes:', error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -80,8 +98,29 @@ export default function Dashboard() {
 
           <NotificationBell />
 
+          {isAdmin && pendingUsersCount > 0 && (
+            <button 
+              onClick={() => setShowPendingUsersModal(true)} 
+              className="btn-icon btn-pending-users" 
+              title={`${pendingUsersCount} usuario(s) pendiente(s) de aprobación`}
+            >
+              <UserCheck size={20} />
+              {pendingUsersCount > 0 && (
+                <span className="pending-badge">{pendingUsersCount}</span>
+              )}
+            </button>
+          )}
+
           <div className="user-menu">
-            <img src={user?.avatar} alt={user?.name} className="avatar" />
+            <img 
+              src={user?.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`} 
+              alt={user?.name} 
+              className="avatar"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`;
+              }}
+            />
             <div className="user-info">
               <span className="user-name">{user?.name}</span>
               <span className="user-role" style={{ 
@@ -223,10 +262,14 @@ export default function Dashboard() {
                     {project.members?.slice(0, 4).map((member) => (
                       <img
                         key={member.user._id}
-                        src={member.user.avatar}
+                        src={member.user.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`}
                         alt={member.user.name}
                         className="member-avatar"
                         title={member.user.name}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`;
+                        }}
                       />
                     ))}
                     {project.members?.length > 4 && (
@@ -250,6 +293,15 @@ export default function Dashboard() {
           onUserCreated={(user) => {
             console.log('Usuario creado:', user);
             // Opcional: Mostrar notificación de éxito
+          }}
+        />
+      )}
+
+      {showPendingUsersModal && (
+        <PendingUsersModal 
+          onClose={() => {
+            setShowPendingUsersModal(false);
+            fetchPendingUsers(); // Actualizar contador
           }}
         />
       )}

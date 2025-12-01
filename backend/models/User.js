@@ -27,6 +27,11 @@ const userSchema = new mongoose.Schema({
     enum: ['usuario', 'administrador'],
     default: 'usuario',
   },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'approved', // Por defecto aprobado para registro local
+  },
   // Para Google OAuth
   googleId: {
     type: String,

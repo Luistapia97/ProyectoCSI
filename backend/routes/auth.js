@@ -243,12 +243,25 @@ if (isZohoConfigured) {
         console.log('✓ Usuario autenticado con Zoho:', req.user.email);
         console.log('ID del usuario:', req.user._id);
         console.log('Rol del usuario:', req.user.role);
+        console.log('Estado del usuario:', req.user.status);
 
         // Verificar que el usuario realmente existe en la base de datos
         const userExists = await User.findById(req.user._id);
         if (!userExists) {
           console.error('❌ Usuario no encontrado en BD después de OAuth');
           return res.redirect(`${frontendURL}/login?error=user_not_saved`);
+        }
+
+        // Verificar si el usuario está pendiente de aprobación
+        if (userExists.status === 'pending') {
+          console.log('⏳ Usuario pendiente de aprobación por administrador');
+          return res.redirect(`${frontendURL}/login?error=pending_approval&email=${encodeURIComponent(userExists.email)}`);
+        }
+
+        // Verificar si el usuario fue rechazado
+        if (userExists.status === 'rejected') {
+          console.log('❌ Usuario rechazado por administrador');
+          return res.redirect(`${frontendURL}/login?error=access_rejected`);
         }
 
         const isTemporary = req.user.email.includes('@temp.nexus.local');
@@ -545,6 +558,88 @@ router.post('/create-user', protect, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error creando usuario:', error);
     res.status(500).json({ message: 'Error al crear usuario', error: error.message });
+  }
+});
+
+// @route   GET /api/auth/pending-users
+// @desc    Obtener usuarios pendientes de aprobación
+// @access  Private (Admin only)
+router.get('/pending-users', protect, isAdmin, async (req, res) => {
+  try {
+    const pendingUsers = await User.find({ status: 'pending' })
+      .select('name email avatar createdAt authProvider')
+      .sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      users: pendingUsers,
+      count: pendingUsers.length,
+    });
+  } catch (error) {
+    console.error('Error obteniendo usuarios pendientes:', error);
+    res.status(500).json({ message: 'Error al obtener usuarios pendientes', error: error.message });
+  }
+});
+
+// @route   POST /api/auth/approve-user/:id
+// @desc    Aprobar usuario pendiente
+// @access  Private (Admin only)
+router.post('/approve-user/:id', protect, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    if (user.status !== 'pending') {
+      return res.status(400).json({ message: 'El usuario no está pendiente de aprobación' });
+    }
+
+    user.status = 'approved';
+    await user.save();
+
+    console.log(`✅ Usuario aprobado: ${user.email} por ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: `Usuario ${user.name} aprobado exitosamente`,
+      user: user.toPublicJSON(),
+    });
+  } catch (error) {
+    console.error('Error aprobando usuario:', error);
+    res.status(500).json({ message: 'Error al aprobar usuario', error: error.message });
+  }
+});
+
+// @route   POST /api/auth/reject-user/:id
+// @desc    Rechazar usuario pendiente
+// @access  Private (Admin only)
+router.post('/reject-user/:id', protect, isAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    if (user.status !== 'pending') {
+      return res.status(400).json({ message: 'El usuario no está pendiente de aprobación' });
+    }
+
+    user.status = 'rejected';
+    await user.save();
+
+    console.log(`❌ Usuario rechazado: ${user.email} por ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: `Usuario ${user.name} rechazado`,
+      user: user.toPublicJSON(),
+    });
+  } catch (error) {
+    console.error('Error rechazando usuario:', error);
+    res.status(500).json({ message: 'Error al rechazar usuario', error: error.message });
   }
 });
 

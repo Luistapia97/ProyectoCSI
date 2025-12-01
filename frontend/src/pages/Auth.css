@@ -107,7 +107,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #1a769a 0%, #050331f0 100%);
+  background: linear-gradient(135deg, #1a769a 0%, #09164bf0 100%) !important;
   color: white;
   padding: 1rem;
   border: none;
@@ -121,7 +121,7 @@
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(26, 118, 154, 0.4);
+  box-shadow: 0 10px 25px rgba(26, 118, 154, 0.4) !important;
 }
 
 .btn-primary:disabled {
@@ -182,14 +182,17 @@
 }
 
 .auth-footer a {
-  color: #6366f1;
+  background: linear-gradient(135deg, #021319 0%, #050331f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
 .auth-footer a:hover {
-  color: #602b98;
+  filter: brightness(1.2);
   text-decoration: underline;
 }
 

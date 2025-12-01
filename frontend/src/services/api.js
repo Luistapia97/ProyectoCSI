@@ -86,6 +86,9 @@ export const authAPI = {
   getAllUsers: () => api.get('/auth/users'),
   createUser: (data) => api.post('/auth/create-user', data),
   getAdminCount: () => api.get('/auth/admin-count'),
+  getPendingUsers: () => api.get('/auth/pending-users'),
+  approveUser: (id) => api.post(`/auth/approve-user/${id}`),
+  rejectUser: (id) => api.post(`/auth/reject-user/${id}`),
 };
 
 // Projects

@@ -166,6 +166,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         
         // Determinar el rol basado en el state
         let userRole = 'usuario';
+        let userStatus = 'pending'; // Por defecto pendiente para Zoho
         
         if (isAdminRegistration) {
           // Verificar límite de administradores
@@ -175,7 +176,10 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
             return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
           }
           userRole = 'administrador';
+          userStatus = 'approved'; // Admins se aprueban automáticamente
           console.log(`Registrando como administrador (${adminCount + 1}/3)`);
+        } else {
+          console.log('Usuario creado con estado PENDIENTE - requiere aprobación de administrador');
         }
         
         const newUser = await User.create({
@@ -184,12 +188,13 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           email: userEmail,
           avatar: userPicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(userName || userEmail)}`,
           role: userRole,
+          status: userStatus,
           authProvider: 'zoho',
           zohoAccessToken: accessToken,
           zohoRefreshToken: refreshToken
         });
         
-        console.log('✓ Nuevo usuario creado:', newUser.email);
+        console.log('✓ Nuevo usuario creado:', newUser.email, '- Estado:', userStatus);
         done(null, newUser);
         
       } catch (error) {

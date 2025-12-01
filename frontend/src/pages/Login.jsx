@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import { getBackendURL } from '../services/api';
@@ -7,6 +7,7 @@ import './Auth.css';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { login } = useAuthStore();
   const [formData, setFormData] = useState({
     email: '',
@@ -14,6 +15,21 @@ export default function Login() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Verificar errores en la URL
+  useEffect(() => {
+    const urlError = searchParams.get('error');
+    const userEmail = searchParams.get('email');
+    
+    if (urlError === 'pending_approval') {
+      setError(`Tu cuenta está pendiente de aprobación por un administrador. Te notificaremos cuando sea aprobada.${userEmail ? ` (${userEmail})` : ''}`);
+    } else if (urlError === 'access_rejected') {
+      setError('Tu solicitud de acceso ha sido rechazada. Contacta al administrador para más información.');
+    } else if (urlError) {
+      // Otros errores de OAuth
+      setError('Error en el inicio de sesión. Por favor intenta nuevamente.');
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
