@@ -32,13 +32,19 @@ connectDB();
 const app = express();
 const httpServer = createServer(app);
 
-// Configurar CORS para permitir acceso desde red local
+// Configurar CORS para permitir acceso desde red local Y producción
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://127.0.0.1:5173',
   'http://127.0.0.1:5174',
 ];
+
+// Agregar URL de producción si existe
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+  console.log('✓ Frontend de producción agregado a CORS:', process.env.FRONTEND_URL);
+}
 
 // Agregar todas las IPs locales posibles
 const nets = networkInterfaces();
