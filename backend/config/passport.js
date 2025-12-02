@@ -39,7 +39,7 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         'profile'
       ],
       passReqToCallback: true,
-      state: true,
+      state: false, // Deshabilitar state para evitar problemas de cookies entre dominios
       // Parámetros adicionales para obtener refresh token
       customHeaders: {
         'access_type': 'offline'

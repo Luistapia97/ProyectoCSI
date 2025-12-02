@@ -111,8 +111,11 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'nexus-secret-key-2024',
   resave: false,
   saveUninitialized: false,
+  proxy: process.env.NODE_ENV === 'production', // Confiar en proxy (Render usa proxy)
   cookie: {
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === 'production', // Solo HTTPS en producción
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' permite cookies entre dominios en HTTPS
     maxAge: 24 * 60 * 60 * 1000, // 24 horas
   },
 }));
