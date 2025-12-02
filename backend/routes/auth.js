@@ -221,10 +221,31 @@ if (isZohoConfigured) {
   // @access  Public
   router.get(
     '/zoho/callback',
-    passport.authenticate('zoho', { 
-      session: false, 
-      failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed` 
-    }),
+    (req, res, next) => {
+      console.log('🔄 Callback de Zoho recibido');
+      console.log('   URL completa:', req.originalUrl);
+      console.log('   Query params:', req.query);
+      
+      passport.authenticate('zoho', { 
+        session: false,
+        failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth_failed`
+      }, (err, user, info) => {
+        if (err) {
+          console.error('❌ Error en autenticación de Zoho:', err.message);
+          console.error('   Stack:', err.stack);
+          return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed&details=${encodeURIComponent(err.message)}`);
+        }
+        
+        if (!user) {
+          console.error('❌ No se pudo autenticar usuario');
+          console.error('   Info:', info);
+          return res.redirect(`${process.env.FRONTEND_URL}/login?error=oauth_failed&reason=no_user`);
+        }
+        
+        req.user = user;
+        next();
+      })(req, res, next);
+    },
     async (req, res) => {
       try {
         // Obtener la URL del frontend dinámicamente

@@ -22,6 +22,8 @@ passport.deserializeUser(async (id, done) => {
 
 if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
   console.log('Configurando Zoho OAuth con OpenID Connect');
+  console.log('   Client ID:', process.env.ZOHO_CLIENT_ID);
+  console.log('   Callback URL configurada:', process.env.ZOHO_REDIRECT_URI);
   console.log('   Scopes: openid, email, profile');
   
   passport.use('zoho', new OAuth2Strategy({
