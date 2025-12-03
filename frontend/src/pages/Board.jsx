@@ -6,6 +6,7 @@ import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import useTaskStore from '../store/taskStore';
 import socketService from '../services/socket';
+import { getBackendURL } from '../services/api';
 import Card from '../components/Card';
 import CreateCardModal from '../components/CreateCardModal';
 import CardDetailsModal from '../components/CardDetailsModal';
@@ -25,6 +26,12 @@ export default function Board() {
   const [viewMode, setViewMode] = useState('board'); // 'board' o 'analytics'
   
   const isAdmin = user?.role === 'administrador';
+
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
 
   // Función para calcular el progreso de una columna
   const calculateColumnProgress = (columnName) => {
@@ -192,7 +199,7 @@ export default function Board() {
             {currentProject.members?.slice(0, 5).map((member) => (
               <img
                 key={member.user._id}
-                src={member.user.avatar}
+                src={getAvatarUrl(member.user.avatar)}
                 alt={member.user.name}
                 className="member-avatar-header"
                 title={member.user.name}

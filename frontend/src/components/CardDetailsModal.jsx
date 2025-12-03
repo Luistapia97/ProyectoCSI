@@ -13,6 +13,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   
   // Obtener la tarea actualizada del store o usar la inicial
   const task = tasks.find(t => t._id === initialTask._id) || currentTask || initialTask;
+
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
   
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -481,7 +487,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
 
                     return (
                       <div key={comment._id} className="comment-item">
-                        <img src={comment.user.avatar} alt={comment.user.name} className="comment-avatar" />
+                        <img src={getAvatarUrl(comment.user.avatar)} alt={comment.user.name} className="comment-avatar" />
                         <div className="comment-content">
                           <div className="comment-header">
                             <span className="comment-author">{comment.user.name}</span>
@@ -552,7 +558,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   })}
                 </div>
                 <form onSubmit={handleAddComment} className="comment-form">
-                  <img src={user?.avatar} alt={user?.name} className="comment-avatar" />
+                  <img src={getAvatarUrl(user?.avatar)} alt={user?.name} className="comment-avatar" />
                   <input
                     type="text"
                     placeholder="Escribe un comentario..."
@@ -698,7 +704,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                     task.assignedTo.map((assignedUser) => (
                       <div key={assignedUser._id} className="assigned-user-item">
                         <img 
-                          src={assignedUser.avatar} 
+                          src={getAvatarUrl(assignedUser.avatar)} 
                           alt={assignedUser.name} 
                           className="assigned-user-avatar"
                         />
@@ -740,7 +746,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                           onClick={() => handleAssignUser(availableUser._id)}
                         >
                           <img 
-                            src={availableUser.avatar} 
+                            src={getAvatarUrl(availableUser.avatar)} 
                             alt={availableUser.name} 
                             className="user-option-avatar"
                           />

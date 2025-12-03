@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, Flag, Tag, Users } from 'lucide-react';
 import useTaskStore from '../store/taskStore';
-import { authAPI } from '../services/api';
+import { authAPI, getBackendURL } from '../services/api';
 import './Modal.css';
 
 const PRIORITIES = ['baja', 'media', 'alta', 'urgente'];
@@ -19,6 +19,12 @@ export default function CreateCardModal({ projectId, column, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableUsers, setAvailableUsers] = useState([]);
+
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
 
   useEffect(() => {
     loadUsers();
@@ -177,7 +183,7 @@ export default function CreateCardModal({ projectId, column, onClose }) {
                   className={`user-selection-item ${formData.assignedTo.includes(user._id) ? 'selected' : ''}`}
                   onClick={() => toggleUserAssignment(user._id)}
                 >
-                  <img src={user.avatar} alt={user.name} className="user-selection-avatar" />
+                  <img src={getAvatarUrl(user.avatar)} alt={user.name} className="user-selection-avatar" />
                   <div className="user-selection-info">
                     <span className="user-selection-name">{user.name}</span>
                     <span className="user-selection-email">{user.email}</span>

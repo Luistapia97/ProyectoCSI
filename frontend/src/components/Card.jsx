@@ -1,6 +1,7 @@
 import { Calendar, User, CheckSquare, AlertCircle, CheckCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { getBackendURL } from '../services/api';
 import './Card.css';
 
 const PRIORITY_COLORS = {
@@ -16,6 +17,12 @@ export default function Card({ task, onClick }) {
   const hasSubtasks = totalSubtasks > 0;
 
   const priorityColor = PRIORITY_COLORS[task.priority] || '#94a3b8';
+
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
 
   // Función para crear fecha local sin conversión UTC
   const getLocalDate = (dateStr) => {
@@ -84,7 +91,7 @@ export default function Card({ task, onClick }) {
               {task.assignedTo.slice(0, 2).map((user) => (
                 <img
                   key={user._id}
-                  src={user.avatar}
+                  src={getAvatarUrl(user.avatar)}
                   alt={user.name}
                   className="assignee-avatar"
                   title={user.name}
