@@ -5,24 +5,28 @@ import path from 'path';
 import fs from 'fs';
 import User from '../models/User.js';
 import { generateToken, protect, admin as isAdmin } from '../middleware/auth.js';
+import { cloudinary, isConfigured as isCloudinaryConfigured } from '../config/cloudinary.js';
 
 const router = express.Router();
 
 // Configuración de multer para subir avatares
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = 'uploads/avatars';
-    // Crear directorio si no existe
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
-    }
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'avatar-' + req.user._id + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Si Cloudinary está configurado, usar memoria; sino, disco
+const storage = isCloudinaryConfigured() 
+  ? multer.memoryStorage()
+  : multer.diskStorage({
+      destination: (req, file, cb) => {
+        const uploadPath = 'uploads/avatars';
+        // Crear directorio si no existe
+        if (!fs.existsSync(uploadPath)) {
+          fs.mkdirSync(uploadPath, { recursive: true });
+        }
+        cb(null, uploadPath);
+      },
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'avatar-' + req.user._id + '-' + uniqueSuffix + path.extname(file.originalname));
+      }
+    });
 
 const upload = multer({
   storage: storage,
@@ -754,16 +758,56 @@ router.post('/upload-avatar', protect, upload.single('avatar'), async (req, res)
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Eliminar avatar anterior si existe y no es una URL externa
-    if (user.avatar && user.avatar.startsWith('/uploads/')) {
-      const oldAvatarPath = path.join(process.cwd(), user.avatar);
-      if (fs.existsSync(oldAvatarPath)) {
-        fs.unlinkSync(oldAvatarPath);
+    let avatarUrl;
+
+    // Si Cloudinary está configurado, subir allí
+    if (isCloudinaryConfigured()) {
+      // Eliminar avatar anterior de Cloudinary si existe
+      if (user.avatar && user.avatar.includes('cloudinary.com')) {
+        const publicId = user.avatar.split('/').pop().split('.')[0];
+        try {
+          await cloudinary.uploader.destroy(`avatars/${publicId}`);
+        } catch (error) {
+          console.log('No se pudo eliminar avatar anterior de Cloudinary:', error.message);
+        }
       }
+
+      // Subir nueva imagen a Cloudinary
+      const uploadPromise = new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: 'avatars',
+            public_id: `avatar-${req.user._id}-${Date.now()}`,
+            transformation: [
+              { width: 500, height: 500, crop: 'fill', gravity: 'face' },
+              { quality: 'auto:good' }
+            ]
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        uploadStream.end(req.file.buffer);
+      });
+
+      const result = await uploadPromise;
+      avatarUrl = result.secure_url;
+    } else {
+      // Modo local: eliminar avatar anterior si existe
+      if (user.avatar && user.avatar.startsWith('/uploads/')) {
+        const oldAvatarPath = path.join(process.cwd(), user.avatar);
+        if (fs.existsSync(oldAvatarPath)) {
+          fs.unlinkSync(oldAvatarPath);
+        }
+      }
+
+      // Guardar ruta local
+      avatarUrl = `/uploads/avatars/${req.file.filename}`;
     }
 
-    // Guardar nueva ruta del avatar
-    user.avatar = `/uploads/avatars/${req.file.filename}`;
+    // Actualizar usuario
+    user.avatar = avatarUrl;
     await user.save();
 
     res.json({
@@ -794,7 +838,17 @@ router.delete('/avatar', protect, async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
 
-    // Eliminar archivo si existe
+    // Eliminar de Cloudinary si está configurado y es una URL de Cloudinary
+    if (isCloudinaryConfigured() && user.avatar && user.avatar.includes('cloudinary.com')) {
+      const publicId = user.avatar.split('/').pop().split('.')[0];
+      try {
+        await cloudinary.uploader.destroy(`avatars/${publicId}`);
+      } catch (error) {
+        console.log('No se pudo eliminar avatar de Cloudinary:', error.message);
+      }
+    }
+    
+    // Eliminar archivo local si existe
     if (user.avatar && user.avatar.startsWith('/uploads/')) {
       const avatarPath = path.join(process.cwd(), user.avatar);
       if (fs.existsSync(avatarPath)) {
