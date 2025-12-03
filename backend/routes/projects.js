@@ -26,7 +26,52 @@ router.get('/', protect, async (req, res) => {
     // Agregar estadísticas de tareas a cada proyecto
     const projectsWithStats = await Promise.all(
       projects.map(async (project) => {
-        const tasks = await Task.find({ project: project._id });
+        // Limpiar usuarios que ya no tienen tareas asignadas
+        const tasks = await Task.find({ 
+          project: project._id,
+          archived: { $ne: true }
+        });
+        
+        // Obtener IDs de todos los usuarios asignados a tareas activas
+        const usersWithTasks = new Set();
+        tasks.forEach(task => {
+          if (task.assignedTo && task.assignedTo.length > 0) {
+            task.assignedTo.forEach(userId => {
+              usersWithTasks.add(userId.toString());
+            });
+          }
+        });
+
+        // Remover miembros que no tienen tareas y no son dueños
+        const membersToRemove = [];
+        project.members.forEach(member => {
+          const memberIdStr = member.user._id.toString();
+          const isOwner = project.owner._id.toString() === memberIdStr;
+          const hasTasks = usersWithTasks.has(memberIdStr);
+          
+          if (!isOwner && !hasTasks) {
+            membersToRemove.push(member.user._id);
+          }
+        });
+
+        // Si hay miembros para remover, actualizar el proyecto
+        if (membersToRemove.length > 0) {
+          await Project.findByIdAndUpdate(project._id, {
+            $pull: {
+              members: { user: { $in: membersToRemove } }
+            }
+          });
+          
+          // Recargar el proyecto actualizado
+          const updatedProject = await Project.findById(project._id)
+            .populate('owner', 'name email avatar')
+            .populate('members.user', 'name email avatar');
+          
+          project.members = updatedProject.members;
+          
+          console.log(`🧹 Limpieza: Removidos ${membersToRemove.length} usuarios sin tareas del proyecto ${project.name}`);
+        }
+
         const totalTasks = tasks.length;
         const completedTasks = tasks.filter(task => task.completed).length;
         

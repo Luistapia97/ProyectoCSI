@@ -79,6 +79,74 @@
   padding: 0.75rem;
   background: var(--bg-primary);
   border-radius: 0.5rem;
+  position: relative;
+}
+
+.subtask-item:hover .subtask-actions {
+  opacity: 1;
+}
+
+.subtask-actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.subtask-edit-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.subtask-edit-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 0.25rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.subtask-edit-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-icon-tiny {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-icon-tiny:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn-icon-tiny.btn-success {
+  color: var(--success-color);
+}
+
+.btn-icon-tiny.btn-success:hover {
+  background: var(--success-bg);
+}
+
+.btn-icon-tiny.btn-danger {
+  color: var(--danger-color);
+}
+
+.btn-icon-tiny.btn-danger:hover {
+  background: var(--danger-bg);
 }
 
 .subtask-item input[type="checkbox"] {

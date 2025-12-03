@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import RegisterAdmin from './pages/RegisterAdmin';
 import Dashboard from './pages/Dashboard';
 import Board from './pages/Board';
+import Profile from './pages/Profile';
 import ZohoComplete from './pages/ZohoComplete';
 import AddPassword from './pages/AddPassword';
 import Settings from './pages/Settings';
@@ -121,6 +122,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           }
         />

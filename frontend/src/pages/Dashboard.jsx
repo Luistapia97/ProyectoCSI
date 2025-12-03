@@ -8,12 +8,12 @@ import CreateUserModal from '../components/CreateUserModal';
 import PendingUsersModal from '../components/PendingUsersModal';
 import NotificationBell from '../components/NotificationBell';
 import socketService from '../services/socket';
-import { authAPI } from '../services/api';
+import { authAPI, getBackendURL } from '../services/api';
 import './Dashboard.css';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, loadUser } = useAuthStore();
   const { projects, fetchProjects, deleteProject, loading } = useProjectStore();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
@@ -22,6 +22,12 @@ export default function Dashboard() {
   const [theme, setTheme] = useState('light');
   
   const isAdmin = user?.role === 'administrador';
+
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl) return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
 
   useEffect(() => {
     fetchProjects();
@@ -36,7 +42,18 @@ export default function Dashboard() {
     if (isAdmin) {
       fetchPendingUsers();
     }
-  }, [fetchProjects, user, isAdmin]);
+
+    // Listener para recargar usuario cuando vuelve de otra página
+    const handleFocus = () => {
+      loadUser(); // Recargar usuario desde el backend
+    };
+
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [fetchProjects, user, isAdmin, loadUser]);
 
   const fetchPendingUsers = async () => {
     try {
@@ -111,9 +128,9 @@ export default function Dashboard() {
             </button>
           )}
 
-          <div className="user-menu">
+          <div className="user-menu" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="Ver mi perfil">
             <img 
-              src={user?.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`} 
+              src={getAvatarUrl(user?.avatar) || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`} 
               alt={user?.name} 
               className="avatar"
               onError={(e) => {
@@ -262,7 +279,7 @@ export default function Dashboard() {
                     {project.members?.slice(0, 4).map((member) => (
                       <img
                         key={member.user._id}
-                        src={member.user.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`}
+                        src={getAvatarUrl(member.user.avatar) || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`}
                         alt={member.user.name}
                         className="member-avatar"
                         title={member.user.name}

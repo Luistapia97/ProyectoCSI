@@ -23,6 +23,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     completed: task.completed,
   });
   const [newSubtask, setNewSubtask] = useState('');
+  const [editingSubtaskIndex, setEditingSubtaskIndex] = useState(null);
+  const [editingSubtaskText, setEditingSubtaskText] = useState('');
   const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingCommentText, setEditingCommentText] = useState('');
@@ -86,6 +88,33 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     const updatedSubtasks = [...task.subtasks];
     updatedSubtasks[index].completed = !updatedSubtasks[index].completed;
     await updateTask(task._id, { subtasks: updatedSubtasks });
+  };
+
+  const handleStartEditSubtask = (index) => {
+    setEditingSubtaskIndex(index);
+    setEditingSubtaskText(task.subtasks[index].title);
+  };
+
+  const handleSaveEditSubtask = async () => {
+    if (!editingSubtaskText.trim()) return;
+    
+    const updatedSubtasks = [...task.subtasks];
+    updatedSubtasks[editingSubtaskIndex].title = editingSubtaskText.trim();
+    await updateTask(task._id, { subtasks: updatedSubtasks });
+    setEditingSubtaskIndex(null);
+    setEditingSubtaskText('');
+  };
+
+  const handleCancelEditSubtask = () => {
+    setEditingSubtaskIndex(null);
+    setEditingSubtaskText('');
+  };
+
+  const handleDeleteSubtask = async (index) => {
+    if (confirm('¿Estás seguro de eliminar esta subtarea?')) {
+      const updatedSubtasks = task.subtasks.filter((_, i) => i !== index);
+      await updateTask(task._id, { subtasks: updatedSubtasks });
+    }
   };
 
   const handleAddComment = async (e) => {
@@ -306,10 +335,50 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       type="checkbox"
                       checked={subtask.completed}
                       onChange={() => handleToggleSubtask(index)}
+                      disabled={editingSubtaskIndex === index}
                     />
-                    <span className={subtask.completed ? 'completed-subtask' : ''}>
-                      {subtask.title}
-                    </span>
+                    {editingSubtaskIndex === index ? (
+                      <div className="subtask-edit-container">
+                        <input
+                          type="text"
+                          value={editingSubtaskText}
+                          onChange={(e) => setEditingSubtaskText(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleSaveEditSubtask()}
+                          className="subtask-edit-input"
+                          autoFocus
+                        />
+                        <div className="subtask-edit-actions">
+                          <button onClick={handleSaveEditSubtask} className="btn-icon-tiny btn-success" title="Guardar">
+                            <Check size={16} />
+                          </button>
+                          <button onClick={handleCancelEditSubtask} className="btn-icon-tiny" title="Cancelar">
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className={subtask.completed ? 'completed-subtask' : ''}>
+                          {subtask.title}
+                        </span>
+                        <div className="subtask-actions">
+                          <button
+                            onClick={() => handleStartEditSubtask(index)}
+                            className="btn-icon-tiny"
+                            title="Editar subtarea"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSubtask(index)}
+                            className="btn-icon-tiny btn-danger"
+                            title="Eliminar subtarea"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>

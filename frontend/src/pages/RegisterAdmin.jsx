@@ -17,7 +17,7 @@ export default function RegisterAdmin() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [adminInfo, setAdminInfo] = useState({ count: 0, available: 3 });
+  const [adminInfo, setAdminInfo] = useState({ count: 0, available: 4 });
 
   useEffect(() => {
     // Obtener cantidad de admins disponibles
@@ -102,7 +102,7 @@ export default function RegisterAdmin() {
             <AlertCircle size={20} />
             <strong>
               {adminInfo.available > 0 
-                ? `${adminInfo.available} de 3 espacios disponibles`
+                ? `${adminInfo.available} de 4 espacios disponibles`
                 : 'No hay espacios disponibles'}
             </strong>
           </div>
@@ -114,7 +114,7 @@ export default function RegisterAdmin() {
           }}>
             {adminInfo.available > 0 
               ? `Ya hay ${adminInfo.count} administrador${adminInfo.count !== 1 ? 'es' : ''} registrado${adminInfo.count !== 1 ? 's' : ''}. Puedes registrar ${adminInfo.available} más.`
-              : 'Se ha alcanzado el límite máximo de 3 administradores. No se pueden registrar más.'}
+              : 'Se ha alcanzado el límite máximo de 4 administradores. No se pueden registrar más.'}
           </p>
         </div>
 

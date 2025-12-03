@@ -106,6 +106,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Agregar cookie-parser ANTES de las rutas
 
+// Servir archivos estáticos (avatares y otros uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Configurar sesión para Passport
 app.use(session({
   secret: process.env.SESSION_SECRET || 'nexus-secret-key-2024',

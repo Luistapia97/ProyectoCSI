@@ -89,6 +89,11 @@ export const authAPI = {
   getPendingUsers: () => api.get('/auth/pending-users'),
   approveUser: (id) => api.post(`/auth/approve-user/${id}`),
   rejectUser: (id) => api.post(`/auth/reject-user/${id}`),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  uploadAvatar: (formData) => api.post('/auth/upload-avatar', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  deleteAvatar: () => api.delete('/auth/avatar'),
 };
 
 // Projects

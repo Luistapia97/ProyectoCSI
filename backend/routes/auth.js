@@ -1,9 +1,46 @@
 ﻿import express from 'express';
 import passport from 'passport';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 import User from '../models/User.js';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, protect, admin as isAdmin } from '../middleware/auth.js';
 
 const router = express.Router();
+
+// Configuración de multer para subir avatares
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = 'uploads/avatars';
+    // Crear directorio si no existe
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'avatar-' + req.user._id + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten imágenes (jpeg, jpg, png, gif, webp)'));
+    }
+  }
+});
 
 /**
  * Obtener la URL del frontend dinámicamente
@@ -49,11 +86,11 @@ router.post('/register-admin', async (req, res) => {
       return res.status(403).json({ message: 'Código de administrador incorrecto' });
     }
 
-    // Verificar si ya existen 3 administradores
+    // Verificar si ya existen 4 administradores
     const adminCount = await User.countDocuments({ role: 'administrador' });
-    if (adminCount >= 3) {
+    if (adminCount >= 4) {
       return res.status(403).json({ 
-        message: 'Ya existen 3 administradores. No se pueden registrar más.' 
+        message: 'Ya existen 4 administradores. No se pueden registrar más.' 
       });
     }
 
@@ -74,7 +111,7 @@ router.post('/register-admin', async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: `Administrador creado exitosamente (${adminCount + 1}/3)`,
+      message: `Administrador creado exitosamente (${adminCount + 1}/4)`,
       user: user.toPublicJSON(),
       token: generateToken(user._id),
     });
@@ -409,9 +446,6 @@ if (isZohoConfigured) {
 // @route   GET /api/auth/me
 // @desc    Obtener usuario actual
 // @access  Private
-import { protect } from '../middleware/auth.js';
-import { isAdmin } from '../middleware/roleAuth.js';
-
 router.get('/me', protect, async (req, res) => {
   res.json({
     success: true,
@@ -471,8 +505,8 @@ router.get('/admin-count', async (req, res) => {
     res.json({
       success: true,
       count: adminCount,
-      max: 3,
-      available: 3 - adminCount,
+      max: 4,
+      available: 4 - adminCount,
     });
   } catch (error) {
     console.error('Error obteniendo cantidad de admins:', error);
@@ -661,6 +695,133 @@ router.post('/reject-user/:id', protect, isAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error rechazando usuario:', error);
     res.status(500).json({ message: 'Error al rechazar usuario', error: error.message });
+  }
+});
+
+// @route   PUT /api/auth/profile
+// @desc    Actualizar perfil de usuario
+// @access  Private
+router.put('/profile', protect, async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Actualizar campos si se proporcionan
+    if (name) user.name = name;
+    if (email && email !== user.email) {
+      // Verificar que el email no esté en uso
+      const emailExists = await User.findOne({ email, _id: { $ne: user._id } });
+      if (emailExists) {
+        return res.status(400).json({ message: 'El email ya está en uso' });
+      }
+      user.email = email;
+    }
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Perfil actualizado exitosamente',
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Error actualizando perfil:', error);
+    res.status(500).json({ message: 'Error al actualizar perfil', error: error.message });
+  }
+});
+
+// @route   POST /api/auth/upload-avatar
+// @desc    Subir foto de perfil
+// @access  Private
+router.post('/upload-avatar', protect, upload.single('avatar'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se proporcionó ninguna imagen' });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Eliminar avatar anterior si existe y no es una URL externa
+    if (user.avatar && user.avatar.startsWith('/uploads/')) {
+      const oldAvatarPath = path.join(process.cwd(), user.avatar);
+      if (fs.existsSync(oldAvatarPath)) {
+        fs.unlinkSync(oldAvatarPath);
+      }
+    }
+
+    // Guardar nueva ruta del avatar
+    user.avatar = `/uploads/avatars/${req.file.filename}`;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Avatar actualizado exitosamente',
+      avatar: user.avatar,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Error subiendo avatar:', error);
+    res.status(500).json({ message: 'Error al subir avatar', error: error.message });
+  }
+});
+
+// @route   DELETE /api/auth/avatar
+// @desc    Eliminar foto de perfil y usar iniciales
+// @access  Private
+router.delete('/avatar', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Eliminar archivo si existe
+    if (user.avatar && user.avatar.startsWith('/uploads/')) {
+      const avatarPath = path.join(process.cwd(), user.avatar);
+      if (fs.existsSync(avatarPath)) {
+        fs.unlinkSync(avatarPath);
+      }
+    }
+
+    // Generar avatar con iniciales del email
+    const emailInitials = user.email.substring(0, 2).toUpperCase();
+    user.avatar = `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${emailInitials}&bold=true`;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Avatar eliminado, usando iniciales del correo',
+      avatar: user.avatar,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+      }
+    });
+  } catch (error) {
+    console.error('Error eliminando avatar:', error);
+    res.status(500).json({ message: 'Error al eliminar avatar', error: error.message });
   }
 });
 

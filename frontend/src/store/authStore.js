@@ -126,6 +126,14 @@ const useAuthStore = create((set, get) => ({
     }));
   },
 
+  setUser: (user) => {
+    localStorage.setItem('user', JSON.stringify(user));
+    set({ user });
+    
+    // Notificar a otras pestañas
+    window.dispatchEvent(new Event('auth-change'));
+  },
+
   // Método para sincronizar con otras pestañas
   syncAuth: () => {
     const token = localStorage.getItem('token');

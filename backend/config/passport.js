@@ -124,12 +124,12 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           // Si es registro de admin, actualizar rol
           if (isAdminRegistration && user.role !== 'administrador') {
             const adminCount = await User.countDocuments({ role: 'administrador' });
-            if (adminCount >= 3) {
-              console.log('Límite de administradores alcanzado (3/3)');
-              return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
+            if (adminCount >= 4) {
+              console.log('Límite de administradores alcanzado (4/4)');
+              return done(new Error('Ya existen 4 administradores. No se pueden registrar más.'), null);
             }
             user.role = 'administrador';
-            console.log(`Actualizando rol a administrador (${adminCount + 1}/3)`);
+            console.log(`Actualizando rol a administrador (${adminCount + 1}/4)`);
           }
           
           await user.save();
@@ -152,12 +152,12 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
           // Si es registro de admin, actualizar rol
           if (isAdminRegistration && user.role !== 'administrador') {
             const adminCount = await User.countDocuments({ role: 'administrador' });
-            if (adminCount >= 3) {
-              console.log('Límite de administradores alcanzado (3/3)');
-              return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
+            if (adminCount >= 4) {
+              console.log('Límite de administradores alcanzado (4/4)');
+              return done(new Error('Ya existen 4 administradores. No se pueden registrar más.'), null);
             }
             user.role = 'administrador';
-            console.log(`Actualizando rol a administrador (${adminCount + 1}/3)`);
+            console.log(`Actualizando rol a administrador (${adminCount + 1}/4)`);
           }
           await user.save();
           return done(null, user);
@@ -173,13 +173,13 @@ if (process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET) {
         if (isAdminRegistration) {
           // Verificar límite de administradores
           const adminCount = await User.countDocuments({ role: 'administrador' });
-          if (adminCount >= 3) {
-            console.log('Límite de administradores alcanzado (3/3)');
-            return done(new Error('Ya existen 3 administradores. No se pueden registrar más.'), null);
+          if (adminCount >= 4) {
+            console.log('Límite de administradores alcanzado (4/4)');
+            return done(new Error('Ya existen 4 administradores. No se pueden registrar más.'), null);
           }
           userRole = 'administrador';
           userStatus = 'approved'; // Admins se aprueban automáticamente
-          console.log(`Registrando como administrador (${adminCount + 1}/3)`);
+          console.log(`Registrando como administrador (${adminCount + 1}/4)`);
         } else {
           console.log('Usuario creado con estado PENDIENTE - requiere aprobación de administrador');
         }

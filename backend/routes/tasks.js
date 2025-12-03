@@ -331,7 +331,7 @@ router.put('/:id', protect, async (req, res) => {
             const isOwner = projectDoc.owner.toString() === userId.toString();
 
             if (!isMember && !isOwner) {
-              console.log(`âž• Agregando usuario ${userId} como miembro del proyecto ${task.project}`);
+              console.log(`➕ Agregando usuario ${userId} como miembro del proyecto ${task.project}`);
               await Project.findByIdAndUpdate(task.project, {
                 $push: {
                   members: {
@@ -348,13 +348,47 @@ router.put('/:id', protect, async (req, res) => {
             user: userId,
             type: 'task_assigned',
             title: 'Nueva tarea asignada',
-            message: `${req.user.name} te asignÃ³ la tarea: ${task.title}`,
+            message: `${req.user.name} te asignó la tarea: ${task.title}`,
             relatedTask: task._id,
             relatedProject: task.project,
             relatedUser: req.user._id,
           }));
 
           await Notification.insertMany(notifications);
+        }
+
+        // Usuarios removidos de la tarea
+        const removedUsers = oldAssignedTo.filter(
+          oldId => !assignedTo.some(newId => newId.toString() === oldId.toString())
+        );
+
+        // Si hay usuarios removidos, verificar si deben ser removidos del proyecto
+        if (removedUsers.length > 0) {
+          for (const userId of removedUsers) {
+            // Verificar si el usuario tiene otras tareas en el proyecto
+            const userIdStr = userId.toString();
+            const otherTasks = await Task.countDocuments({
+              project: task.project,
+              _id: { $ne: task._id }, // Excluir la tarea actual
+              assignedTo: userIdStr,
+              archived: { $ne: true }
+            });
+
+            // Si no tiene otras tareas, remover del proyecto
+            if (otherTasks === 0) {
+              const projectDoc = await Project.findById(task.project);
+              const isOwner = projectDoc.owner.toString() === userIdStr;
+
+              if (!isOwner) {
+                console.log(`➖ Removiendo usuario ${userId} del proyecto ${task.project} (sin tareas asignadas)`);
+                await Project.findByIdAndUpdate(task.project, {
+                  $pull: {
+                    members: { user: userId }
+                  }
+                });
+              }
+            }
+          }
         }
 
         task.assignedTo = assignedTo;
@@ -432,17 +466,53 @@ router.delete('/:id', protect, isAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
 
+    // Guardar usuarios asignados antes de eliminar
+    const assignedUsers = task.assignedTo || [];
+    const projectId = task.project;
+
     // Archivar en lugar de eliminar
     task.archived = true;
     await task.save();
 
-    // Actualizar estadÃ­sticas
-    await Project.findByIdAndUpdate(task.project, {
-      $inc: { 
-        'stats.totalTasks': -1,
-        'stats.completedTasks': task.completed ? -1 : 0,
-      },
-    });
+    // Verificar si los usuarios removidos deben ser eliminados del proyecto
+    if (assignedUsers.length > 0) {
+      for (const userId of assignedUsers) {
+        // Verificar si el usuario tiene otras tareas en el proyecto
+        const userIdStr = userId.toString();
+        const otherTasks = await Task.countDocuments({
+          project: projectId,
+          _id: { $ne: task._id },
+          assignedTo: userIdStr,
+          archived: { $ne: true }
+        });
+
+        // Si no tiene otras tareas, remover del proyecto
+        if (otherTasks === 0) {
+          const projectDoc = await Project.findById(projectId);
+          if (projectDoc) {
+            const isOwner = projectDoc.owner.toString() === userIdStr;
+
+            if (!isOwner) {
+              console.log(`➖ Removiendo usuario ${userId} del proyecto ${projectId} (tarea eliminada, sin otras tareas)`);
+              await Project.findByIdAndUpdate(projectId, {
+                $pull: {
+                  members: { user: userId }
+                }
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Emitir evento de actualización para que el dashboard se refresque
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`project-${projectId}`).emit('task-deleted', { 
+        taskId: task._id,
+        projectId: projectId 
+      });
+    }
 
     // Responder inmediatamente (Zoho Tasks sync desactivado)
     res.json({ success: true, message: 'Tarea eliminada exitosamente' });
