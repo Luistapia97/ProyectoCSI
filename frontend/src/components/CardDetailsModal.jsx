@@ -41,6 +41,9 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [showUserSelector, setShowUserSelector] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [fileInputRef, setFileInputRef] = useState(null);
+  const [newTag, setNewTag] = useState('');
+  const [editingTagIndex, setEditingTagIndex] = useState(null);
+  const [editingTagText, setEditingTagText] = useState('');
 
   useEffect(() => {
     fetchComments(task._id);
@@ -120,6 +123,41 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     if (confirm('¿Estás seguro de eliminar esta subtarea?')) {
       const updatedSubtasks = task.subtasks.filter((_, i) => i !== index);
       await updateTask(task._id, { subtasks: updatedSubtasks });
+    }
+  };
+
+  const handleAddTag = async () => {
+    if (!newTag.trim()) return;
+
+    const updatedTags = [...(task.tags || []), newTag.trim()];
+    await updateTask(task._id, { tags: updatedTags });
+    setNewTag('');
+  };
+
+  const handleStartEditTag = (index) => {
+    setEditingTagIndex(index);
+    setEditingTagText(task.tags[index]);
+  };
+
+  const handleSaveEditTag = async () => {
+    if (!editingTagText.trim()) return;
+
+    const updatedTags = [...task.tags];
+    updatedTags[editingTagIndex] = editingTagText.trim();
+    await updateTask(task._id, { tags: updatedTags });
+    setEditingTagIndex(null);
+    setEditingTagText('');
+  };
+
+  const handleCancelEditTag = () => {
+    setEditingTagIndex(null);
+    setEditingTagText('');
+  };
+
+  const handleDeleteTag = async (index) => {
+    if (confirm('¿Eliminar esta etiqueta?')) {
+      const updatedTags = task.tags.filter((_, i) => i !== index);
+      await updateTask(task._id, { tags: updatedTags });
     }
   };
 
@@ -679,19 +717,74 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 )}
               </div>
 
-              {task.tags && task.tags.length > 0 && (
-                <div className="detail-item">
-                  <label>
-                    <Tag size={16} />
-                    Etiquetas
-                  </label>
-                  <div className="tags-display">
-                    {task.tags.map((tag, index) => (
-                      <span key={index} className="detail-tag">{tag}</span>
-                    ))}
-                  </div>
+              <div className="detail-item">
+                <label>
+                  <Tag size={16} />
+                  Etiquetas ({task.tags?.length || 0})
+                </label>
+                <div className="tags-list">
+                  {task.tags && task.tags.length > 0 ? (
+                    task.tags.map((tag, index) => (
+                      <div key={index} className="tag-item">
+                        {editingTagIndex === index ? (
+                          <div className="tag-edit-container">
+                            <input
+                              type="text"
+                              value={editingTagText}
+                              onChange={(e) => setEditingTagText(e.target.value)}
+                              onKeyPress={(e) => e.key === 'Enter' && handleSaveEditTag()}
+                              className="tag-edit-input"
+                              autoFocus
+                            />
+                            <div className="tag-edit-actions">
+                              <button onClick={handleSaveEditTag} className="btn-icon-tiny btn-success" title="Guardar">
+                                <Check size={14} />
+                              </button>
+                              <button onClick={handleCancelEditTag} className="btn-icon-tiny" title="Cancelar">
+                                <X size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            <span className="detail-tag">{tag}</span>
+                            <div className="tag-actions">
+                              <button
+                                onClick={() => handleStartEditTag(index)}
+                                className="btn-icon-tiny"
+                                title="Editar etiqueta"
+                              >
+                                <Edit2 size={12} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTag(index)}
+                                className="btn-icon-tiny btn-danger"
+                                title="Eliminar etiqueta"
+                              >
+                                <X size={12} />
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="no-tags">Sin etiquetas</p>
+                  )}
                 </div>
-              )}
+                <div className="add-tag">
+                  <input
+                    type="text"
+                    placeholder="Agregar etiqueta..."
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                  />
+                  <button onClick={handleAddTag} className="btn-icon-small">
+                    <Plus size={18} />
+                  </button>
+                </div>
+              </div>
 
               {/* Usuarios asignados */}
               <div className="detail-item">
