@@ -16,11 +16,31 @@
   background: var(--bg-primary);
 }
 
+@media (max-width: 768px) {
+  .title-input {
+    font-size: 1.25rem;
+  }
+}
+
 .modal-body-split {
   display: flex;
   gap: 2rem;
   max-height: 70vh;
   overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .modal-body-split {
+    flex-direction: column;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-body-split {
+    gap: 1rem;
+  }
 }
 
 .modal-main-content {
@@ -29,11 +49,26 @@
   padding: 1.5rem;
 }
 
+@media (max-width: 768px) {
+  .modal-main-content {
+    padding: 1rem;
+  }
+}
+
 .modal-sidebar {
   width: 280px;
   border-left: 1px solid var(--border-color);
   padding: 1.5rem;
   overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+  .modal-sidebar {
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+    padding: 1rem;
+  }
 }
 
 .detail-section {

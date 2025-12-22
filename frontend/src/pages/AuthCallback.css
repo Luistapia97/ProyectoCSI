@@ -7,6 +7,12 @@
   padding: 2rem;
 }
 
+@media (max-width: 768px) {
+  .auth-callback {
+    padding: 1rem;
+  }
+}
+
 .callback-card {
   background: white;
   padding: 3rem 2rem;
@@ -17,16 +23,42 @@
   width: 100%;
 }
 
+@media (max-width: 768px) {
+  .callback-card {
+    padding: 2rem 1.5rem;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .callback-card {
+    padding: 1.5rem 1rem;
+  }
+}
+
 .callback-card h2 {
   margin: 1.5rem 0 1rem 0;
   color: #333;
   font-size: 24px;
 }
 
+@media (max-width: 480px) {
+  .callback-card h2 {
+    font-size: 20px;
+    margin: 1rem 0 0.75rem 0;
+  }
+}
+
 .callback-card p {
   color: #666;
   margin: 0.5rem 0;
   font-size: 15px;
+}
+
+@media (max-width: 480px) {
+  .callback-card p {
+    font-size: 14px;
+  }
 }
 
 .redirect-text {
@@ -43,6 +75,14 @@
   border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+@media (max-width: 480px) {
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border-width: 3px;
+  }
 }
 
 @keyframes spin {
@@ -63,6 +103,15 @@
   animation: scaleIn 0.4s ease-out;
 }
 
+@media (max-width: 480px) {
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    line-height: 64px;
+    font-size: 38px;
+  }
+}
+
 .error-icon {
   width: 80px;
   height: 80px;
@@ -74,6 +123,15 @@
   font-size: 48px;
   font-weight: bold;
   animation: scaleIn 0.4s ease-out;
+}
+
+@media (max-width: 480px) {
+  .error-icon {
+    width: 64px;
+    height: 64px;
+    line-height: 64px;
+    font-size: 38px;
+  }
 }
 
 @keyframes scaleIn {

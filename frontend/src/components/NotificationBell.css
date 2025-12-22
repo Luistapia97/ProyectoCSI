@@ -64,6 +64,24 @@
   animation: slideDown 0.2s ease-out;
 }
 
+@media (max-width: 768px) {
+  .notification-dropdown {
+    width: 340px;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notification-dropdown {
+    position: fixed;
+    top: 60px;
+    right: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    max-height: calc(100vh - 80px);
+  }
+}
+
 @keyframes slideDown {
   from {
     opacity: 0;
@@ -83,11 +101,23 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+@media (max-width: 480px) {
+  .notification-header {
+    padding: 0.875rem 1rem;
+  }
+}
+
 .notification-header h3 {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
+}
+
+@media (max-width: 480px) {
+  .notification-header h3 {
+    font-size: 1rem;
+  }
 }
 
 .mark-all-read-btn {
@@ -102,6 +132,13 @@
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
+}
+
+@media (max-width: 480px) {
+  .mark-all-read-btn {
+    font-size: 0.8125rem;
+    padding: 0.375rem 0.625rem;
+  }
 }
 
 .mark-all-read-btn:hover {
@@ -155,6 +192,12 @@
   cursor: pointer;
   transition: background 0.2s;
   position: relative;
+}
+
+@media (max-width: 480px) {
+  .notification-item {
+    padding: 0.875rem 1rem;
+  }
 }
 
 .notification-item:hover {

@@ -4,6 +4,12 @@
   padding: 2rem;
 }
 
+@media (max-width: 768px) {
+  .zoho-settings-container {
+    padding: 1rem;
+  }
+}
+
 .settings-header {
   text-align: center;
   margin-bottom: 2rem;
@@ -48,6 +54,13 @@
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .connected-state {
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+  }
 }
 
 .status-badge {
@@ -215,6 +228,12 @@
   padding: 2rem;
 }
 
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 1rem;
+  }
+}
+
 .settings-header-main {
   display: flex;
   align-items: center;
@@ -229,6 +248,12 @@
 .settings-header-main h1 {
   color: #1f2937;
   font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+  .settings-header-main h1 {
+    font-size: 1.5rem;
+  }
 }
 
 .settings-layout {
@@ -280,6 +305,13 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+@media (max-width: 768px) {
+  .tab-content {
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+  }
+}
+
 .tab-content h2 {
   color: #1f2937;
   margin-bottom: 1rem;
@@ -292,14 +324,31 @@
 @media (max-width: 768px) {
   .settings-layout {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
   
   .settings-sidebar {
     flex-direction: row;
     overflow-x: auto;
+    padding-bottom: 0.5rem;
   }
   
   .tab-button {
     white-space: nowrap;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-disconnect,
+  .btn-connect {
+    width: 100%;
+  }
+  
+  .instructions {
+    padding: 1.25rem;
+  }
+  
+  .connection-form {
+    padding: 1.5rem 1rem;
   }
 }

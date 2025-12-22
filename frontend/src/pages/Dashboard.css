@@ -32,6 +32,14 @@
   box-shadow: var(--shadow);
 }
 
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
 .header-left h1 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -46,10 +54,28 @@
   width: auto;
 }
 
+@media (max-width: 768px) {
+  .header-left h1 {
+    font-size: 1.25rem;
+  }
+  
+  .dashboard-logo {
+    height: 2rem;
+  }
+}
+
 .header-right {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .header-right {
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .btn-icon {
@@ -397,12 +423,31 @@
     align-items: flex-start;
     gap: 1rem;
   }
+  
+  .dashboard-intro h2 {
+    font-size: 1.5rem;
+  }
 
   .projects-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .user-info {
     display: none;
+  }
+  
+  .user-menu {
+    padding: 0.375rem 0.625rem;
+  }
+  
+  .avatar {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .btn-create {
+    width: 100%;
+    justify-content: center;
   }
 }

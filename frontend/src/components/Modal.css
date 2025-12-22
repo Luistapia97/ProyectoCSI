@@ -9,6 +9,15 @@
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
   backdrop-filter: blur(4px);
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0.5rem;
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
 }
 
 @keyframes fadeIn {
@@ -31,6 +40,21 @@
   animation: slideUp 0.3s ease-out;
 }
 
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: calc(100% - 2rem);
+    margin: 1rem;
+    border-radius: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: calc(100% - 1rem);
+    margin: 0.5rem;
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;
@@ -48,6 +72,12 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+@media (max-width: 768px) {
+  .modal-header {
+    padding: 1rem;
+  }
 }
 
 .modal-header h2 {
@@ -79,6 +109,13 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+@media (max-width: 768px) {
+  .modal-form {
+    padding: 1rem;
+    gap: 1rem;
+  }
 }
 
 .modal-form .form-group {
@@ -172,19 +209,35 @@
 @media (max-width: 640px) {
   .modal-content {
     max-width: 100%;
-    margin: 1rem;
+    margin: 0.5rem;
   }
 
   .modal-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
   }
 
   .modal-actions {
     flex-direction: column-reverse;
+    gap: 0.75rem;
   }
 
   .modal-actions button {
     width: 100%;
+  }
+  
+  .modal-form input,
+  .modal-form textarea {
+    font-size: 0.9375rem;
+    padding: 0.75rem;
+  }
+  
+  .color-picker {
+    gap: 0.5rem;
+  }
+  
+  .color-option {
+    width: 36px;
+    height: 36px;
   }
 }
 
