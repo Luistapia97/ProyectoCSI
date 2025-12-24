@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Tag, Users } from 'lucide-react';
+import { X, Calendar, Flag, Tag, Users, Plus, Trash2, CheckSquare } from 'lucide-react';
 import useTaskStore from '../store/taskStore';
 import { authAPI, getBackendURL } from '../services/api';
 import './Modal.css';
@@ -19,6 +19,8 @@ export default function CreateCardModal({ projectId, column, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableUsers, setAvailableUsers] = useState([]);
+  const [subtasks, setSubtasks] = useState([]);
+  const [newSubtaskText, setNewSubtaskText] = useState('');
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl) return null;
@@ -48,6 +50,24 @@ export default function CreateCardModal({ projectId, column, onClose }) {
     }));
   };
 
+  const addSubtask = () => {
+    if (newSubtaskText.trim()) {
+      setSubtasks([...subtasks, { text: newSubtaskText.trim(), completed: false }]);
+      setNewSubtaskText('');
+    }
+  };
+
+  const removeSubtask = (index) => {
+    setSubtasks(subtasks.filter((_, i) => i !== index));
+  };
+
+  const handleSubtaskKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addSubtask();
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -73,6 +93,7 @@ export default function CreateCardModal({ projectId, column, onClose }) {
       dueDate: formData.dueDate || undefined,
       tags: tagsArray,
       assignedTo: formData.assignedTo,
+      subtasks: subtasks.length > 0 ? subtasks : undefined,
     });
 
     setLoading(false);
@@ -190,6 +211,44 @@ export default function CreateCardModal({ projectId, column, onClose }) {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>
+              <CheckSquare size={18} />
+              Subtareas ({subtasks.length})
+            </label>
+            <div className="subtasks-list">
+              {subtasks.map((subtask, index) => (
+                <div key={index} className="subtask-item">
+                  <span>{subtask.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeSubtask(index)}
+                    className="btn-icon-tiny btn-danger"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="add-subtask">
+              <input
+                type="text"
+                placeholder="Agregar subtarea..."
+                value={newSubtaskText}
+                onChange={(e) => setNewSubtaskText(e.target.value)}
+                onKeyPress={handleSubtaskKeyPress}
+              />
+              <button
+                type="button"
+                onClick={addSubtask}
+                className="btn-icon-small"
+                disabled={!newSubtaskText.trim()}
+              >
+                <Plus size={20} />
+              </button>
             </div>
           </div>
 
