@@ -168,10 +168,11 @@ router.post('/', protect, isAdmin, async (req, res) => {
       dueDate,
       tags,
       color,
+      subtasks,
     } = req.body;
 
     if (!title || !project) {
-      return res.status(400).json({ message: 'TÃ­tulo y proyecto son requeridos' });
+      return res.status(400).json({ message: 'Título y proyecto son requeridos' });
     }
 
     // Verificar acceso al proyecto
@@ -182,6 +183,14 @@ router.post('/', protect, isAdmin, async (req, res) => {
 
     // Obtener posicion para la nueva tarea
     const tasksInColumn = await Task.countDocuments({ project, column: column || 'Pendiente' });
+
+    // Convertir subtasks del frontend al formato del modelo
+    const formattedSubtasks = subtasks && subtasks.length > 0
+      ? subtasks.map(st => ({
+          title: st.text || st.title,
+          completed: st.completed || false
+        }))
+      : [];
 
     const task = await Task.create({
       title,
@@ -195,6 +204,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       dueDate,
       tags: tags || [],
       color,
+      subtasks: formattedSubtasks,
     });
 
     // Actualizar estadi­sticas del proyecto
