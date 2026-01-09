@@ -237,6 +237,18 @@
   margin-left: 0;
 }
 
+.member-avatar-header.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .btn-settings {
   background: none;
   border: none;
@@ -487,4 +499,112 @@
     font-size: 0.7rem;
     padding: 0.125rem 0.375rem;
   }
+}
+
+/* Dark Mode Improvements for Board */
+[data-theme="dark"] .board-container {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .board-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .btn-back:hover {
+  background: #334155;
+}
+
+[data-theme="dark"] .board-column {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .column-header {
+  border-bottom-color: #475569;
+}
+
+[data-theme="dark"] .column-title h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .task-count {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .btn-add-card {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .btn-add-card:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+/* Dark mode para las cards */
+[data-theme="dark"] .task-card {
+  background: #0f172a;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .task-card:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .task-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .task-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .task-meta {
+  border-top-color: #334155;
+}
+
+[data-theme="dark"] .task-badges .badge {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .task-badges .badge-priority-high {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .task-badges .badge-priority-medium {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .task-badges .badge-priority-low {
+  background: #064e3b;
+  color: #86efac;
+}
+
+[data-theme="dark"] .progress-bar {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .validation-status {
+  background: #334155;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .validation-status.requested {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .validation-status.validated {
+  background: #064e3b;
+  color: #86efac;
+}
+
+[data-theme="dark"] .empty-column {
+  color: #64748b;
 }

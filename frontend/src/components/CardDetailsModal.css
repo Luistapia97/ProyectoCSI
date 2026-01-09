@@ -265,6 +265,18 @@
   flex-shrink: 0;
 }
 
+.comment-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .comment-content {
   flex: 1;
   background: var(--bg-primary);
@@ -652,6 +664,18 @@
   border: 2px solid var(--border-color);
 }
 
+.assigned-user-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .assigned-user-name {
   flex: 1;
   font-size: 0.9rem;
@@ -746,6 +770,18 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--border-color);
+}
+
+.user-option-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  user-select: none;
 }
 
 .user-option-info {

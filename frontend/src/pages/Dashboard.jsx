@@ -1,15 +1,60 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2, AlertCircle, UserCheck } from 'lucide-react';
+import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2, AlertCircle, UserCheck, Users, Archive, Settings } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import CreateProjectModal from '../components/CreateProjectModal';
 import CreateUserModal from '../components/CreateUserModal';
 import PendingUsersModal from '../components/PendingUsersModal';
+import ManageUsersModal from '../components/ManageUsersModal';
+import ArchivedProjectsModal from '../components/ArchivedProjectsModal';
+import ProjectActiveTasks from '../components/ProjectActiveTasks';
 import NotificationBell from '../components/NotificationBell';
 import socketService from '../services/socket';
-import { authAPI, getBackendURL } from '../services/api';
+import { authAPI, projectsAPI, getBackendURL } from '../services/api';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from '../components/ConfirmDialog';
+import Toast from '../components/Toast';
 import './Dashboard.css';
+
+function MemberAvatar({ member, className }) {
+  const [imageError, setImageError] = useState(false);
+  
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
+  };
+
+  const avatarUrl = getAvatarUrl(member.user.avatar);
+
+  if (!avatarUrl || imageError) {
+    return (
+      <div className={`${className} avatar-initials`} title={member.user.name}>
+        {getInitials(member.user.name)}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={avatarUrl} 
+      alt={member.user.name} 
+      className={className}
+      title={member.user.name}
+      onError={() => setImageError(true)}
+    />
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -18,15 +63,29 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showPendingUsersModal, setShowPendingUsersModal] = useState(false);
+  const [showManageUsersModal, setShowManageUsersModal] = useState(false);
+  const [showArchivedProjects, setShowArchivedProjects] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
   const [theme, setTheme] = useState('light');
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const { showToast, toasts, removeToast } = useToast();
   
   const isAdmin = user?.role === 'administrador';
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
     return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
   };
 
   useEffect(() => {
@@ -48,10 +107,16 @@ export default function Dashboard() {
       loadUser(); // Recargar usuario desde el backend
     };
 
+    const handleProjectsUpdated = () => {
+      fetchProjects();
+    };
+
     window.addEventListener('focus', handleFocus);
+    window.addEventListener('projectsUpdated', handleProjectsUpdated);
 
     return () => {
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('projectsUpdated', handleProjectsUpdated);
     };
   }, [fetchProjects, user, isAdmin, loadUser]);
 
@@ -86,16 +151,46 @@ export default function Dashboard() {
   const handleDeleteProject = async (e, projectId, projectName) => {
     e.stopPropagation(); // Evitar que se abra el proyecto
     
-    if (!confirm(`¿Estás seguro de eliminar el proyecto "${projectName}"?\n\nEsta acción archivará el proyecto y todas sus tareas.`)) {
-      return;
-    }
+    setConfirmDialog({
+      title: 'Eliminar Proyecto',
+      message: `¿Estás seguro de eliminar el proyecto "${projectName}"?\n\nEsta acción archivará el proyecto y todas sus tareas.`,
+      type: 'danger',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        const result = await deleteProject(projectId);
+        if (result.success) {
+          showToast('Proyecto eliminado exitosamente', 'success');
+        } else {
+          showToast('Error: ' + result.error, 'error');
+        }
+        setConfirmDialog(null);
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
+  };
 
-    const result = await deleteProject(projectId);
-    if (result.success) {
-      alert('✅ Proyecto eliminado exitosamente');
-    } else {
-      alert('❌ Error: ' + result.error);
-    }
+  const handleArchiveProject = async (e, projectId, projectName) => {
+    e.stopPropagation(); // Evitar que se abra el proyecto
+    
+    setConfirmDialog({
+      title: 'Archivar Proyecto',
+      message: `¿Estás seguro de archivar el proyecto "${projectName}"?\n\nPodrás desarchivarlo después desde el menú de archivados.`,
+      type: 'warning',
+      confirmText: 'Archivar',
+      onConfirm: async () => {
+        try {
+          await projectsAPI.archive(projectId, true);
+          showToast('Proyecto archivado exitosamente', 'success');
+          fetchProjects();
+        } catch (error) {
+          console.error('Error archivando proyecto:', error);
+          showToast('Error al archivar proyecto', 'error');
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   return (
@@ -129,15 +224,17 @@ export default function Dashboard() {
           )}
 
           <div className="user-menu" onClick={() => navigate('/profile')} style={{ cursor: 'pointer' }} title="Ver mi perfil">
-            <img 
-              src={getAvatarUrl(user?.avatar) || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`} 
-              alt={user?.name} 
-              className="avatar"
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user?.name || 'User')}`;
-              }}
-            />
+            {getAvatarUrl(user?.avatar) ? (
+              <img 
+                src={getAvatarUrl(user?.avatar)} 
+                alt={user?.name} 
+                className="avatar"
+              />
+            ) : (
+              <div className="avatar avatar-initials">
+                {getInitials(user?.name)}
+              </div>
+            )}
             <div className="user-info">
               <span className="user-name">{user?.name}</span>
               <span className="user-role" style={{ 
@@ -151,6 +248,56 @@ export default function Dashboard() {
               </span>
             </div>
           </div>
+
+          {isAdmin && (
+            <div className="settings-menu-container">
+              <button 
+                onClick={() => setShowSettingsMenu(!showSettingsMenu)} 
+                className="btn-icon" 
+                title="Configuración"
+              >
+                <Settings size={20} />
+              </button>
+              
+              {showSettingsMenu && (
+                <>
+                  <div className="settings-backdrop" onClick={() => setShowSettingsMenu(false)}></div>
+                  <div className="settings-dropdown">
+                    <button 
+                      onClick={() => {
+                        setShowArchivedProjects(true);
+                        setShowSettingsMenu(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <Archive size={18} />
+                      <span>Proyectos Archivados</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowManageUsersModal(true);
+                        setShowSettingsMenu(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <Users size={18} />
+                      <span>Gestionar Usuarios</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowCreateUserModal(true);
+                        setShowSettingsMenu(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <UserPlus size={18} />
+                      <span>Crear Usuario</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           <button onClick={handleLogout} className="btn-icon" title="Cerrar sesión">
             <LogOut size={20} />
@@ -171,20 +318,10 @@ export default function Dashboard() {
 
           <div style={{ display: 'flex', gap: '12px' }}>
             {isAdmin && (
-              <>
-                <button 
-                  onClick={() => setShowCreateUserModal(true)} 
-                  className="btn-secondary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                >
-                  <UserPlus size={20} />
-                  Crear Usuario
-                </button>
-                <button onClick={() => setShowCreateModal(true)} className="btn-create">
-                  <Plus size={20} />
-                  Nuevo Proyecto
-                </button>
-              </>
+              <button onClick={() => setShowCreateModal(true)} className="btn-create">
+                <Plus size={20} />
+                Nuevo Proyecto
+              </button>
             )}
             {!isAdmin && projects.length === 0 && (
               <div style={{ 
@@ -230,13 +367,22 @@ export default function Dashboard() {
                     <div className="project-color" style={{ backgroundColor: project.color }}></div>
                     <h3>{project.name}</h3>
                     {isAdmin && (
-                      <button
-                        className="btn-delete-project"
-                        onClick={(e) => handleDeleteProject(e, project._id, project.name)}
-                        title="Eliminar proyecto"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <div className="project-actions">
+                        <button
+                          className="btn-archive-project"
+                          onClick={(e) => handleArchiveProject(e, project._id, project.name)}
+                          title="Archivar proyecto"
+                        >
+                          <Archive size={16} />
+                        </button>
+                        <button
+                          className="btn-delete-project"
+                          onClick={(e) => handleDeleteProject(e, project._id, project.name)}
+                          title="Eliminar proyecto"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -275,19 +421,11 @@ export default function Dashboard() {
                     ></div>
                   </div>
 
+                  <ProjectActiveTasks projectId={project._id} />
+
                   <div className="project-members">
                     {project.members?.slice(0, 4).map((member) => (
-                      <img
-                        key={member.user._id}
-                        src={getAvatarUrl(member.user.avatar) || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`}
-                        alt={member.user.name}
-                        className="member-avatar"
-                        title={member.user.name}
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(member.user.name)}`;
-                        }}
-                      />
+                      <MemberAvatar key={member.user._id} member={member} className="member-avatar" />
                     ))}
                     {project.members?.length > 4 && (
                       <span className="more-members">+{project.members.length - 4}</span>
@@ -322,6 +460,28 @@ export default function Dashboard() {
           }}
         />
       )}
+      {showManageUsersModal && (
+        <ManageUsersModal 
+          onClose={() => setShowManageUsersModal(false)}
+        />
+      )}
+      {showArchivedProjects && (
+        <ArchivedProjectsModal 
+          onClose={() => setShowArchivedProjects(false)}
+        />
+      )}
+      
+      {toasts.map(toast => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
+      
+      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
     </div>
   );
 }

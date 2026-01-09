@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import ZohoComplete from './pages/ZohoComplete';
 import AddPassword from './pages/AddPassword';
 import Settings from './pages/Settings';
+import './components/DarkModeOverrides.css';
 
 // Componente para rutas protegidas
 function PrivateRoute({ children }) {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout } from 'lucide-react';
+import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import useTaskStore from '../store/taskStore';
@@ -10,9 +10,49 @@ import { getBackendURL } from '../services/api';
 import Card from '../components/Card';
 import CreateCardModal from '../components/CreateCardModal';
 import CardDetailsModal from '../components/CardDetailsModal';
+import ArchivedTasksModal from '../components/ArchivedTasksModal';
 import ProjectAnalytics from '../components/ProjectAnalytics';
 import NotificationBell from '../components/NotificationBell';
 import './Board.css';
+
+function MemberAvatarHeader({ member, className }) {
+  const [imageError, setImageError] = useState(false);
+  
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
+  };
+
+  const avatarUrl = getAvatarUrl(member.user.avatar);
+
+  if (!avatarUrl || imageError) {
+    return (
+      <div className={`${className} avatar-initials`} title={member.user.name}>
+        {getInitials(member.user.name)}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={avatarUrl} 
+      alt={member.user.name} 
+      className={className}
+      title={member.user.name}
+      onError={() => setImageError(true)}
+    />
+  );
+}
 
 export default function Board() {
   const { id } = useParams();
@@ -23,14 +63,24 @@ export default function Board() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState('');
   const [selectedTask, setSelectedTask] = useState(null);
+  const [showArchivedTasks, setShowArchivedTasks] = useState(false);
   const [viewMode, setViewMode] = useState('board'); // 'board' o 'analytics'
   
   const isAdmin = user?.role === 'administrador';
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
     return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
   };
 
   // Función para calcular el progreso de una columna
@@ -94,10 +144,15 @@ export default function Board() {
       socketService.on('task-updated', () => fetchTasks(id));
       socketService.on('task-moved', () => fetchTasks(id));
 
+      // Listener para actualizar cuando se restaure una tarea
+      const handleTasksUpdated = () => fetchTasks(id);
+      window.addEventListener('tasksUpdated', handleTasksUpdated);
+
       return () => {
         socketService.off('task-created');
         socketService.off('task-updated');
         socketService.off('task-moved');
+        window.removeEventListener('tasksUpdated', handleTasksUpdated);
       };
     }
   }, [id, fetchProject, fetchTasks]);
@@ -176,6 +231,18 @@ export default function Board() {
         <div className="board-header-right">
           <NotificationBell />
           
+          {isAdmin && (
+            <button 
+              onClick={() => setShowArchivedTasks(true)} 
+              className="btn-secondary"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px' }}
+              title="Ver tareas archivadas"
+            >
+              <Archive size={18} />
+              Archivadas
+            </button>
+          )}
+
           <div className="view-mode-toggle">
             <button 
               className={`view-mode-btn ${viewMode === 'board' ? 'active' : ''}`}
@@ -197,13 +264,7 @@ export default function Board() {
 
           <div className="project-members-header">
             {currentProject.members?.slice(0, 5).map((member) => (
-              <img
-                key={member.user._id}
-                src={getAvatarUrl(member.user.avatar)}
-                alt={member.user.name}
-                className="member-avatar-header"
-                title={member.user.name}
-              />
+              <MemberAvatarHeader key={member.user._id} member={member} className="member-avatar-header" />
             ))}
           </div>
 
@@ -307,6 +368,13 @@ export default function Board() {
         <CardDetailsModal
           task={selectedTask}
           onClose={() => setSelectedTask(null)}
+        />
+      )}
+      
+      {showArchivedTasks && (
+        <ArchivedTasksModal
+          projectId={id}
+          onClose={() => setShowArchivedTasks(false)}
         />
       )}
     </div>

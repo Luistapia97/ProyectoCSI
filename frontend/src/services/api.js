@@ -85,6 +85,7 @@ export const authAPI = {
   googleAuth: () => window.location.href = `${API_URL}/auth/google`,
   getAllUsers: () => api.get('/auth/users'),
   createUser: (data) => api.post('/auth/create-user', data),
+  deleteUser: (id) => api.delete(`/auth/users/${id}`),
   getAdminCount: () => api.get('/auth/admin-count'),
   getPendingUsers: () => api.get('/auth/pending-users'),
   approveUser: (id) => api.post(`/auth/approve-user/${id}`),
@@ -99,20 +100,25 @@ export const authAPI = {
 // Projects
 export const projectsAPI = {
   getAll: () => api.get('/projects'),
+  getArchived: () => api.get('/projects/archived'),
   getById: (id) => api.get(`/projects/${id}`),
   create: (data) => api.post('/projects', data),
   update: (id, data) => api.put(`/projects/${id}`, data),
   delete: (id) => api.delete(`/projects/${id}`),
+  archive: (id, archived) => api.patch(`/projects/${id}/archive`, { archived }),
   addMember: (id, data) => api.post(`/projects/${id}/members`, data),
 };
 
 // Tasks
 export const tasksAPI = {
   getByProject: (projectId) => api.get(`/tasks/project/${projectId}`),
+  getArchived: (projectId) => api.get(`/tasks/archived/${projectId}`),
+  getActiveByUser: (projectId) => api.get(`/tasks/project/${projectId}/active-by-user`),
   getById: (id) => api.get(`/tasks/${id}`),
   create: (data) => api.post('/tasks', data),
   update: (id, data) => api.put(`/tasks/${id}`, data),
   delete: (id) => api.delete(`/tasks/${id}`),
+  archive: (id, archived) => api.patch(`/tasks/${id}/archive`, { archived }),
   reorder: (data) => api.post('/tasks/reorder', data),
   addComment: (id, data) => api.post(`/tasks/${id}/comments`, data),
   getComments: (id) => api.get(`/tasks/${id}/comments`),

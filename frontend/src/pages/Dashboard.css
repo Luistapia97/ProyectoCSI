@@ -20,6 +20,8 @@
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
   --border-color: #334155;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .dashboard-header {
@@ -134,6 +136,18 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  user-select: none;
 }
 
 .user-info {
@@ -283,10 +297,23 @@
   flex: 1;
 }
 
+.project-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.project-card:hover .project-actions {
+  opacity: 1;
+}
+
+.btn-archive-project,
 .btn-delete-project {
   background: transparent;
   border: none;
-  color: #ef4444;
   padding: 0.5rem;
   cursor: pointer;
   border-radius: 0.5rem;
@@ -294,12 +321,20 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
-  opacity: 0;
-  margin-left: auto;
 }
 
-.project-card:hover .btn-delete-project {
-  opacity: 1;
+.btn-archive-project {
+  color: #f59e0b;
+}
+
+.btn-archive-project:hover {
+  background: #fef3c7;
+  color: #d97706;
+  transform: scale(1.1);
+}
+
+.btn-delete-project {
+  color: #ef4444;
 }
 
 .btn-delete-project:hover {
@@ -394,6 +429,30 @@
   margin-left: 0;
 }
 
+.member-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.member-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .more-members {
   width: 32px;
   height: 32px;
@@ -407,6 +466,112 @@
   font-weight: 600;
   margin-left: -8px;
   border: 2px solid var(--bg-secondary);
+}
+
+/* Active Tasks Section */
+.project-active-tasks {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-color);
+}
+
+.active-tasks-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.active-tasks-header svg {
+  color: var(--primary-color);
+}
+
+.active-tasks-loading,
+.active-tasks-empty {
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.active-tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.active-task-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.active-task-item:hover {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.active-tasks-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.active-tasks-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+.active-task-name {
+  flex: 1;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.active-task-counts {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.active-task-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  min-width: 40px;
+  justify-content: center;
+}
+
+.active-task-count.active {
+  color: var(--primary-color);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.active-task-count.pending {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -450,4 +615,117 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+/* Settings Menu Dropdown */
+.settings-menu-container {
+  position: relative;
+}
+
+.settings-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
+  min-width: 220px;
+  z-index: 999;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.settings-item:hover {
+  background: var(--bg-primary);
+  color: #667eea;
+}
+
+.settings-item svg {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.settings-item:hover svg {
+  color: #667eea;
+}
+
+/* Dark mode improvements for project cards */
+[data-theme="dark"] .project-card {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-color: #475569;
+}
+
+[data-theme="dark"] .project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+  border-color: #667eea;
+}
+
+[data-theme="dark"] .project-header h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .project-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .project-stats {
+  border-top-color: #475569;
+}
+
+[data-theme="dark"] .stat-item {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .stat-item span:first-child {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .user-menu {
+  background: #0f172a;
+}
+
+[data-theme="dark"] .user-menu:hover {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .btn-icon:hover {
+  background: #334155;
 }

@@ -1,11 +1,52 @@
 import { useState, useEffect } from 'react';
-import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell, Paperclip, Download, FileText } from 'lucide-react';
+import { X, Calendar, Flag, Tag, CheckSquare, Plus, Send, Trash2, Edit2, Check, CheckCircle, XCircle, UserPlus, Users, Bell, Paperclip, Download, FileText, Archive } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import useTaskStore from '../store/taskStore';
 import useAuthStore from '../store/authStore';
 import { authAPI, tasksAPI, getBackendURL } from '../services/api';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from './ConfirmDialog';
+import Toast from './Toast';
 import './CardDetailsModal.css';
+
+function UserAvatarDetail({ user, className }) {
+  const [imageError, setImageError] = useState(false);
+  
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
+  };
+
+  const avatarUrl = getAvatarUrl(user.avatar);
+
+  if (!avatarUrl || imageError) {
+    return (
+      <div className={`${className} avatar-initials`}>
+        {getInitials(user.name)}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={avatarUrl} 
+      alt={user.name} 
+      className={className}
+      onError={() => setImageError(true)}
+    />
+  );
+}
 
 export default function CardDetailsModal({ task: initialTask, onClose }) {
   const { user } = useAuthStore();
@@ -15,9 +56,18 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const task = tasks.find(t => t._id === initialTask._id) || currentTask || initialTask;
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
     return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
   };
   
   const [editing, setEditing] = useState(false);
@@ -38,6 +88,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [showValidationModal, setShowValidationModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [availableUsers, setAvailableUsers] = useState([]);
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const { showToast, toasts, removeToast } = useToast();
   const [showUserSelector, setShowUserSelector] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [fileInputRef, setFileInputRef] = useState(null);
@@ -70,9 +122,47 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleDelete = async () => {
-    if (confirm('¿Estás seguro de eliminar esta tarea?')) {
-      await deleteTask(task._id);
-      onClose();
+    setConfirmDialog({
+      title: 'Eliminar Tarea',
+      message: '¿Estás seguro de eliminar esta tarea? Esta acción no se puede deshacer.',
+      type: 'danger',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        await deleteTask(task._id);
+        showToast('Tarea eliminada exitosamente', 'success');
+        setConfirmDialog(null);
+        onClose();
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
+  };
+
+  const handleArchive = async () => {
+    try {
+      const action = task.archived ? 'desarchivar' : 'archivar';
+      setConfirmDialog({
+        title: task.archived ? 'Desarchivar Tarea' : 'Archivar Tarea',
+        message: `¿Estás seguro de ${action} esta tarea?`,
+        type: 'warning',
+        confirmText: task.archived ? 'Desarchivar' : 'Archivar',
+        onConfirm: async () => {
+          try {
+            await tasksAPI.archive(task._id, !task.archived);
+            showToast(`Tarea ${task.archived ? 'desarchivada' : 'archivada'} exitosamente`, 'success');
+            setConfirmDialog(null);
+            onClose();
+            window.location.reload();
+          } catch (error) {
+            console.error('Error archivando tarea:', error);
+            showToast('Error al archivar la tarea', 'error');
+            setConfirmDialog(null);
+          }
+        },
+        onCancel: () => setConfirmDialog(null)
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      showToast('Error al procesar la solicitud', 'error');
     }
   };
 
@@ -120,10 +210,19 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleDeleteSubtask = async (index) => {
-    if (confirm('¿Estás seguro de eliminar esta subtarea?')) {
-      const updatedSubtasks = task.subtasks.filter((_, i) => i !== index);
-      await updateTask(task._id, { subtasks: updatedSubtasks });
-    }
+    setConfirmDialog({
+      title: 'Eliminar Subtarea',
+      message: '¿Estás seguro de eliminar esta subtarea?',
+      type: 'warning',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        const updatedSubtasks = task.subtasks.filter((_, i) => i !== index);
+        await updateTask(task._id, { subtasks: updatedSubtasks });
+        showToast('Subtarea eliminada', 'success');
+        setConfirmDialog(null);
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   const handleAddTag = async () => {
@@ -155,10 +254,19 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleDeleteTag = async (index) => {
-    if (confirm('¿Eliminar esta etiqueta?')) {
-      const updatedTags = task.tags.filter((_, i) => i !== index);
-      await updateTask(task._id, { tags: updatedTags });
-    }
+    setConfirmDialog({
+      title: 'Eliminar Etiqueta',
+      message: '¿Eliminar esta etiqueta?',
+      type: 'warning',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        const updatedTags = task.tags.filter((_, i) => i !== index);
+        await updateTask(task._id, { tags: updatedTags });
+        showToast('Etiqueta eliminada', 'success');
+        setConfirmDialog(null);
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   const handleAddComment = async (e) => {
@@ -190,9 +298,18 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleDeleteComment = async (commentId) => {
-    if (confirm('¿Estás seguro de eliminar este comentario?')) {
-      await deleteComment(task._id, commentId);
-    }
+    setConfirmDialog({
+      title: 'Eliminar Comentario',
+      message: '¿Estás seguro de eliminar este comentario?',
+      type: 'warning',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        await deleteComment(task._id, commentId);
+        showToast('Comentario eliminado', 'success');
+        setConfirmDialog(null);
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   const handleSendReminder = async () => {
@@ -200,11 +317,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       setLoading(true);
       const response = await tasksAPI.sendReminder(task._id);
       if (response.data.success) {
-        alert(`✅ Recordatorio enviado a ${response.data.notifications.length} usuario(s)`);
+        showToast(`Recordatorio enviado a ${response.data.notifications.length} usuario(s)`, 'success');
       }
     } catch (error) {
       console.error('Error enviando recordatorio:', error);
-      alert('❌ Error al enviar recordatorio: ' + (error.response?.data?.message || error.message));
+      showToast('Error al enviar recordatorio: ' + (error.response?.data?.message || error.message), 'error');
     } finally {
       setLoading(false);
     }
@@ -243,9 +360,9 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     setLoading(false);
     
     if (result.success) {
-      alert(result.message || 'Validación solicitada exitosamente');
+      showToast(result.message || 'Validación solicitada exitosamente', 'success');
     } else {
-      alert(result.error || 'Error al solicitar validación');
+      showToast(result.error || 'Error al solicitar validación', 'error');
     }
   };
 
@@ -257,11 +374,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     setLoading(false);
     
     if (result.success) {
-      alert(result.message);
+      showToast(result.message, 'success');
       setShowValidationModal(false);
       setValidationComment('');
     } else {
-      alert(result.error || 'Error al validar tarea');
+      showToast(result.error || 'Error al validar tarea', 'error');
     }
   };
 
@@ -271,7 +388,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
 
     // Validar tamaño (10MB máximo)
     if (file.size > 10 * 1024 * 1024) {
-      alert('El archivo es demasiado grande. Máximo 10MB');
+      showToast('El archivo es demasiado grande. Máximo 10MB', 'error');
       return;
     }
 
@@ -284,11 +401,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       if (response.data.attachment) {
         // Actualizar la tarea localmente
         await fetchTask(task._id);
-        alert('Archivo subido exitosamente');
+        showToast('Archivo subido exitosamente', 'success');
       }
     } catch (error) {
       console.error('Error subiendo archivo:', error);
-      alert('Error al subir archivo: ' + (error.response?.data?.message || error.message));
+      showToast('Error al subir archivo: ' + (error.response?.data?.message || error.message), 'error');
     } finally {
       setUploading(false);
       if (e.target) e.target.value = '';
@@ -296,16 +413,25 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleDeleteAttachment = async (attachmentId) => {
-    if (!confirm('¿Estás seguro de eliminar este archivo?')) return;
-
-    try {
-      await tasksAPI.deleteAttachment(task._id, attachmentId);
-      await fetchTask(task._id);
-      alert('Archivo eliminado exitosamente');
-    } catch (error) {
-      console.error('Error eliminando archivo:', error);
-      alert('Error al eliminar archivo: ' + (error.response?.data?.message || error.message));
-    }
+    setConfirmDialog({
+      title: 'Eliminar Archivo',
+      message: '¿Estás seguro de eliminar este archivo?',
+      type: 'warning',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          await tasksAPI.deleteAttachment(task._id, attachmentId);
+          await fetchTask(task._id);
+          showToast('Archivo eliminado exitosamente', 'success');
+          setConfirmDialog(null);
+        } catch (error) {
+          console.error('Error eliminando archivo:', error);
+          showToast('Error al eliminar archivo: ' + (error.response?.data?.message || error.message), 'error');
+          setConfirmDialog(null);
+        }
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   const formatFileSize = (bytes) => {
@@ -525,7 +651,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
 
                     return (
                       <div key={comment._id} className="comment-item">
-                        <img src={getAvatarUrl(comment.user.avatar)} alt={comment.user.name} className="comment-avatar" />
+                        {getAvatarUrl(comment.user.avatar) ? (
+                          <img src={getAvatarUrl(comment.user.avatar)} alt={comment.user.name} className="comment-avatar" />
+                        ) : (
+                          <div className="comment-avatar avatar-initials">
+                            {getInitials(comment.user.name)}
+                          </div>
+                        )}
                         <div className="comment-content">
                           <div className="comment-header">
                             <span className="comment-author">{comment.user.name}</span>
@@ -596,7 +728,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   })}
                 </div>
                 <form onSubmit={handleAddComment} className="comment-form">
-                  <img src={getAvatarUrl(user?.avatar)} alt={user?.name} className="comment-avatar" />
+                  {getAvatarUrl(user?.avatar) ? (
+                    <img src={getAvatarUrl(user?.avatar)} alt={user?.name} className="comment-avatar" />
+                  ) : (
+                    <div className="comment-avatar avatar-initials">
+                      {getInitials(user?.name)}
+                    </div>
+                  )}
                   <input
                     type="text"
                     placeholder="Escribe un comentario..."
@@ -796,11 +934,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   {task.assignedTo && task.assignedTo.length > 0 ? (
                     task.assignedTo.map((assignedUser) => (
                       <div key={assignedUser._id} className="assigned-user-item">
-                        <img 
-                          src={getAvatarUrl(assignedUser.avatar)} 
-                          alt={assignedUser.name} 
-                          className="assigned-user-avatar"
-                        />
+                        <UserAvatarDetail user={assignedUser} className="assigned-user-avatar" />
                         <span className="assigned-user-name">{assignedUser.name}</span>
                         {isAdmin && (
                           <button
@@ -838,11 +972,17 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                           className={`user-option ${isAssigned ? 'assigned' : ''}`}
                           onClick={() => handleAssignUser(availableUser._id)}
                         >
-                          <img 
-                            src={getAvatarUrl(availableUser.avatar)} 
-                            alt={availableUser.name} 
-                            className="user-option-avatar"
-                          />
+                          {getAvatarUrl(availableUser.avatar) ? (
+                            <img 
+                              src={getAvatarUrl(availableUser.avatar)} 
+                              alt={availableUser.name} 
+                              className="user-option-avatar"
+                            />
+                          ) : (
+                            <div className="user-option-avatar avatar-initials">
+                              {getInitials(availableUser.name)}
+                            </div>
+                          )}
                           <div className="user-option-info">
                             <span className="user-option-name">{availableUser.name}</span>
                             <span className="user-option-email">{availableUser.email}</span>
@@ -874,7 +1014,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 <button 
                   onClick={() => {
                     if (!isAdmin) {
-                      alert('⚠️ Solo los administradores pueden editar tareas');
+                      showToast('Solo los administradores pueden editar tareas', 'warning');
                       return;
                     }
                     setEditing(true);
@@ -899,10 +1039,16 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
               )}
 
               {isAdmin && (
-                <button onClick={handleDelete} className="btn-danger">
-                  <Trash2 size={18} />
-                  Eliminar tarea
-                </button>
+                <>
+                  <button onClick={handleArchive} className="btn-secondary">
+                    <Archive size={18} />
+                    {task.archived ? 'Desarchivar' : 'Archivar'}
+                  </button>
+                  <button onClick={handleDelete} className="btn-danger">
+                    <Trash2 size={18} />
+                    Eliminar tarea
+                  </button>
+                </>
               )}
             </div>
           </div>
@@ -941,6 +1087,18 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
           </div>
         )}
       </div>
+      
+      {toasts.map(toast => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
+      
+      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
     </div>
   );
 }

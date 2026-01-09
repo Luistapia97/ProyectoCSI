@@ -1,0 +1,60 @@
+/* Dark Mode Overrides - Import this in main components */
+
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .modal-content {
+  background: #1e293b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .modal-header {
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .modal-header h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-group label {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-textarea,
+[data-theme="dark"] .form-select {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .form-textarea::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .archived-project-card h3,
+[data-theme="dark"] .archived-task-card h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .archived-project-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .status-badge.pendiente {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .status-badge.en-progreso {
+  background: #1e3a8a;
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .status-badge.completada {
+  background: #064e3b;
+  color: #86efac;
+}

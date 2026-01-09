@@ -6,6 +6,44 @@ import './Modal.css';
 
 const PRIORITIES = ['baja', 'media', 'alta', 'urgente'];
 
+function UserAvatarSelector({ user }) {
+  const [imageError, setImageError] = useState(false);
+  
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
+  };
+
+  const avatarUrl = getAvatarUrl(user.avatar);
+
+  if (!avatarUrl || imageError) {
+    return (
+      <div className="user-selection-avatar avatar-initials">
+        {getInitials(user.name)}
+      </div>
+    );
+  }
+
+  return (
+    <img 
+      src={avatarUrl} 
+      alt={user.name} 
+      className="user-selection-avatar"
+      onError={() => setImageError(true)}
+    />
+  );
+}
+
 export default function CreateCardModal({ projectId, column, onClose }) {
   const { createTask } = useTaskStore();
   const [formData, setFormData] = useState({
@@ -23,9 +61,18 @@ export default function CreateCardModal({ projectId, column, onClose }) {
   const [newSubtaskText, setNewSubtaskText] = useState('');
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
     return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
   };
 
   useEffect(() => {
@@ -145,6 +192,44 @@ export default function CreateCardModal({ projectId, column, onClose }) {
             />
           </div>
 
+          <div className="form-group">
+            <label>
+              <CheckSquare size={18} />
+              Subtareas ({subtasks.length})
+            </label>
+            <div className="subtasks-list">
+              {subtasks.map((subtask, index) => (
+                <div key={index} className="subtask-item">
+                  <span>{subtask.text}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeSubtask(index)}
+                    className="btn-icon-tiny btn-danger"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="add-subtask">
+              <input
+                type="text"
+                placeholder="Agregar subtarea..."
+                value={newSubtaskText}
+                onChange={(e) => setNewSubtaskText(e.target.value)}
+                onKeyPress={handleSubtaskKeyPress}
+              />
+              <button
+                type="button"
+                onClick={addSubtask}
+                className="btn-icon-small"
+                disabled={!newSubtaskText.trim()}
+              >
+                <Plus size={20} />
+              </button>
+            </div>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
               <label htmlFor="priority">
@@ -204,51 +289,13 @@ export default function CreateCardModal({ projectId, column, onClose }) {
                   className={`user-selection-item ${formData.assignedTo.includes(user._id) ? 'selected' : ''}`}
                   onClick={() => toggleUserAssignment(user._id)}
                 >
-                  <img src={getAvatarUrl(user.avatar)} alt={user.name} className="user-selection-avatar" />
+                  <UserAvatarSelector user={user} />
                   <div className="user-selection-info">
                     <span className="user-selection-name">{user.name}</span>
                     <span className="user-selection-email">{user.email}</span>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>
-              <CheckSquare size={18} />
-              Subtareas ({subtasks.length})
-            </label>
-            <div className="subtasks-list">
-              {subtasks.map((subtask, index) => (
-                <div key={index} className="subtask-item">
-                  <span>{subtask.text}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeSubtask(index)}
-                    className="btn-icon-tiny btn-danger"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-            </div>
-            <div className="add-subtask">
-              <input
-                type="text"
-                placeholder="Agregar subtarea..."
-                value={newSubtaskText}
-                onChange={(e) => setNewSubtaskText(e.target.value)}
-                onKeyPress={handleSubtaskKeyPress}
-              />
-              <button
-                type="button"
-                onClick={addSubtask}
-                className="btn-icon-small"
-                disabled={!newSubtaskText.trim()}
-              >
-                <Plus size={20} />
-              </button>
             </div>
           </div>
 

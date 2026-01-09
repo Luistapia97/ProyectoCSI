@@ -1,6 +1,7 @@
 import { Calendar, User, CheckSquare, AlertCircle, CheckCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useState } from 'react';
 import { getBackendURL } from '../services/api';
 import './Card.css';
 
@@ -11,6 +12,45 @@ const PRIORITY_COLORS = {
   urgente: '#dc2626',
 };
 
+function UserAvatar({ user, className }) {
+  const [imageError, setImageError] = useState(false);
+  
+  const getAvatarUrl = (avatarUrl) => {
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
+    if (avatarUrl.startsWith('http')) return avatarUrl;
+    return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
+  };
+
+  const avatarUrl = getAvatarUrl(user.avatar);
+
+  if (!avatarUrl || imageError) {
+    return (
+      <div className={`${className} avatar-initials`} title={user.name}>
+        {getInitials(user.name)}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={avatarUrl}
+      alt={user.name}
+      className={className}
+      title={user.name}
+      onError={() => setImageError(true)}
+    />
+  );
+}
+
 export default function Card({ task, onClick }) {
   const completedSubtasks = task.subtasks?.filter(st => st.completed).length || 0;
   const totalSubtasks = task.subtasks?.length || 0;
@@ -19,9 +59,18 @@ export default function Card({ task, onClick }) {
   const priorityColor = PRIORITY_COLORS[task.priority] || '#94a3b8';
 
   const getAvatarUrl = (avatarUrl) => {
-    if (!avatarUrl) return null;
+    if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
     if (avatarUrl.startsWith('http')) return avatarUrl;
     return `${getBackendURL()}${avatarUrl}`;
+  };
+
+  const getInitials = (name) => {
+    if (!name) return '?';
+    const words = name.trim().split(' ');
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return words[0].substring(0, 2).toUpperCase();
   };
 
   // Función para crear fecha local sin conversión UTC
@@ -89,13 +138,7 @@ export default function Card({ task, onClick }) {
           {task.assignedTo && task.assignedTo.length > 0 && (
             <div className="card-assignees">
               {task.assignedTo.slice(0, 2).map((user) => (
-                <img
-                  key={user._id}
-                  src={getAvatarUrl(user.avatar)}
-                  alt={user.name}
-                  className="assignee-avatar"
-                  title={user.name}
-                />
+                <UserAvatar key={user._id} user={user} className="assignee-avatar" />
               ))}
               {task.assignedTo.length > 2 && (
                 <span className="more-assignees">+{task.assignedTo.length - 2}</span>

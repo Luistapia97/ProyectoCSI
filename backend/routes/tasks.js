@@ -131,6 +131,82 @@ router.get('/project/:projectId', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/tasks/project/:projectId/active-by-user
+// @desc    Obtener tareas activas y pendientes de validación agrupadas por usuario en un proyecto
+// @access  Private
+router.get('/project/:projectId/active-by-user', protect, async (req, res) => {
+  try {
+    // Tareas activas (no completadas)
+    const activeTasks = await Task.find({
+      project: req.params.projectId,
+      archived: false,
+      completed: false,
+    })
+      .populate('assignedTo', 'name email avatar')
+      .select('assignedTo');
+
+    // Tareas pendientes de validación
+    const pendingValidationTasks = await Task.find({
+      project: req.params.projectId,
+      archived: false,
+      pendingValidation: true,
+    })
+      .populate('assignedTo', 'name email avatar')
+      .select('assignedTo');
+
+    // Agrupar tareas por usuario
+    const tasksByUser = {};
+    
+    // Procesar tareas activas
+    activeTasks.forEach(task => {
+      task.assignedTo.forEach(user => {
+        const userId = user._id.toString();
+        if (!tasksByUser[userId]) {
+          tasksByUser[userId] = {
+            user: {
+              _id: user._id,
+              name: user.name,
+              email: user.email,
+              avatar: user.avatar
+            },
+            activeTasks: 0,
+            pendingValidation: 0
+          };
+        }
+        tasksByUser[userId].activeTasks++;
+      });
+    });
+
+    // Procesar tareas pendientes de validación
+    pendingValidationTasks.forEach(task => {
+      task.assignedTo.forEach(user => {
+        const userId = user._id.toString();
+        if (!tasksByUser[userId]) {
+          tasksByUser[userId] = {
+            user: {
+              _id: user._id,
+              name: user.name,
+              email: user.email,
+              avatar: user.avatar
+            },
+            activeTasks: 0,
+            pendingValidation: 0
+          };
+        }
+        tasksByUser[userId].pendingValidation++;
+      });
+    });
+
+    // Convertir a array
+    const result = Object.values(tasksByUser);
+
+    res.json({ success: true, tasksByUser: result });
+  } catch (error) {
+    console.error('Error obteniendo tareas activas por usuario:', error);
+    res.status(500).json({ message: 'Error al obtener tareas activas', error: error.message });
+  }
+});
+
 // @route   GET /api/tasks/:id
 // @desc    Obtener una tarea especÃ­fica
 // @access  Private
@@ -462,6 +538,79 @@ router.put('/:id', protect, async (req, res) => {
   } catch (error) {
     console.error('Error actualizando tarea:', error);
     res.status(500).json({ message: 'Error al actualizar tarea', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/archived/:projectId
+// @desc    Obtener tareas archivadas de un proyecto
+// @access  Private
+router.get('/archived/:projectId', protect, async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    
+    // Verificar que el proyecto existe y el usuario tiene acceso
+    const project = await Project.findById(projectId);
+    if (!project) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+    
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isMember = project.members.some(m => m.user.toString() === req.user._id.toString());
+    const isAdmin = req.user.role === 'administrador';
+    
+    if (!isOwner && !isMember && !isAdmin) {
+      return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
+    }
+    
+    const tasks = await Task.find({ 
+      project: projectId, 
+      archived: true 
+    })
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .sort({ updatedAt: -1 });
+    
+    res.json(tasks);
+  } catch (error) {
+    console.error('Error obteniendo tareas archivadas:', error);
+    res.status(500).json({ message: 'Error al obtener tareas archivadas', error: error.message });
+  }
+});
+
+// @route   PATCH /api/tasks/:id/archive
+// @desc    Archivar o desarchivar una tarea
+// @access  Private (Admin only)
+router.patch('/:id/archive', protect, isAdmin, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    const { archived } = req.body;
+    task.archived = archived !== undefined ? archived : !task.archived;
+    
+    await task.save();
+
+    const updatedTask = await Task.findById(task._id)
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('validatedBy', 'name email avatar')
+      .populate('project', 'name');
+
+    // Emitir evento
+    const io = req.app.get('io');
+    io.to(`project-${task.project}`).emit('task-updated', { task: updatedTask });
+
+    res.json({ 
+      success: true, 
+      task: updatedTask,
+      message: task.archived ? 'Tarea archivada' : 'Tarea desarchivada'
+    });
+  } catch (error) {
+    console.error('Error archivando tarea:', error);
+    res.status(500).json({ message: 'Error al archivar tarea', error: error.message });
   }
 });
 

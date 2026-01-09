@@ -9,6 +9,11 @@ const useAuthStore = create((set, get) => ({
 
   login: async (credentials) => {
     try {
+      // Limpiar cualquier sesión previa antes de login
+      console.log('🧹 Limpiando sesión previa antes de login...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
       console.log('🔐 Intentando login con:', credentials.email);
       const response = await authAPI.login(credentials);
       console.log('✅ Login exitoso:', response.data);
@@ -36,6 +41,11 @@ const useAuthStore = create((set, get) => ({
 
   register: async (userData) => {
     try {
+      // Limpiar cualquier sesión previa antes de registro
+      console.log('🧹 Limpiando sesión previa antes de registro...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
       const response = await authAPI.register(userData);
       const { user, token } = response.data;
       
@@ -59,6 +69,11 @@ const useAuthStore = create((set, get) => ({
 
   registerAdmin: async (userData) => {
     try {
+      // Limpiar cualquier sesión previa antes de registro admin
+      console.log('🧹 Limpiando sesión previa antes de registro de admin...');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      
       const response = await authAPI.registerAdmin(userData);
       const { user, token } = response.data;
       
@@ -106,12 +121,19 @@ const useAuthStore = create((set, get) => ({
   },
 
   logout: () => {
+    console.log('🚪 Cerrando sesión...');
+    
+    // Limpiar localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    set({ user: null, token: null, isAuthenticated: false });
+    
+    // Limpiar estado de Zustand
+    set({ user: null, token: null, isAuthenticated: false, loading: false });
     
     // Notificar a otras pestañas
     window.dispatchEvent(new Event('auth-change'));
+    
+    console.log('✅ Sesión cerrada completamente');
   },
 
   setTheme: (theme) => {

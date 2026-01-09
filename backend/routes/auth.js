@@ -701,7 +701,38 @@ router.post('/reject-user/:id', protect, isAdmin, async (req, res) => {
     res.status(500).json({ message: 'Error al rechazar usuario', error: error.message });
   }
 });
+// @route   DELETE /api/auth/users/:id
+// @desc    Eliminar usuario (solo admin)
+// @access  Private (Admin only)
+router.delete('/users/:id', protect, isAdmin, async (req, res) => {
+  try {
+    const userId = req.params.id;
 
+    // No permitir que el admin se elimine a sí mismo
+    if (userId === req.user._id.toString()) {
+      return res.status(400).json({ message: 'No puedes eliminarte a ti mismo' });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Eliminar el usuario
+    await User.findByIdAndDelete(userId);
+
+    console.log(`🗑️ Usuario eliminado: ${user.email} por ${req.user.email}`);
+
+    res.json({
+      success: true,
+      message: `Usuario ${user.name} eliminado exitosamente`,
+    });
+  } catch (error) {
+    console.error('Error eliminando usuario:', error);
+    res.status(500).json({ message: 'Error al eliminar usuario', error: error.message });
+  }
+});
 // @route   PUT /api/auth/profile
 // @desc    Actualizar perfil de usuario
 // @access  Private

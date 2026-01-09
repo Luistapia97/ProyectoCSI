@@ -118,6 +118,29 @@ router.get('/', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/projects/archived
+// @desc    Obtener proyectos archivados del usuario
+// @access  Private
+router.get('/archived', protect, async (req, res) => {
+  try {
+    const projects = await Project.find({
+      $or: [
+        { owner: req.user._id },
+        { 'members.user': req.user._id },
+      ],
+      archived: true,
+    })
+      .populate('owner', 'name email avatar')
+      .populate('members.user', 'name email avatar')
+      .sort({ updatedAt: -1 });
+
+    res.json(projects);
+  } catch (error) {
+    console.error('Error obteniendo proyectos archivados:', error);
+    res.status(500).json({ message: 'Error al obtener proyectos archivados', error: error.message });
+  }
+});
+
 // @route   GET /api/projects/:id
 // @desc    Obtener un proyecto específico
 // @access  Private
@@ -243,9 +266,52 @@ router.put('/:id', protect, async (req, res) => {
 });
 
 // @route   DELETE /api/projects/:id
-// @desc    Eliminar (archivar) un proyecto
+// @desc    Eliminar permanentemente un proyecto
 // @access  Private (Admin o Owner)
 router.delete('/:id', protect, async (req, res) => {
+  try {
+    console.log('🗑️ Intentando eliminar proyecto:', req.params.id);
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      console.log('❌ Proyecto no encontrado:', req.params.id);
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    console.log('✅ Proyecto encontrado:', project.name);
+
+    // Solo el owner o un administrador pueden eliminar
+    const isOwner = project.owner.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'administrador';
+    
+    console.log('🔐 Permisos - isOwner:', isOwner, 'isAdmin:', isAdmin);
+    
+    if (!isOwner && !isAdmin) {
+      console.log('❌ Sin permisos para eliminar');
+      return res.status(403).json({ message: 'No tienes permisos para eliminar este proyecto' });
+    }
+
+    // Eliminar todas las tareas asociadas al proyecto
+    console.log('🗑️ Eliminando tareas asociadas...');
+    const deletedTasks = await Task.deleteMany({ project: req.params.id });
+    console.log('✅ Tareas eliminadas:', deletedTasks.deletedCount);
+
+    // Eliminar el proyecto
+    console.log('🗑️ Eliminando proyecto...');
+    const deletedProject = await Project.findByIdAndDelete(req.params.id);
+    console.log('✅ Proyecto eliminado:', deletedProject ? deletedProject.name : 'null');
+
+    res.json({ success: true, message: 'Proyecto eliminado permanentemente' });
+  } catch (error) {
+    console.error('Error eliminando proyecto:', error);
+    res.status(500).json({ message: 'Error al eliminar proyecto', error: error.message });
+  }
+});
+
+// @route   PATCH /api/projects/:id/archive
+// @desc    Archivar o desarchivar un proyecto
+// @access  Private (Admin or Owner)
+router.patch('/:id/archive', protect, async (req, res) => {
   try {
     const project = await Project.findById(req.params.id);
 
@@ -253,21 +319,27 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Solo el owner o un administrador pueden eliminar
+    // Solo el owner o un administrador pueden archivar
     const isOwner = project.owner.toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'administrador';
     
     if (!isOwner && !isAdmin) {
-      return res.status(403).json({ message: 'No tienes permisos para eliminar este proyecto' });
+      return res.status(403).json({ message: 'No tienes permisos para archivar este proyecto' });
     }
 
-    project.archived = true;
+    const { archived } = req.body;
+    project.archived = archived !== undefined ? archived : !project.archived;
+    
     await project.save();
 
-    res.json({ success: true, message: 'Proyecto archivado exitosamente' });
+    res.json({ 
+      success: true, 
+      project,
+      message: project.archived ? 'Proyecto archivado' : 'Proyecto desarchivado'
+    });
   } catch (error) {
-    console.error('Error eliminando proyecto:', error);
-    res.status(500).json({ message: 'Error al eliminar proyecto', error: error.message });
+    console.error('Error archivando proyecto:', error);
+    res.status(500).json({ message: 'Error al archivar proyecto', error: error.message });
   }
 });
 

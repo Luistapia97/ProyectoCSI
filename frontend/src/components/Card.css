@@ -150,6 +150,18 @@
   margin-left: 0;
 }
 
+.assignee-avatar.avatar-initials {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  user-select: none;
+}
+
 .more-assignees {
   width: 24px;
   height: 24px;
@@ -214,4 +226,52 @@
     height: 22px;
     font-size: 0.625rem;
   }
+}
+
+/* Dark Mode Improvements for Cards */
+[data-theme="dark"] .task-card {
+  background: #1e293b;
+  border-color: #475569;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .task-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-left-color: #667eea;
+}
+
+[data-theme="dark"] .task-card.pending-validation {
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.1), #1e293b);
+}
+
+[data-theme="dark"] .validation-badge {
+  background: #78350f;
+  color: #fcd34d;
+  border-color: #92400e;
+}
+
+[data-theme="dark"] .card-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .card-description {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .card-tag {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .card-date,
+[data-theme="dark"] .card-subtasks {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .card-date.overdue {
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .assignee-avatar.avatar-initials {
+  background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
 }
