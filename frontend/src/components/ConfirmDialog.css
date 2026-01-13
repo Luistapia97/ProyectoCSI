@@ -52,10 +52,14 @@
   margin: 0 auto 1.5rem;
 }
 
-.confirm-icon-warning,
-.confirm-icon-danger {
+.confirm-icon-warning {
   background: linear-gradient(135deg, #fef3c7, #fde68a);
   color: #f59e0b;
+}
+
+.confirm-icon-danger {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #ef4444;
 }
 
 .confirm-icon-info {

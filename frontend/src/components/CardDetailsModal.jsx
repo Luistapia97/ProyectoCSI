@@ -1098,7 +1098,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
         />
       ))}
       
-      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
+      {confirmDialog && <ConfirmDialog {...confirmDialog} isOpen={true} />}
     </div>
   );
 }

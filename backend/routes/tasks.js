@@ -666,8 +666,8 @@ router.get('/archived/:projectId', protect, async (req, res) => {
 
 // @route   PATCH /api/tasks/:id/archive
 // @desc    Archivar o desarchivar una tarea
-// @access  Private (Admin only)
-router.patch('/:id/archive', protect, isAdmin, async (req, res) => {
+// @access  Private (Assigned user or Admin)
+router.patch('/:id/archive', protect, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
@@ -703,8 +703,8 @@ router.patch('/:id/archive', protect, isAdmin, async (req, res) => {
 
 // @route   DELETE /api/tasks/:id
 // @desc    Eliminar una tarea
-// @access  Private (Admin only)
-router.delete('/:id', protect, isAdmin, async (req, res) => {
+// @access  Private (Assigned user or Admin)
+router.delete('/:id', protect, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 

@@ -188,7 +188,7 @@ const ArchivedProjectsModal = ({ onClose }) => {
         />
       ))}
       
-      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
+      {confirmDialog && <ConfirmDialog {...confirmDialog} isOpen={true} />}
     </div>
   );
 };
