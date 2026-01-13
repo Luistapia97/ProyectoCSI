@@ -86,11 +86,13 @@ class ReportService {
         $nin: ['Rediseño Web', 'Pagina Web', 'Desarrollo App', 'rediseño web', 'pagina web', 'desarrollo app'] 
       }
     })
+      .select('name owner members archived')
       .populate('members.user', 'name email')
       .lean();
 
     // Obtener todas las tareas
     const allTasks = await Task.find({ archived: false })
+      .select('title completed assignedTo project dueDate completedAt archived')
       .populate('assignedTo', 'name email')
       .populate('project', 'name')
       .lean();

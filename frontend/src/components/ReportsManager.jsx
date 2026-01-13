@@ -19,6 +19,7 @@ const ReportsManager = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [triggeringReport, setTriggeringReport] = useState(false);
   const [cronStatus, setCronStatus] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [emailModal, setEmailModal] = useState(false);
@@ -121,14 +122,16 @@ const ReportsManager = () => {
 
   const handleTriggerAutomated = async () => {
     try {
-      setLoading(true);
-      await reportsAPI.trigger();
-      showToast('Reporte automático ejecutado', 'success');
+      setTriggeringReport(true);
+      const response = await reportsAPI.trigger();
+      showToast(response.data.message || 'Reporte generado y enviado exitosamente', 'success');
+      await fetchReports(); // Recargar la lista de reportes
     } catch (error) {
       console.error('Error triggering report:', error);
-      showToast('Error ejecutando reporte automático', 'error');
+      const errorMessage = error.response?.data?.message || 'Error ejecutando reporte automático';
+      showToast(errorMessage, 'error');
     } finally {
-      setLoading(false);
+      setTriggeringReport(false);
     }
   };
 
@@ -247,10 +250,19 @@ const ReportsManager = () => {
           <button
             className="btn-outline"
             onClick={handleTriggerAutomated}
-            disabled={loading}
+            disabled={triggeringReport}
           >
-            <Send size={18} />
-            Ejecutar Ahora
+            {triggeringReport ? (
+              <>
+                <RefreshCw size={18} className="spinning" />
+                Generando y enviando...
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                Ejecutar Ahora
+              </>
+            )}
           </button>
         </div>
       )}
