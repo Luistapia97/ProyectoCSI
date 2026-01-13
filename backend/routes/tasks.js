@@ -89,6 +89,53 @@ router.post('/test-reminders/today', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/tasks/user-stats
+// @desc    Obtener estadísticas del usuario actual
+// @access  Private
+router.get('/user-stats', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now = new Date();
+
+    // Tareas activas (no completadas, no archivadas)
+    const activeTasks = await Task.countDocuments({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+    });
+
+    // Tareas pendientes de validación
+    const pendingValidation = await Task.countDocuments({
+      assignedTo: userId,
+      pendingValidation: true,
+      archived: false,
+    });
+
+    // Tareas por vencer (próximas 7 días)
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(now.getDate() + 7);
+    
+    const tasksDueSoon = await Task.countDocuments({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+      dueDate: {
+        $gte: now,
+        $lte: sevenDaysFromNow,
+      },
+    });
+
+    res.json({
+      activeTasks,
+      pendingValidation,
+      tasksDueSoon,
+    });
+  } catch (error) {
+    console.error('Error obteniendo estadísticas del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas', error: error.message });
+  }
+});
+
 // @route   GET /api/tasks/pending-validation
 // @desc    Obtener tareas pendientes de validación (solo administradores)
 // @access  Private (Admin only)
@@ -136,6 +183,10 @@ router.get('/project/:projectId', protect, async (req, res) => {
 // @access  Private
 router.get('/project/:projectId/active-by-user', protect, async (req, res) => {
   try {
+    const now = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(now.getDate() + 7);
+
     // Tareas activas (no completadas)
     const activeTasks = await Task.find({
       project: req.params.projectId,
@@ -150,6 +201,19 @@ router.get('/project/:projectId/active-by-user', protect, async (req, res) => {
       project: req.params.projectId,
       archived: false,
       pendingValidation: true,
+    })
+      .populate('assignedTo', 'name email avatar')
+      .select('assignedTo');
+
+    // Tareas por vencer (próximas 7 días)
+    const tasksDueSoon = await Task.find({
+      project: req.params.projectId,
+      archived: false,
+      completed: false,
+      dueDate: {
+        $gte: now,
+        $lte: sevenDaysFromNow,
+      },
     })
       .populate('assignedTo', 'name email avatar')
       .select('assignedTo');
@@ -170,7 +234,8 @@ router.get('/project/:projectId/active-by-user', protect, async (req, res) => {
               avatar: user.avatar
             },
             activeTasks: 0,
-            pendingValidation: 0
+            pendingValidation: 0,
+            tasksDueSoon: 0
           };
         }
         tasksByUser[userId].activeTasks++;
@@ -190,10 +255,32 @@ router.get('/project/:projectId/active-by-user', protect, async (req, res) => {
               avatar: user.avatar
             },
             activeTasks: 0,
-            pendingValidation: 0
+            pendingValidation: 0,
+            tasksDueSoon: 0
           };
         }
         tasksByUser[userId].pendingValidation++;
+      });
+    });
+
+    // Procesar tareas por vencer
+    tasksDueSoon.forEach(task => {
+      task.assignedTo.forEach(user => {
+        const userId = user._id.toString();
+        if (!tasksByUser[userId]) {
+          tasksByUser[userId] = {
+            user: {
+              _id: user._id,
+              name: user.name,
+              email: user.email,
+              avatar: user.avatar
+            },
+            activeTasks: 0,
+            pendingValidation: 0,
+            tasksDueSoon: 0
+          };
+        }
+        tasksByUser[userId].tasksDueSoon++;
       });
     });
 

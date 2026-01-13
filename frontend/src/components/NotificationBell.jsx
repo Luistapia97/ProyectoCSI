@@ -76,12 +76,19 @@ export default function NotificationBell() {
 
     // Navegar según el tipo
     if (notification.relatedTask) {
-      // Necesitamos el projectId para navegar al board
-      // Por ahora cerramos el dropdown
+      // Navegar a la tarea en el board correspondiente
+      const taskId = notification.relatedTask;
+      const projectId = notification.relatedProject;
+      
+      setIsOpen(false);
+      
+      if (projectId) {
+        // Navegar al proyecto y abrir la tarea
+        navigate(`/project/${projectId}?task=${taskId}`);
+      }
+    } else {
       setIsOpen(false);
     }
-
-    setIsOpen(false);
   };
 
   const handleMarkAllRead = async () => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Shield, Mail, Lock, User, Key, AlertCircle } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import { authAPI, getBackendURL } from '../services/api';
@@ -7,6 +7,7 @@ import './Auth.css';
 
 export default function RegisterAdmin() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { registerAdmin } = useAuthStore();
   const [formData, setFormData] = useState({
     name: '',
@@ -20,6 +21,12 @@ export default function RegisterAdmin() {
   const [adminInfo, setAdminInfo] = useState({ count: 0, available: 4 });
 
   useEffect(() => {
+    // Verificar errores en la URL
+    const urlError = searchParams.get('error');
+    if (urlError === 'invalid_admin_code') {
+      setError('Código de administrador inválido. Por favor verifica el código e intenta nuevamente.');
+    }
+    
     // Obtener cantidad de admins disponibles
     const fetchAdminCount = async () => {
       try {
@@ -30,7 +37,7 @@ export default function RegisterAdmin() {
       }
     };
     fetchAdminCount();
-  }, []);
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,9 +77,17 @@ export default function RegisterAdmin() {
   };
 
   const handleZohoRegister = () => {
+    // Primero pedir el código de administrador
+    const adminCode = prompt('Ingresa el código de administrador para continuar con Zoho:');
+    
+    if (!adminCode) {
+      setError('Debes ingresar el código de administrador');
+      return;
+    }
+    
     // Redirigir a Zoho OAuth con parámetro para indicar que es registro de admin
     const frontendURL = window.location.origin; // Obtener la URL actual del frontend
-    window.location.href = `${getBackendURL()}/api/auth/zoho?register=admin&frontend=${encodeURIComponent(frontendURL)}`;
+    window.location.href = `${getBackendURL()}/api/auth/zoho?register=admin&adminCode=${encodeURIComponent(adminCode)}&frontend=${encodeURIComponent(frontendURL)}`;
   };
 
   return (
@@ -245,13 +260,12 @@ export default function RegisterAdmin() {
                 e.target.style.color = '#d63031';
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M21.8 12c0-.7-.1-1.4-.2-2H12v3.8h5.5c-.2 1.2-1 2.2-2 2.9v2.5h3.2c1.9-1.7 3-4.3 3-7.2z"/>
-                <path d="M12 22c2.7 0 4.9-.9 6.5-2.4l-3.2-2.5c-.9.6-2 .9-3.3.9-2.5 0-4.7-1.7-5.4-4H3.4v2.6C5 19.5 8.2 22 12 22z"/>
-                <path d="M6.6 13c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V6.4H3.4C2.5 8.1 2 10 2 12s.5 3.9 1.4 5.6l3.2-2.6z"/>
-                <path d="M12 5.4c1.4 0 2.7.5 3.7 1.4l2.8-2.8C16.9 2.4 14.7 1.6 12 1.6 8.2 1.6 5 4.1 3.4 7.4l3.2 2.6C7.3 7.1 9.5 5.4 12 5.4z"/>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <rect width="20" height="20" rx="3" fill="#FF6B00"/>
+                <path d="M14.5 6H5.5L3 10l2.5 4h9l2.5-4-2.5-4z" fill="white"/>
+                <path d="M10 7v6M7 10h6" stroke="#FF6B00" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              Continuar con Zoho
+              Continuar con Zoho (Admin)
             </button>
           </form>
         ) : (

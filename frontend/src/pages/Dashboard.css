@@ -569,6 +569,11 @@
   background: rgba(99, 102, 241, 0.1);
 }
 
+.active-task-count.due-soon {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
 .active-task-count.pending {
   color: #f59e0b;
   background: rgba(245, 158, 11, 0.1);
@@ -728,4 +733,191 @@
 
 [data-theme="dark"] .btn-icon:hover {
   background: #334155;
+}
+
+/* User Stats Cards */
+.user-stats-container {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+@media (max-width: 1024px) {
+  .user-stats-container {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-stats-container {
+    width: 100%;
+    order: -1;
+  }
+  
+  .dashboard-intro > div:last-child {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+.user-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.625rem;
+  transition: all 0.2s;
+  box-shadow: var(--shadow);
+  min-width: fit-content;
+  height: 52px;
+}
+
+.user-stat-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px !important;
+  height: 34px !important;
+  max-width: 34px;
+  max-height: 34px;
+  border-radius: 0.5rem;
+  flex-shrink: 0;
+}
+
+.stat-icon svg {
+  width: 18px !important;
+  height: 18px !important;
+  max-width: 18px;
+  max-height: 18px;
+}
+
+.stat-icon-active {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+.stat-icon-validation {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.25);
+}
+
+.stat-icon-due {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  justify-content: center;
+}
+
+.user-stat-card .stat-value {
+  font-size: 1.125rem !important;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1 !important;
+}
+
+.user-stat-card .stat-label {
+  font-size: 0.625rem !important;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.2 !important;
+  margin-top: 0.15rem;
+}
+
+[data-theme="dark"] .user-stat-card {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .user-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+[data-theme="dark"] .stat-icon-active {
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+}
+
+[data-theme="dark"] .stat-icon-validation {
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+[data-theme="dark"] .stat-icon-due {
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .user-stat-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-color: rgba(102, 126, 234, 0.4);
+}
+
+/* Reports Manager Modal */
+.reports-modal-content {
+  position: relative;
+  background: var(--bg-primary);
+  border-radius: 1rem;
+  max-width: 95vw;
+  width: 1400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.close-reports-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.close-reports-btn:hover {
+  background: #fee;
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+[data-theme="dark"] .reports-modal-content {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .close-reports-btn {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .close-reports-btn:hover {
+  background: #450a0a;
+  color: #fca5a5;
+  border-color: #ef4444;
 }

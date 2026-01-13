@@ -179,3 +179,26 @@
     width: 100%;
   }
 }
+
+/* Dark Mode */
+[data-theme="dark"] .confirm-dialog {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .confirm-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .confirm-message {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .btn-cancel {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .btn-cancel:hover {
+  background: #334155;
+}

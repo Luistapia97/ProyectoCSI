@@ -111,6 +111,7 @@ export const projectsAPI = {
 
 // Tasks
 export const tasksAPI = {
+  getUserStats: () => api.get('/tasks/user-stats'),
   getByProject: (projectId) => api.get(`/tasks/project/${projectId}`),
   getArchived: (projectId) => api.get(`/tasks/archived/${projectId}`),
   getActiveByUser: (projectId) => api.get(`/tasks/project/${projectId}/active-by-user`),
@@ -131,6 +132,74 @@ export const tasksAPI = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   deleteAttachment: (taskId, attachmentId) => api.delete(`/tasks/${taskId}/attachments/${attachmentId}`),
+};
+
+// Reports
+export const reportsAPI = {
+  generate: () => {
+    // Timeout aumentado para generación de reportes (2 minutos)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 120000);
+    
+    return api.get('/reports/generate', { signal: controller.signal })
+      .finally(() => clearTimeout(timeoutId));
+  },
+  getHistory: () => api.get('/reports/history'),
+  download: async (filename) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/reports/download/${filename}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/pdf'
+        }
+      });
+      
+      if (!response.ok) {
+        // Intentar leer el mensaje de error del servidor
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error descargando el archivo');
+        } catch (jsonError) {
+          throw new Error(`Error descargando el archivo (${response.status})`);
+        }
+      }
+      
+      // Asegurarse de que es un PDF
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/pdf')) {
+        console.warn('Advertencia: El tipo de contenido no es PDF:', contentType);
+      }
+      
+      const blob = await response.blob();
+      
+      // Crear un blob con tipo explícito de PDF
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      
+      const url = window.URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      
+      // Limpiar después de un pequeño delay
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 100);
+    } catch (error) {
+      console.error('Error descargando reporte:', error);
+      throw error;
+    }
+  },
+  sendEmail: (recipients) => api.post('/reports/email', { recipients }),
+  trigger: () => api.post('/reports/trigger'),
+  getCronStatus: () => api.get('/reports/cron-status'),
+  verifyEmail: () => api.post('/reports/verify-email'),
+  deleteReport: (filename) => api.delete(`/reports/${filename}`),
 };
 
 export default api;

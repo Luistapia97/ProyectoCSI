@@ -2,20 +2,28 @@ import { AlertTriangle, Info, HelpCircle } from 'lucide-react';
 import './ConfirmDialog.css';
 
 const ConfirmDialog = ({ 
+  isOpen = false,
   title, 
   message, 
   type = 'warning', 
   confirmText = 'Confirmar', 
   cancelText = 'Cancelar',
   onConfirm, 
-  onCancel 
+  onCancel,
+  confirmButtonClass
 }) => {
+  // No renderizar si no está abierto
+  if (!isOpen) return null;
+
   const icons = {
     warning: <AlertTriangle size={48} />,
     danger: <AlertTriangle size={48} />,
     info: <Info size={48} />,
     question: <HelpCircle size={48} />
   };
+
+  // Usar confirmButtonClass si se proporciona, sino usar type
+  const buttonClass = confirmButtonClass || type;
 
   return (
     <div className="confirm-overlay" onClick={onCancel}>
@@ -29,7 +37,7 @@ const ConfirmDialog = ({
           <button className="btn-cancel" onClick={onCancel}>
             {cancelText}
           </button>
-          <button className={`btn-confirm btn-confirm-${type}`} onClick={onConfirm}>
+          <button className={`btn-confirm btn-confirm-${buttonClass}`} onClick={onConfirm}>
             {confirmText}
           </button>
         </div>

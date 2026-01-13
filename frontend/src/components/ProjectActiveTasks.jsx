@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckSquare, Clock } from 'lucide-react';
+import { CheckSquare, Clock, AlertTriangle } from 'lucide-react';
 import { tasksAPI, getBackendURL } from '../services/api';
 
 function UserAvatarSmall({ user }) {
@@ -101,6 +101,12 @@ export default function ProjectActiveTasks({ projectId }) {
                 <span className="active-task-count active" title="Tareas activas">
                   <CheckSquare size={12} />
                   {item.activeTasks}
+                </span>
+              )}
+              {item.tasksDueSoon > 0 && (
+                <span className="active-task-count due-soon" title="Tareas por vencer">
+                  <AlertTriangle size={12} />
+                  {item.tasksDueSoon}
                 </span>
               )}
               {item.pendingValidation > 0 && (

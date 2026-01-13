@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { X, Trash2, Shield, User as UserIcon, AlertCircle } from 'lucide-react';
 import { authAPI, getBackendURL } from '../services/api';
+import { useToast } from '../hooks/useToast';
+import ConfirmDialog from './ConfirmDialog';
+import Toast from './Toast';
 import './Modal.css';
 
 function UserAvatarManage({ user }) {
@@ -46,6 +49,8 @@ export default function ManageUsersModal({ onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [deletingUser, setDeletingUser] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const { showToast, toasts, removeToast } = useToast();
 
   useEffect(() => {
     fetchUsers();
@@ -65,21 +70,27 @@ export default function ManageUsersModal({ onClose }) {
   };
 
   const handleDeleteUser = async (userId, userName) => {
-    if (!confirm(`¿Estás seguro de que quieres eliminar a ${userName}? Esta acción no se puede deshacer.`)) {
-      return;
-    }
-
-    try {
-      setDeletingUser(userId);
-      await authAPI.deleteUser(userId);
-      setUsers(users.filter(u => u._id !== userId));
-      alert(`Usuario ${userName} eliminado exitosamente`);
-    } catch (error) {
-      console.error('Error eliminando usuario:', error);
-      alert(error.response?.data?.message || 'Error al eliminar usuario');
-    } finally {
-      setDeletingUser(null);
-    }
+    setConfirmDialog({
+      title: 'Eliminar Usuario',
+      message: `¿Estás seguro de que quieres eliminar a ${userName}? Esta acción no se puede deshacer.`,
+      type: 'danger',
+      confirmText: 'Eliminar',
+      onConfirm: async () => {
+        try {
+          setDeletingUser(userId);
+          await authAPI.deleteUser(userId);
+          setUsers(users.filter(u => u._id !== userId));
+          showToast(`Usuario ${userName} eliminado exitosamente`, 'success');
+        } catch (error) {
+          console.error('Error eliminando usuario:', error);
+          showToast(error.response?.data?.message || 'Error al eliminar usuario', 'error');
+        } finally {
+          setDeletingUser(null);
+          setConfirmDialog(null);
+        }
+      },
+      onCancel: () => setConfirmDialog(null)
+    });
   };
 
   return (
@@ -147,6 +158,18 @@ export default function ManageUsersModal({ onClose }) {
           )}
         </div>
       </div>
+      
+      {toasts.map(toast => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
+      
+      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
     </div>
   );
 }

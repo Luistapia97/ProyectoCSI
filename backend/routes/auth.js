@@ -233,6 +233,19 @@ if (isZohoConfigured) {
       
       if (registerType === 'admin') {
         console.log('Registro de administrador solicitado via Zoho');
+        
+        // Validar código de administrador
+        const adminCode = req.query.adminCode;
+        const ADMIN_CODE = process.env.ADMIN_REGISTRATION_CODE || 'NEXUS2025';
+        
+        if (!adminCode || adminCode !== ADMIN_CODE) {
+          console.log('❌ Código de administrador inválido o no proporcionado');
+          const frontendURL = req.query.frontend || process.env.FRONTEND_URL || 'http://localhost:5173';
+          return res.redirect(`${frontendURL}/register-admin?error=invalid_admin_code`);
+        }
+        
+        console.log('✓ Código de administrador válido');
+        
         // Guardar en una cookie temporal que el callback puede leer
         res.cookie('register_type', 'admin', { 
           httpOnly: true, 

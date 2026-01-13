@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2, AlertCircle, UserCheck, Users, Archive, Settings } from 'lucide-react';
+import { Plus, Folder, LogOut, Moon, Sun, TrendingUp, UserPlus, Shield, User as UserIcon, Trash2, AlertCircle, UserCheck, Users, Archive, Settings, CheckCircle2, Clock, AlertTriangle, FileText } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import CreateProjectModal from '../components/CreateProjectModal';
@@ -10,11 +10,13 @@ import ManageUsersModal from '../components/ManageUsersModal';
 import ArchivedProjectsModal from '../components/ArchivedProjectsModal';
 import ProjectActiveTasks from '../components/ProjectActiveTasks';
 import NotificationBell from '../components/NotificationBell';
+import ReportsManager from '../components/ReportsManager';
 import socketService from '../services/socket';
-import { authAPI, projectsAPI, getBackendURL } from '../services/api';
+import { authAPI, projectsAPI, tasksAPI, getBackendURL } from '../services/api';
 import { useToast } from '../hooks/useToast';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Toast from '../components/Toast';
+import '../components/ReportsManager.css';
 import './Dashboard.css';
 
 function MemberAvatar({ member, className }) {
@@ -65,11 +67,17 @@ export default function Dashboard() {
   const [showPendingUsersModal, setShowPendingUsersModal] = useState(false);
   const [showManageUsersModal, setShowManageUsersModal] = useState(false);
   const [showArchivedProjects, setShowArchivedProjects] = useState(false);
+  const [showReportsManager, setShowReportsManager] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
   const [theme, setTheme] = useState('light');
   const [confirmDialog, setConfirmDialog] = useState(null);
   const { showToast, toasts, removeToast } = useToast();
+  const [userStats, setUserStats] = useState({
+    activeTasks: 0,
+    pendingValidation: 0,
+    tasksDueSoon: 0,
+  });
   
   const isAdmin = user?.role === 'administrador';
 
@@ -90,6 +98,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchProjects();
+    fetchUserStats();
     
     // Conectar al socket y unirse al room del usuario
     if (user?._id) {
@@ -126,6 +135,15 @@ export default function Dashboard() {
       setPendingUsersCount(response.data.count || 0);
     } catch (error) {
       console.error('Error obteniendo usuarios pendientes:', error);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await tasksAPI.getUserStats();
+      setUserStats(response.data);
+    } catch (error) {
+      console.error('Error obteniendo estadísticas:', error);
     }
   };
 
@@ -265,6 +283,16 @@ export default function Dashboard() {
                   <div className="settings-dropdown">
                     <button 
                       onClick={() => {
+                        setShowReportsManager(true);
+                        setShowSettingsMenu(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <FileText size={18} />
+                      <span>Reportes de Seguimiento</span>
+                    </button>
+                    <button 
+                      onClick={() => {
                         setShowArchivedProjects(true);
                         setShowSettingsMenu(false);
                       }}
@@ -316,7 +344,38 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            {/* Estadísticas del usuario */}
+            <div className="user-stats-container">
+              <div className="user-stat-card">
+                <div className="stat-icon stat-icon-active">
+                  <CheckCircle2 size={18} />
+                </div>
+                <div className="stat-info">
+                  <span className="stat-value">{userStats.activeTasks}</span>
+                  <span className="stat-label">Activas</span>
+                </div>
+              </div>
+              <div className="user-stat-card">
+                <div className="stat-icon stat-icon-validation">
+                  <Clock size={18} />
+                </div>
+                <div className="stat-info">
+                  <span className="stat-value">{userStats.pendingValidation}</span>
+                  <span className="stat-label">Por validar</span>
+                </div>
+              </div>
+              <div className="user-stat-card">
+                <div className="stat-icon stat-icon-due">
+                  <AlertTriangle size={18} />
+                </div>
+                <div className="stat-info">
+                  <span className="stat-value">{userStats.tasksDueSoon}</span>
+                  <span className="stat-label">Por vencer</span>
+                </div>
+              </div>
+            </div>
+
             {isAdmin && (
               <button onClick={() => setShowCreateModal(true)} className="btn-create">
                 <Plus size={20} />
@@ -469,6 +528,20 @@ export default function Dashboard() {
         <ArchivedProjectsModal 
           onClose={() => setShowArchivedProjects(false)}
         />
+      )}
+
+      {showReportsManager && (
+        <div className="modal-overlay" onClick={() => setShowReportsManager(false)}>
+          <div className="reports-modal-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="close-reports-btn"
+              onClick={() => setShowReportsManager(false)}
+            >
+              ✕
+            </button>
+            <ReportsManager />
+          </div>
+        </div>
       )}
       
       {toasts.map(toast => (

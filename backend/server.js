@@ -106,6 +106,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Agregar cookie-parser ANTES de las rutas
 
+// Configurar headers para UTF-8
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
+
 // Servir archivos estáticos (avatares y otros uploads)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -141,6 +147,11 @@ reminderService.start();
 // Hacer reminderService disponible en las rutas
 app.set('reminderService', reminderService);
 
+// Iniciar servicio de tareas programadas (reportes)
+import cronJobService from './services/cronJobs.js';
+cronJobService.initializeJobs();
+console.log('✅ Servicio de tareas programadas iniciado');
+
 // Rutas de prueba
 app.get('/', (req, res) => {
   res.json({ 
@@ -174,11 +185,13 @@ import authRoutes from './routes/auth.js';
 import projectRoutes from './routes/projects.js';
 import taskRoutes from './routes/tasks.js';
 import notificationRoutes from './routes/notifications.js';
+import reportRoutes from './routes/reports.js';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Manejador de errores
 app.use((err, req, res, next) => {

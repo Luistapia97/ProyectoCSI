@@ -58,3 +58,129 @@
   background: #064e3b;
   color: #86efac;
 }
+
+/* Mejoras adicionales de texto en modo oscuro */
+[data-theme="dark"] .detail-section h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .detail-section p,
+[data-theme="dark"] .detail-section textarea {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .detail-item label {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .detail-item span {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .detail-item select,
+[data-theme="dark"] .detail-item input[type="date"] {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .priority-badge {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .priority-baja {
+  background: #064e3b;
+  color: #86efac;
+}
+
+[data-theme="dark"] .priority-media {
+  background: #78350f;
+  color: #fcd34d;
+}
+
+[data-theme="dark"] .priority-alta {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .priority-urgente {
+  background: #450a0a;
+  color: #fecaca;
+}
+
+[data-theme="dark"] .info-box {
+  background: #0f172a;
+  border-color: #475569;
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .sidebar-section h4 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .add-subtask input,
+[data-theme="dark"] .add-tag input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .no-tags,
+[data-theme="dark"] .no-assigned-users {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .modal-close:hover {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .empty-state {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .loading-message {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .archived-project-meta,
+[data-theme="dark"] .archived-task-meta {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .meta-item {
+  color: #cbd5e1;
+}
+
+/* Comentarios en modo oscuro */
+[data-theme="dark"] .comment-form input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .comment-form input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .comment-edit-form input {
+  background: #0f172a;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .comment-edit-form input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .comment-text {
+  color: #cbd5e1;
+}
+
+[data-theme="dark"] .comment-author {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .comment-date {
+  color: #94a3b8;
+}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive } from 'lucide-react';
 import useAuthStore from '../store/authStore';
@@ -57,6 +57,7 @@ function MemberAvatarHeader({ member, className }) {
 export default function Board() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuthStore();
   const { currentProject, fetchProject } = useProjectStore();
   const { tasks, fetchTasks, reorderTask } = useTaskStore();
@@ -156,6 +157,20 @@ export default function Board() {
       };
     }
   }, [id, fetchProject, fetchTasks]);
+
+  // Detectar si hay una tarea en la URL (desde notificaciones)
+  useEffect(() => {
+    const taskIdFromUrl = searchParams.get('task');
+    if (taskIdFromUrl && tasks.length > 0) {
+      const task = tasks.find(t => t._id === taskIdFromUrl);
+      if (task) {
+        setSelectedTask(task);
+        // Limpiar el parámetro de la URL
+        searchParams.delete('task');
+        setSearchParams(searchParams, { replace: true });
+      }
+    }
+  }, [searchParams, tasks, setSearchParams]);
 
   const getTasksByColumn = (columnName) => {
     return tasks
