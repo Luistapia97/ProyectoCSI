@@ -79,7 +79,7 @@ class EmailService {
         console.log('📄 PDF leído:', pdfBuffer.length, 'bytes');
 
         const emailData = {
-          from: 'Sistema Nexus CSI <onboarding@resend.dev>',
+          from: 'Sistema Nexus CSI <noreply@proyectoscsi.mx>',
           to: recipientEmail,
           subject: `📊 Reporte Semanal de Seguimiento - ${this.formatDate(generatedAt)}`,
           html: this.generateEmailHTML(reportData),
@@ -516,7 +516,7 @@ class EmailService {
         console.log('📧 Enviando email de prueba con Resend a:', testEmail);
         
         const result = await resend.emails.send({
-          from: 'Sistema Nexus CSI <onboarding@resend.dev>',
+          from: 'Sistema Nexus CSI <noreply@proyectoscsi.mx>',
           to: testEmail,
           subject: '✅ Prueba de Configuración Email - Sistema Nexus',
           html: htmlContent
