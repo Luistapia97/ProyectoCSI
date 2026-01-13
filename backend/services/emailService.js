@@ -71,13 +71,14 @@ class EmailService {
       if (this.useResend) {
         // Usar Resend API
         console.log('📧 Usando Resend API para enviar...');
+        console.log('📧 Destinatario:', recipientEmail);
         const resend = this.getResend();
         
         // Leer el archivo PDF como buffer
         const pdfBuffer = fs.readFileSync(reportPath);
-        const pdfBase64 = pdfBuffer.toString('base64');
+        console.log('📄 PDF leído:', pdfBuffer.length, 'bytes');
 
-        const result = await resend.emails.send({
+        const emailData = {
           from: 'Sistema Nexus CSI <onboarding@resend.dev>',
           to: recipientEmail,
           subject: `📊 Reporte Semanal de Seguimiento - ${this.formatDate(generatedAt)}`,
@@ -85,13 +86,24 @@ class EmailService {
           attachments: [
             {
               filename: filename,
-              content: pdfBase64
+              content: pdfBuffer
             }
           ]
-        });
+        };
 
-        console.log('✅ Reporte enviado exitosamente con Resend:', result.id);
-        return { success: true, messageId: result.id };
+        console.log('📤 Enviando email con datos:', JSON.stringify({
+          from: emailData.from,
+          to: emailData.to,
+          subject: emailData.subject,
+          attachmentSize: pdfBuffer.length
+        }));
+
+        const result = await resend.emails.send(emailData);
+        
+        console.log('📬 Respuesta completa de Resend:', JSON.stringify(result, null, 2));
+        console.log('✅ Reporte enviado exitosamente con Resend:', result?.data?.id || result?.id);
+        
+        return { success: true, messageId: result?.data?.id || result?.id };
       } else {
         // Usar SMTP tradicional
         console.log('📧 Usando SMTP para enviar...');
@@ -501,14 +513,18 @@ class EmailService {
 
       if (this.useResend) {
         const resend = this.getResend();
+        console.log('📧 Enviando email de prueba con Resend a:', testEmail);
+        
         const result = await resend.emails.send({
           from: 'Sistema Nexus CSI <onboarding@resend.dev>',
           to: testEmail,
           subject: '✅ Prueba de Configuración Email - Sistema Nexus',
           html: htmlContent
         });
-        console.log('✅ Correo de prueba enviado exitosamente con Resend:', result.id);
-        return { success: true, messageId: result.id };
+        
+        console.log('📬 Respuesta de Resend:', JSON.stringify(result, null, 2));
+        console.log('✅ Correo de prueba enviado exitosamente con Resend:', result?.data?.id || result?.id);
+        return { success: true, messageId: result?.data?.id || result?.id };
       } else {
         const mailOptions = {
           from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
