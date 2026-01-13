@@ -1,52 +1,106 @@
 import pkg from 'nodemailer';
 const { createTransport } = pkg;
 import path from 'path';
+import { Resend } from 'resend';
+import fs from 'fs';
 
 class EmailService {
   constructor() {
     this.transporter = null;
+    this.resend = null;
+    this.useResend = !!process.env.RESEND_API_KEY;
   }
 
   /**
-   * Obtiene o crea el transportador de correo
+   * Obtiene o crea el cliente de Resend
+   */
+  getResend() {
+    if (!this.resend && this.useResend) {
+      console.log('📧 Inicializando Resend API...');
+      this.resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return this.resend;
+  }
+
+  /**
+   * Obtiene o crea el transportador de correo SMTP
    */
   getTransporter() {
-    if (!this.transporter) {
+    if (!this.transporter && !this.useResend) {
       console.log('📧 Inicializando transportador SMTP...');
       console.log(`   Host: ${process.env.SMTP_HOST}`);
       console.log(`   Puerto: ${process.env.SMTP_PORT}`);
       console.log(`   Usuario: ${process.env.SMTP_USER}`);
       
+      const port = parseInt(process.env.SMTP_PORT) || 587;
+      const isSecure = port === 465;
+      
       this.transporter = createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT) || 587,
-        secure: false, // true para 465, false para otros puertos
+        port: port,
+        secure: isSecure,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
         },
         tls: {
-          rejectUnauthorized: false
+          rejectUnauthorized: false,
+          minVersion: 'TLSv1.2'
         },
+        connectionTimeout: 60000,
+        greetingTimeout: 30000,
+        socketTimeout: 60000,
         debug: true,
-        logger: true
-      });
-    }
-    return this.transporter;
-  }
+        logger: true,
+        pool: true,
+        maxConnections: 5,
+        maxMessages: 100 } = reportData;
+      const filename = path.basename(reportPath);
 
-  /**
-   * Envía el reporte semanal por correo
-   */
-  async sendWeeklyReport(reportPath, reportData, recipientEmail) {
-    try {
-      const { generatedAt, globalMetrics } = reportData;
+      if (this.useResend) {
+        // Usar Resend API
+        console.log('📧 Usando Resend API para enviar...');
+        const resend = this.getResend();
+        
+        // Leer el archivo PDF como buffer
+        const pdfBuffer = fs.readFileSync(reportPath);
+        const pdfBase64 = pdfBuffer.toString('base64');
 
-      const mailOptions = {
-        from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
-        to: recipientEmail,
-        subject: `📊 Reporte Semanal de Seguimiento - ${this.formatDate(generatedAt)}`,
-        html: this.generateEmailHTML(reportData),
+        const result = await resend.emails.send({
+          from: 'Sistema Nexus CSI <onboarding@resend.dev>',
+          to: recipientEmail,
+          subject: `📊 Reporte Semanal de Seguimiento - ${this.formatDate(generatedAt)}`,
+          html: this.generateEmailHTML(reportData),
+          attachments: [
+            {
+              filename: filename,
+              content: pdfBase64
+            }
+          ]
+        });
+
+        console.log('✅ Reporte enviado exitosamente con Resend:', result.id);
+        return { success: true, messageId: result.id };
+      } else {
+        // Usar SMTP tradicional
+        console.log('📧 Usando SMTP para enviar...');
+        const mailOptions = {
+          from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
+          to: recipientEmail,
+          subject: `📊 Reporte Semanal de Seguimiento - ${this.formatDate(generatedAt)}`,
+          html: this.generateEmailHTML(reportData),
+          attachments: [
+            {
+              filename: filename,
+              path: reportPath
+            }
+          ]
+        };
+
+        const info = await this.getTransporter().sendMail(mailOptions);
+        console.log('✅ Reporte enviado exitosamente:', info.messageId);
+        return { success: true, messageId: info.messageId };
+      }
         attachments: [
           {
             filename: path.basename(reportPath),
@@ -296,6 +350,10 @@ class EmailService {
                 <div class="stat-label">Cumplimiento</div>
               </div>
               <div class="stat-item">
+      if (this.useResend) {
+        console.log('✅ Usando Resend API (no requiere verificación SMTP)');
+        return true;
+      }
                 <div class="stat-value ${userData.metrics.overdueTasks > 0 ? 'danger' : 'success'}">
                   ${userData.metrics.overdueTasks}
                 </div>
@@ -306,11 +364,9 @@ class EmailService {
           ${userMetrics.length > 3 ? `<p style="text-align: center; color: #64748b; font-size: 12px;">+ ${userMetrics.length - 3} usuarios más...</p>` : ''}
         </div>
 
-        <div class="footer">
-          <p><strong>📎 Reporte Completo Adjunto</strong></p>
-          <p>Revisa el archivo PDF adjunto para ver todas las métricas detalladas, análisis por usuario y seguimiento completo de proyectos.</p>
-          <p style="margin-top: 20px;">
-            Este es un correo automático generado por el sistema Proyecto Nexus.<br>
+        <divtestEmail = this.useResend ? process.env.REPORT_RECIPIENTS?.split(',')[0] : process.env.SMTP_USER;
+      
+      const htmlContent =ste es un correo automático generado por el sistema Proyecto Nexus.<br>
             © ${new Date().getFullYear()} CSI - Todos los derechos reservados
           </p>
         </div>
@@ -416,9 +472,10 @@ class EmailService {
                 
                 <div class="info-box">
                   <strong>Configuración actual:</strong><br>
-                  <strong>Servidor:</strong> ${process.env.SMTP_HOST}<br>
+                  <strong>Método:</strong> ${this.useResend ? 'Resend API' : 'SMTP'}<br>
+                  ${this.useResend ? '' : `<strong>Servidor:</strong> ${process.env.SMTP_HOST}<br>
                   <strong>Puerto:</strong> ${process.env.SMTP_PORT}<br>
-                  <strong>Usuario:</strong> ${process.env.SMTP_USER}<br>
+                  <strong>Usuario:</strong> ${process.env.SMTP_USER}<br>`}
                   <strong>Fecha:</strong> ${new Date().toLocaleString('es-MX', { dateStyle: 'full', timeStyle: 'short' })}
                 </div>
                 
@@ -437,12 +494,30 @@ class EmailService {
             </div>
           </body>
           </html>
-        `
-      };
+        `;
 
-      const info = await this.getTransporter().sendMail(mailOptions);
-      console.log('✅ Correo de prueba enviado exitosamente:', info.messageId);
-      return { success: true, messageId: info.messageId };
+      if (this.useResend) {
+        const resend = this.getResend();
+        const result = await resend.emails.send({
+          from: 'Sistema Nexus CSI <onboarding@resend.dev>',
+          to: testEmail,
+          subject: '✅ Prueba de Configuración Email - Sistema Nexus',
+          html: htmlContent
+        });
+        console.log('✅ Correo de prueba enviado exitosamente con Resend:', result.id);
+        return { success: true, messageId: result.id };
+      } else {
+        const mailOptions = {
+          from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
+          to: testEmail,
+          subject: '✅ Prueba de Configuración SMTP - Sistema Nexus',
+          html: htmlContent
+        };
+
+        const info = await this.getTransporter().sendMail(mailOptions);
+        console.log('✅ Correo de prueba enviado exitosamente:', info.messageId);
+        return { success: true, messageId: info.messageId };
+      }
     } catch (error) {
       console.error('❌ Error enviando correo de prueba:', error);
       throw error;
