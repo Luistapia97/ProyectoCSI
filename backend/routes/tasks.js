@@ -463,7 +463,9 @@ router.put('/:id', protect, async (req, res) => {
     } = req.body;
 
     const isAdmin = req.user.role === 'administrador';
-    const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+    const isAssigned = task.assignedTo && task.assignedTo.some(
+      assignee => assignee.toString() === req.user._id.toString()
+    );
 
     // Validar permisos
     if (!isAdmin && !isAssigned) {
