@@ -54,7 +54,18 @@ class EmailService {
         logger: true,
         pool: true,
         maxConnections: 5,
-        maxMessages: 100 } = reportData;
+        maxMessages: 100
+      });
+    }
+    return this.transporter;
+  }
+
+  /**
+   * Envía el reporte semanal por correo
+   */
+  async sendWeeklyReport(reportPath, reportData, recipientEmail) {
+    try {
+      const { generatedAt } = reportData;
       const filename = path.basename(reportPath);
 
       if (this.useResend) {
@@ -101,17 +112,6 @@ class EmailService {
         console.log('✅ Reporte enviado exitosamente:', info.messageId);
         return { success: true, messageId: info.messageId };
       }
-        attachments: [
-          {
-            filename: path.basename(reportPath),
-            path: reportPath
-          }
-        ]
-      };
-
-      const info = await this.getTransporter().sendMail(mailOptions);
-      console.log('✅ Reporte enviado exitosamente:', info.messageId);
-      return { success: true, messageId: info.messageId };
     } catch (error) {
       console.error('❌ Error enviando reporte:', error);
       throw error;
@@ -381,6 +381,11 @@ class EmailService {
    */
   async verifyConnection() {
     try {
+      if (this.useResend) {
+        console.log('✅ Usando Resend API (no requiere verificación SMTP)');
+        return true;
+      }
+      
       await this.getTransporter().verify();
       console.log('✅ Servidor de correo configurado correctamente');
       return true;
@@ -395,106 +400,104 @@ class EmailService {
    */
   async sendTestEmail() {
     try {
-      const mailOptions = {
-        from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
-        to: process.env.SMTP_USER,
-        subject: '✅ Prueba de Configuración SMTP - Sistema Nexus',
-        html: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            <style>
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-                line-height: 1.6;
-                color: #333;
-                max-width: 600px;
-                margin: 0 auto;
-                padding: 20px;
-                background-color: #f8fafc;
-              }
-              .container {
-                background: white;
-                border-radius: 12px;
-                padding: 30px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-              }
-              .header {
-                text-align: center;
-                padding-bottom: 20px;
-                border-bottom: 3px solid #3b82f6;
-                margin-bottom: 30px;
-              }
-              .header h1 {
-                color: #3b82f6;
-                margin: 0;
-                font-size: 24px;
-              }
-              .success-icon {
-                font-size: 48px;
-                text-align: center;
-                margin: 20px 0;
-              }
-              .content {
-                padding: 20px 0;
-              }
-              .info-box {
-                background: #f0f9ff;
-                border-left: 4px solid #3b82f6;
-                padding: 15px;
-                margin: 15px 0;
-                border-radius: 4px;
-              }
-              .footer {
-                text-align: center;
-                margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #e5e7eb;
-                color: #64748b;
-                font-size: 14px;
-              }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>✅ Configuración SMTP Exitosa</h1>
-              </div>
-              
-              <div class="success-icon">
-                ✅
-              </div>
-              
-              <div class="content">
-                <p><strong>Felicidades!</strong></p>
-                <p>Este es un correo de prueba para confirmar que la configuración SMTP del Sistema Nexus CSI está funcionando correctamente.</p>
-                
-                <div class="info-box">
-                  <strong>Configuración actual:</strong><br>
-                  <strong>Método:</strong> ${this.useResend ? 'Resend API' : 'SMTP'}<br>
-                  ${this.useResend ? '' : `<strong>Servidor:</strong> ${process.env.SMTP_HOST}<br>
-                  <strong>Puerto:</strong> ${process.env.SMTP_PORT}<br>
-                  <strong>Usuario:</strong> ${process.env.SMTP_USER}<br>`}
-                  <strong>Fecha:</strong> ${new Date().toLocaleString('es-MX', { dateStyle: 'full', timeStyle: 'short' })}
-                </div>
-                
-                <p>Ahora puedes:</p>
-                <ul>
-                  <li>📊 Generar reportes semanales</li>
-                  <li>📧 Enviar reportes por correo</li>
-                  <li>⏰ Programar envíos automáticos</li>
-                </ul>
-              </div>
-              
-              <div class="footer">
-                <p>Sistema de Gestión CSI - Proyecto Nexus</p>
-                <p>Este es un correo automático, por favor no respondas.</p>
-              </div>
+      const testEmail = this.useResend ? process.env.REPORT_RECIPIENTS?.split(',')[0] : process.env.SMTP_USER;
+      
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f8fafc;
+            }
+            .container {
+              background: white;
+              border-radius: 12px;
+              padding: 30px;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+              text-align: center;
+              padding-bottom: 20px;
+              border-bottom: 3px solid #3b82f6;
+              margin-bottom: 30px;
+            }
+            .header h1 {
+              color: #3b82f6;
+              margin: 0;
+              font-size: 24px;
+            }
+            .success-icon {
+              font-size: 48px;
+              text-align: center;
+              margin: 20px 0;
+            }
+            .content {
+              padding: 20px 0;
+            }
+            .info-box {
+              background: #f0f9ff;
+              border-left: 4px solid #3b82f6;
+              padding: 15px;
+              margin: 15px 0;
+              border-radius: 4px;
+            }
+            .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 1px solid #e5e7eb;
+              color: #64748b;
+              font-size: 14px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Configuración Email Exitosa</h1>
             </div>
-          </body>
-          </html>
-        `;
+            
+            <div class="success-icon">
+              ✅
+            </div>
+            
+            <div class="content">
+              <p><strong>Felicidades!</strong></p>
+              <p>Este es un correo de prueba para confirmar que la configuración de email del Sistema Nexus CSI está funcionando correctamente.</p>
+              
+              <div class="info-box">
+                <strong>Configuración actual:</strong><br>
+                <strong>Método:</strong> ${this.useResend ? 'Resend API' : 'SMTP'}<br>
+                ${this.useResend ? '' : `<strong>Servidor:</strong> ${process.env.SMTP_HOST}<br>
+                <strong>Puerto:</strong> ${process.env.SMTP_PORT}<br>
+                <strong>Usuario:</strong> ${process.env.SMTP_USER}<br>`}
+                <strong>Fecha:</strong> ${new Date().toLocaleString('es-MX', { dateStyle: 'full', timeStyle: 'short' })}
+              </div>
+              
+              <p>Ahora puedes:</p>
+              <ul>
+                <li>📊 Generar reportes semanales</li>
+                <li>📧 Enviar reportes por correo</li>
+                <li>⏰ Programar envíos automáticos</li>
+              </ul>
+            </div>
+            
+            <div class="footer">
+              <p>Sistema de Gestión CSI - Proyecto Nexus</p>
+              <p>Este es un correo automático, por favor no respondas.</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
 
       if (this.useResend) {
         const resend = this.getResend();
@@ -510,7 +513,7 @@ class EmailService {
         const mailOptions = {
           from: `"Sistema Nexus CSI" <${process.env.SMTP_USER}>`,
           to: testEmail,
-          subject: '✅ Prueba de Configuración SMTP - Sistema Nexus',
+          subject: '✅ Prueba de Configuración Email - Sistema Nexus',
           html: htmlContent
         };
 
