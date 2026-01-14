@@ -179,9 +179,9 @@ export default function NotificationBell() {
             <div className="notification-footer">
               <button 
                 className="view-all-btn"
-                onClick={() => {
+                onClick={async () => {
+                  await markAllAsRead();
                   setIsOpen(false);
-                  // TODO: Navegar a página de notificaciones
                 }}
               >
                 Ver todas las notificaciones

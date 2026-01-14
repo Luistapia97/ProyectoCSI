@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive } from 'lucide-react';
+import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive, Edit, Users, Trash2 } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import useTaskStore from '../store/taskStore';
@@ -13,6 +13,8 @@ import CardDetailsModal from '../components/CardDetailsModal';
 import ArchivedTasksModal from '../components/ArchivedTasksModal';
 import ProjectAnalytics from '../components/ProjectAnalytics';
 import NotificationBell from '../components/NotificationBell';
+import EditProjectModal from '../components/EditProjectModal';
+import ManageProjectMembersModal from '../components/ManageProjectMembersModal';
 import './Board.css';
 
 function MemberAvatarHeader({ member, className }) {
@@ -66,6 +68,9 @@ export default function Board() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showArchivedTasks, setShowArchivedTasks] = useState(false);
   const [viewMode, setViewMode] = useState('board'); // 'board' o 'analytics'
+  const [showProjectSettings, setShowProjectSettings] = useState(false);
+  const [showEditProjectModal, setShowEditProjectModal] = useState(false);
+  const [showManageMembersModal, setShowManageMembersModal] = useState(false);
   
   const isAdmin = user?.role === 'administrador';
 
@@ -283,9 +288,65 @@ export default function Board() {
             ))}
           </div>
 
-          <button className="btn-settings">
-            <Settings size={20} />
-          </button>
+          {isAdmin && (
+            <div className="settings-menu-container">
+              <button 
+                className="btn-settings"
+                onClick={() => setShowProjectSettings(!showProjectSettings)}
+                title="Configuración del proyecto"
+              >
+                <Settings size={20} />
+              </button>
+              
+              {showProjectSettings && (
+                <>
+                  <div className="settings-backdrop" onClick={() => setShowProjectSettings(false)}></div>
+                  <div className="settings-dropdown">
+                    <button 
+                      onClick={() => {
+                        setViewMode(viewMode === 'board' ? 'analytics' : 'board');
+                        setShowProjectSettings(false);
+                      }}
+                      className="settings-item"
+                    >
+                      {viewMode === 'board' ? <BarChart3 size={18} /> : <Layout size={18} />}
+                      <span>{viewMode === 'board' ? 'Ver Estadísticas' : 'Ver Tablero'}</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowArchivedTasks(true);
+                        setShowProjectSettings(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <Archive size={18} />
+                      <span>Tareas Archivadas</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowEditProjectModal(true);
+                        setShowProjectSettings(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <Edit size={18} />
+                      <span>Editar Proyecto</span>
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowManageMembersModal(true);
+                        setShowProjectSettings(false);
+                      }}
+                      className="settings-item"
+                    >
+                      <Users size={18} />
+                      <span>Gestionar Miembros</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </header>
 
@@ -390,6 +451,22 @@ export default function Board() {
         <ArchivedTasksModal
           projectId={id}
           onClose={() => setShowArchivedTasks(false)}
+        />
+      )}
+
+      {showEditProjectModal && currentProject && (
+        <EditProjectModal
+          project={currentProject}
+          isOpen={showEditProjectModal}
+          onClose={() => setShowEditProjectModal(false)}
+        />
+      )}
+
+      {showManageMembersModal && currentProject && (
+        <ManageProjectMembersModal
+          project={currentProject}
+          isOpen={showManageMembersModal}
+          onClose={() => setShowManageMembersModal(false)}
         />
       )}
     </div>

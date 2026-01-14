@@ -97,6 +97,13 @@ export const authAPI = {
   deleteAvatar: () => api.delete('/auth/avatar'),
 };
 
+// Users (alias para facilitar el uso)
+export const usersAPI = {
+  getAll: () => authAPI.getAllUsers(),
+  create: (data) => authAPI.createUser(data),
+  delete: (id) => authAPI.deleteUser(id),
+};
+
 // Projects
 export const projectsAPI = {
   getAll: () => api.get('/projects'),
