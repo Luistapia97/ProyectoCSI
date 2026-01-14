@@ -5,7 +5,7 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
-import upload from '../config/multer.js';
+import uploadTaskAttachment, { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinaryAttachments.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -1171,26 +1171,19 @@ router.post('/:id/remind', protect, async (req, res) => {
 });
 
 // @route   POST /api/tasks/:id/attachments
-// @desc    Subir archivo adjunto a una tarea
+// @desc    Subir archivo adjunto a una tarea (Cloudinary)
 // @access  Private
-router.post('/:id/attachments', protect, upload.single('file'), async (req, res) => {
+router.post('/:id/attachments', protect, uploadTaskAttachment.single('file'), async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
     if (!task) {
-      // Si falla, eliminar el archivo subido
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
 
     // Verificar que el usuario tenga acceso al proyecto
     const project = await Project.findById(task.project);
     if (!project) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
@@ -1198,9 +1191,6 @@ router.post('/:id/attachments', protect, upload.single('file'), async (req, res)
     const isCreator = project.createdBy && project.createdBy.toString() === req.user._id.toString();
 
     if (!isMember && !isCreator) {
-      if (req.file) {
-        fs.unlinkSync(req.file.path);
-      }
       return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
     }
 
@@ -1208,13 +1198,21 @@ router.post('/:id/attachments', protect, upload.single('file'), async (req, res)
       return res.status(400).json({ message: 'No se ha subido ningún archivo' });
     }
 
+    // Subir a Cloudinary
+    const result = await uploadToCloudinary(
+      req.file.buffer,
+      req.file.originalname,
+      req.file.mimetype
+    );
+
     // Crear objeto de archivo adjunto
     const attachment = {
-      filename: req.file.filename,
+      filename: result.public_id,
       originalName: req.file.originalname,
       mimeType: req.file.mimetype,
       size: req.file.size,
-      url: `/uploads/${req.file.filename}`,
+      url: result.secure_url,
+      cloudinaryId: result.public_id,
       uploadedBy: req.user._id,
       uploadedAt: new Date(),
     };
@@ -1231,14 +1229,6 @@ router.post('/:id/attachments', protect, upload.single('file'), async (req, res)
       attachment: task.attachments[task.attachments.length - 1],
     });
   } catch (error) {
-    // Si hay error, eliminar el archivo subido
-    if (req.file) {
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (unlinkError) {
-        console.error('Error eliminando archivo:', unlinkError);
-      }
-    }
     console.error('Error subiendo archivo:', error);
     res.status(500).json({ message: 'Error al subir archivo', error: error.message });
   }
@@ -1281,12 +1271,15 @@ router.delete('/:taskId/attachments/:attachmentId', protect, async (req, res) =>
       return res.status(403).json({ message: 'No tienes permiso para eliminar este archivo' });
     }
 
-    // Eliminar archivo físico del servidor
-    const uploadsDir = path.join(__dirname, '../uploads');
-    const filePath = path.join(uploadsDir, attachment.filename);
-    
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Eliminar archivo de Cloudinary
+    if (attachment.cloudinaryId) {
+      try {
+        await deleteFromCloudinary(attachment.cloudinaryId);
+        console.log('✅ Archivo eliminado de Cloudinary:', attachment.cloudinaryId);
+      } catch (error) {
+        console.error('⚠️ Error eliminando de Cloudinary:', error);
+        // Continuar aunque falle la eliminación en Cloudinary
+      }
     }
 
     // Eliminar del array de attachments

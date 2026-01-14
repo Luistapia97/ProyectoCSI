@@ -134,6 +134,9 @@ const taskSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    cloudinaryId: {
+      type: String,
+    },
     uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
