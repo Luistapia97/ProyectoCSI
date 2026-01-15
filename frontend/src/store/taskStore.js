@@ -26,7 +26,12 @@ const useTaskStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const response = await tasksAPI.getById(id);
-      set({ currentTask: response.data.task, loading: false });
+      set((state) => ({ 
+        currentTask: response.data.task, 
+        // También actualizar la tarea en el array tasks si existe
+        tasks: state.tasks.map(t => t._id === id ? response.data.task : t),
+        loading: false 
+      }));
     } catch (error) {
       console.error('Error obteniendo tarea:', error);
       set({ 

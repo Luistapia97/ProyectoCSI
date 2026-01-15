@@ -10,6 +10,17 @@ import ConfirmDialog from './ConfirmDialog';
 import Toast from './Toast';
 import './CardDetailsModal.css';
 
+// Helper para obtener URL de archivos (soporta Cloudinary y archivos locales antiguos)
+const getAttachmentUrl = (url) => {
+  if (!url) return '';
+  // Si la URL ya es completa (Cloudinary), devolverla tal cual
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+  // Si es una ruta local antigua, agregar el backend URL
+  return `${getBackendURL()}${url}`;
+};
+
 function UserAvatarDetail({ user, className }) {
   const [imageError, setImageError] = useState(false);
   
@@ -96,6 +107,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [newTag, setNewTag] = useState('');
   const [editingTagIndex, setEditingTagIndex] = useState(null);
   const [editingTagText, setEditingTagText] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     fetchComments(task._id);
@@ -383,9 +395,14 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   };
 
   const handleFileUpload = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target?.files?.[0];
     if (!file) return;
 
+    await uploadFile(file);
+    if (e.target) e.target.value = '';
+  };
+
+  const uploadFile = async (file) => {
     // Validar tamaño (10MB máximo)
     if (file.size > 10 * 1024 * 1024) {
       showToast('El archivo es demasiado grande. Máximo 10MB', 'error');
@@ -399,16 +416,54 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     try {
       const response = await tasksAPI.uploadAttachment(task._id, formData);
       if (response.data.attachment) {
-        // Actualizar la tarea localmente
         await fetchTask(task._id);
-        showToast('Archivo subido exitosamente', 'success');
+        showToast(`${file.name} subido exitosamente`, 'success');
       }
     } catch (error) {
       console.error('Error subiendo archivo:', error);
       showToast('Error al subir archivo: ' + (error.response?.data?.message || error.message), 'error');
     } finally {
       setUploading(false);
-      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    
+    if (files.length === 0) return;
+
+    // Subir archivos uno por uno
+    for (const file of files) {
+      await uploadFile(file);
+    }
+  };
+
+  const handlePaste = async (e) => {
+    const items = Array.from(e.clipboardData?.items || []);
+    
+    for (const item of items) {
+      if (item.kind === 'file') {
+        const file = item.getAsFile();
+        if (file) {
+          await uploadFile(file);
+        }
+      }
     }
   };
 
@@ -450,6 +505,10 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '📽️';
     if (mimeType.includes('zip') || mimeType.includes('compressed')) return '🗜️';
     return '📎';
+  };
+
+  const isImageFile = (mimeType) => {
+    return mimeType && mimeType.startsWith('image/');
   };
 
   const isAdmin = user?.role === 'administrador';
@@ -576,50 +635,102 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 {task.attachments && task.attachments.length > 0 ? (
                   task.attachments.map((attachment) => (
                     <div key={attachment._id} className="attachment-item">
-                      <div className="attachment-info">
-                        <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
-                        <div className="attachment-details">
+                      {isImageFile(attachment.mimeType) ? (
+                        <div className="attachment-image-preview">
                           <a
-                            href={`${getBackendURL()}${attachment.url}`}
+                            href={getAttachmentUrl(attachment.url)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="attachment-name"
-                            download
                           >
-                            {attachment.originalName}
+                            <img
+                              src={getAttachmentUrl(attachment.url)}
+                              alt={attachment.originalName}
+                              className="attachment-preview-img"
+                            />
                           </a>
-                          <span className="attachment-meta">
-                            {formatFileSize(attachment.size)} • {format(new Date(attachment.uploadedAt), 'dd MMM yyyy', { locale: es })}
-                            {attachment.uploadedBy && ` • ${attachment.uploadedBy.name}`}
-                          </span>
+                          <div className="attachment-image-info">
+                            <div className="attachment-details">
+                              <span className="attachment-name">{attachment.originalName}</span>
+                              <span className="attachment-meta">
+                                {formatFileSize(attachment.size)} • {format(new Date(attachment.uploadedAt), 'dd MMM yyyy', { locale: es })}
+                                {attachment.uploadedBy && ` • ${attachment.uploadedBy.name}`}
+                              </span>
+                            </div>
+                            <div className="attachment-actions">
+                              <a
+                                href={getAttachmentUrl(attachment.url)}
+                                download
+                                className="btn-icon-tiny"
+                                title="Descargar"
+                              >
+                                <Download size={16} />
+                              </a>
+                              {(attachment.uploadedBy?._id === user?._id || isAdmin) && (
+                                <button
+                                  onClick={() => handleDeleteAttachment(attachment._id)}
+                                  className="btn-icon-tiny btn-danger"
+                                  title="Eliminar"
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="attachment-actions">
-                        <a
-                          href={`${getBackendURL()}${attachment.url}`}
-                          download
-                          className="btn-icon-tiny"
-                          title="Descargar"
-                        >
-                          <Download size={16} />
-                        </a>
-                        {(attachment.uploadedBy?._id === user?._id || isAdmin) && (
-                          <button
-                            onClick={() => handleDeleteAttachment(attachment._id)}
-                            className="btn-icon-tiny btn-danger"
-                            title="Eliminar archivo"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )}
-                      </div>
+                      ) : (
+                        <>
+                          <div className="attachment-info">
+                            <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
+                            <div className="attachment-details">
+                              <a
+                                href={getAttachmentUrl(attachment.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="attachment-name"
+                                download
+                              >
+                                {attachment.originalName}
+                              </a>
+                              <span className="attachment-meta">
+                                {formatFileSize(attachment.size)} • {format(new Date(attachment.uploadedAt), 'dd MMM yyyy', { locale: es })}
+                                {attachment.uploadedBy && ` • ${attachment.uploadedBy.name}`}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="attachment-actions">
+                            <a
+                              href={getAttachmentUrl(attachment.url)}
+                              download
+                              className="btn-icon-tiny"
+                              title="Descargar"
+                            >
+                              <Download size={16} />
+                            </a>
+                            {(attachment.uploadedBy?._id === user?._id || isAdmin) && (
+                              <button
+                                onClick={() => handleDeleteAttachment(attachment._id)}
+                                className="btn-icon-tiny btn-danger"
+                                title="Eliminar archivo"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </div>
                   ))
                 ) : (
                   <p className="no-attachments">No hay archivos adjuntos</p>
                 )}
               </div>
-              <div className="add-attachment">
+              <div 
+                className={`add-attachment ${isDragging ? 'dragging' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onPaste={handlePaste}
+              >
                 <input
                   type="file"
                   ref={(ref) => setFileInputRef(ref)}
@@ -633,9 +744,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   disabled={uploading}
                 >
                   <Paperclip size={18} />
-                  {uploading ? 'Subiendo...' : 'Adjuntar archivo'}
+                  {uploading ? 'Subiendo...' : 'Adjuntar archivo o foto'}
                 </button>
-                <span className="attachment-hint">Máximo 10MB • Imágenes, PDFs, Office, ZIP</span>
+                <span className="attachment-hint">
+                  {isDragging 
+                    ? '📂 Suelta los archivos aquí' 
+                    : 'Arrastra archivos, pega o haz clic • Máximo 10MB'}
+                </span>
               </div>
             </div>
 

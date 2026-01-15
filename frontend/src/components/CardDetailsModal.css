@@ -898,3 +898,104 @@
   color: var(--text-secondary);
   font-style: italic;
 }
+
+/* Previsualización de imágenes */
+.attachment-image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.attachment-preview-img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  background: var(--bg-tertiary);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.attachment-preview-img:hover {
+  transform: scale(1.02);
+}
+
+.attachment-image-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.attachment-image-info .attachment-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.attachment-image-info .attachment-name {
+  font-size: 0.85rem;
+  display: block;
+}
+
+.attachment-image-info .attachment-actions {
+  flex-shrink: 0;
+}
+
+/* Ajuste para items de attachment con imagen */
+.attachment-item:has(.attachment-image-preview) {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1rem;
+}
+/* Drag & Drop Styles */
+.add-attachment {
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-attachment.dragging {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border: 2px dashed var(--primary-color);
+  border-radius: 8px;
+  padding: 20px;
+  transform: scale(1.02);
+}
+
+.add-attachment.dragging::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: linear-gradient(45deg, transparent 49%, var(--primary-color) 49%, var(--primary-color) 51%, transparent 51%);
+  background-size: 20px 20px;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.attachment-hint {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: center;
+  transition: color 0.3s ease;
+}
+
+.add-attachment.dragging .attachment-hint {
+  color: var(--primary-color);
+  font-weight: 600;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
