@@ -105,17 +105,29 @@
 }
 
 .modal-form {
-  padding: 1.5rem;
+  padding: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
   .modal-form {
-    padding: 1rem;
-    gap: 1rem;
+    padding: 1.5rem;
+    gap: 1.25rem;
   }
+}
+
+form {
+  padding: 2rem;
+}
+
+form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+form .form-group:last-child {
+  margin-bottom: 0;
 }
 
 .modal-form .form-group {

@@ -25,9 +25,13 @@ console.log('   ZOHO_REDIRECT_URI:', process.env.ZOHO_REDIRECT_URI || 'No defini
 // Ahora importar módulos que dependen de variables de entorno
 import connectDB from './config/database.js';
 import './config/passport.js'; // Configuración de Passport
+import { setupMongooseLogging } from './middleware/mongooseLogger.js';
 
 // Conectar a la base de datos
 connectDB();
+
+// Activar logging global de Mongoose para detectar modificaciones a proyectos
+setupMongooseLogging();
 
 const app = express();
 const httpServer = createServer(app);
@@ -102,6 +106,18 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+// Middleware global para loguear TODAS las peticiones a rutas de proyectos
+app.use((req, res, next) => {
+  if (req.url.includes('/projects')) {
+    console.log(`\n📡 PETICIÓN: ${req.method} ${req.url}`);
+    console.log(`   Origin: ${req.headers.origin || 'N/A'}`);
+    console.log(`   User-Agent: ${req.headers['user-agent']?.substring(0, 50) || 'N/A'}`);
+    console.log(`   IP: ${req.ip}`);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); // Agregar cookie-parser ANTES de las rutas

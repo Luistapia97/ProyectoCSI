@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { X, UserPlus, Trash2, Shield, User } from 'lucide-react';
 import useProjectStore from '../store/projectStore';
-import { usersAPI } from '../services/api';
-import { getBackendURL } from '../services/api';
+import { usersAPI, projectsAPI, getBackendURL } from '../services/api';
 import './Modal.css';
 
 export default function ManageProjectMembersModal({ project, isOpen, onClose }) {
-  const { updateProject } = useProjectStore();
+  const { updateProject, setCurrentProject } = useProjectStore();
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedRole, setSelectedRole] = useState('miembro');
@@ -16,6 +15,11 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
 
   useEffect(() => {
     if (isOpen && project) {
+      console.log('🔍 Modal abierto - Proyecto recibido:', {
+        name: project.name,
+        membersCount: project.members?.length,
+        members: project.members
+      });
       fetchAvailableUsers();
     }
   }, [isOpen, project]);
@@ -47,22 +51,49 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
     setError('');
 
     try {
-      const updatedMembers = [
-        ...project.members,
-        { user: selectedUserId, role: selectedRole }
-      ];
+      // Buscar el email del usuario seleccionado
+      const selectedUser = availableUsers.find(u => u._id === selectedUserId);
+      if (!selectedUser) {
+        setError('Usuario no encontrado');
+        setLoading(false);
+        return;
+      }
 
-      const result = await updateProject(project._id, { members: updatedMembers });
+      console.log('🔄 Agregando miembro:', {
+        projectId: project._id,
+        email: selectedUser.email,
+        role: selectedRole === 'lider' ? 'leader' : 'member'
+      });
 
-      if (result.success) {
+      // Usar projectsAPI en lugar de fetch directo
+      const response = await projectsAPI.addMember(project._id, {
+        email: selectedUser.email,
+        role: selectedRole === 'lider' ? 'leader' : 'member'
+      });
+
+      console.log('📡 Respuesta del servidor:', response);
+      console.log('📡 Respuesta data:', response.data);
+
+      if (response.data.success && response.data.project) {
+        console.log('✅ Miembro agregado exitosamente');
+        console.log('✅ Proyecto actualizado:', response.data.project);
+        console.log('✅ Número de miembros en el proyecto actualizado:', response.data.project.members?.length);
+        // Actualizar directamente en el store
+        setCurrentProject(response.data.project);
+        console.log('✅ setCurrentProject llamado');
         setSelectedUserId('');
         setSelectedRole('miembro');
-        fetchAvailableUsers();
+        await fetchAvailableUsers();
+        setError('');
       } else {
-        setError(result.error || 'Error al agregar miembro');
+        console.error('❌ Error en la respuesta:', response.data);
+        setError(response.data.message || 'Error al agregar miembro al proyecto');
       }
     } catch (error) {
-      setError('Error al agregar miembro');
+      console.error('❌ Error completo:', error);
+      console.error('❌ Error response:', error.response);
+      console.error('❌ Error response data:', error.response?.data);
+      setError(`Error al agregar miembro: ${error.response?.data?.message || error.message}`);
     }
     
     setLoading(false);
@@ -77,16 +108,19 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
     setError('');
 
     try {
-      const updatedMembers = project.members.filter(m => m.user._id !== userId);
-      const result = await updateProject(project._id, { members: updatedMembers });
-
-      if (result.success) {
-        fetchAvailableUsers();
+      const response = await projectsAPI.removeMember(project._id, userId);
+      
+      if (response.data.success && response.data.project) {
+        // Actualizar directamente en el store
+        setCurrentProject(response.data.project);
+        await fetchAvailableUsers();
+        setError('');
       } else {
-        setError(result.error || 'Error al eliminar miembro');
+        setError(response.data.message || 'Error al eliminar miembro');
       }
     } catch (error) {
-      setError('Error al eliminar miembro');
+      console.error('❌ Error eliminando miembro:', error);
+      setError(`Error al eliminar miembro: ${error.response?.data?.message || error.message}`);
     }
     
     setLoading(false);

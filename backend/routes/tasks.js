@@ -549,7 +549,10 @@ router.put('/:id', protect, async (req, res) => {
               archived: { $ne: true }
             });
 
-            // Si no tiene otras tareas, remover del proyecto
+            // NOTA: Se removió la lógica de eliminación automática de miembros sin tareas
+            // Los miembros ahora deben ser gestionados manualmente por los administradores
+            // Comentado para evitar que se eliminen miembros agregados manualmente
+            /*
             if (otherTasks === 0) {
               const projectDoc = await Project.findById(task.project);
               const isOwner = projectDoc.owner.toString() === userIdStr;
@@ -563,6 +566,7 @@ router.put('/:id', protect, async (req, res) => {
                 });
               }
             }
+            */
           }
         }
 
@@ -734,7 +738,9 @@ router.delete('/:id', protect, async (req, res) => {
           archived: { $ne: true }
         });
 
-        // Si no tiene otras tareas, remover del proyecto
+        // NOTA: Se removió la lógica de eliminación automática de miembros sin tareas
+        // Los miembros ahora deben ser gestionados manualmente por los administradores
+        /*
         if (otherTasks === 0) {
           const projectDoc = await Project.findById(projectId);
           if (projectDoc) {
@@ -750,6 +756,7 @@ router.delete('/:id', protect, async (req, res) => {
             }
           }
         }
+        */
       }
     }
 

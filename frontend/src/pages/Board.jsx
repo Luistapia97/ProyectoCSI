@@ -154,14 +154,23 @@ export default function Board() {
       const handleTasksUpdated = () => fetchTasks(id);
       window.addEventListener('tasksUpdated', handleTasksUpdated);
 
+      // Cerrar menú de configuración al hacer clic fuera
+      const handleClickOutside = (event) => {
+        if (showProjectSettings && !event.target.closest('.settings-menu-container')) {
+          setShowProjectSettings(false);
+        }
+      };
+      document.addEventListener('click', handleClickOutside);
+
       return () => {
         socketService.off('task-created');
         socketService.off('task-updated');
         socketService.off('task-moved');
         window.removeEventListener('tasksUpdated', handleTasksUpdated);
+        document.removeEventListener('click', handleClickOutside);
       };
     }
-  }, [id, fetchProject, fetchTasks]);
+  }, [id, fetchProject, fetchTasks, showProjectSettings]);
 
   // Detectar si hay una tarea en la URL (desde notificaciones)
   useEffect(() => {
@@ -299,10 +308,8 @@ export default function Board() {
               </button>
               
               {showProjectSettings && (
-                <>
-                  <div className="settings-backdrop" onClick={() => setShowProjectSettings(false)}></div>
-                  <div className="settings-dropdown">
-                    <button 
+                <div className="settings-dropdown">
+                  <button 
                       onClick={() => {
                         setViewMode(viewMode === 'board' ? 'analytics' : 'board');
                         setShowProjectSettings(false);
@@ -322,12 +329,13 @@ export default function Board() {
                       <Archive size={18} />
                       <span>Tareas Archivadas</span>
                     </button>
+                    <div className="settings-divider"></div>
                     <button 
                       onClick={() => {
                         setShowEditProjectModal(true);
                         setShowProjectSettings(false);
                       }}
-                      className="settings-item"
+                      className="settings-item settings-highlight"
                     >
                       <Edit size={18} />
                       <span>Editar Proyecto</span>
@@ -337,13 +345,12 @@ export default function Board() {
                         setShowManageMembersModal(true);
                         setShowProjectSettings(false);
                       }}
-                      className="settings-item"
+                      className="settings-item settings-highlight"
                     >
                       <Users size={18} />
                       <span>Gestionar Miembros</span>
                     </button>
                   </div>
-                </>
               )}
             </div>
           )}

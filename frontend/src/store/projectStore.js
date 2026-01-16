@@ -72,6 +72,16 @@ const useProjectStore = create((set, get) => ({
     }
   },
 
+  // Actualizar proyecto localmente con datos ya obtenidos del servidor
+  setCurrentProject: (project) => {
+    set((state) => ({
+      projects: state.projects.map((p) =>
+        p._id === project._id ? project : p
+      ),
+      currentProject: project,
+    }));
+  },
+
   deleteProject: async (id) => {
     try {
       await projectsAPI.delete(id);

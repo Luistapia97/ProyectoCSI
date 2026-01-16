@@ -12,6 +12,23 @@ const router = express.Router();
 // @access  Private
 router.get('/', protect, async (req, res) => {
   try {
+    console.log('🔍 GET /projects - Usuario:', req.user.email, req.user._id.toString());
+    
+    // Primero, consultar directamente de la DB SIN populate para ver miembros crudos
+    const rawProjects = await Project.find({
+      $or: [
+        { owner: req.user._id },
+        { 'members.user': req.user._id },
+      ],
+      archived: false,
+      name: 'Plan Marketing' // Solo el proyecto problemático
+    }).lean();
+    
+    if (rawProjects.length > 0) {
+      console.log('🔬 DATOS CRUDOS de MongoDB - Plan Marketing members count:', rawProjects[0].members.length);
+      console.log('🔬 DATOS CRUDOS de MongoDB - Plan Marketing members:', JSON.stringify(rawProjects[0].members, null, 2));
+    }
+    
     const projects = await Project.find({
       $or: [
         { owner: req.user._id },
@@ -26,52 +43,14 @@ router.get('/', protect, async (req, res) => {
     // Agregar estadísticas de tareas a cada proyecto
     const projectsWithStats = await Promise.all(
       projects.map(async (project) => {
-        // Limpiar usuarios que ya no tienen tareas asignadas
+        // NOTA: Se removió la lógica de limpieza automática de miembros sin tareas
+        // Los miembros ahora deben ser gestionados manualmente por los administradores
+        
         const tasks = await Task.find({ 
           project: project._id,
           archived: { $ne: true }
         });
         
-        // Obtener IDs de todos los usuarios asignados a tareas activas
-        const usersWithTasks = new Set();
-        tasks.forEach(task => {
-          if (task.assignedTo && task.assignedTo.length > 0) {
-            task.assignedTo.forEach(userId => {
-              usersWithTasks.add(userId.toString());
-            });
-          }
-        });
-
-        // Remover miembros que no tienen tareas y no son dueños
-        const membersToRemove = [];
-        project.members.forEach(member => {
-          const memberIdStr = member.user._id.toString();
-          const isOwner = project.owner._id.toString() === memberIdStr;
-          const hasTasks = usersWithTasks.has(memberIdStr);
-          
-          if (!isOwner && !hasTasks) {
-            membersToRemove.push(member.user._id);
-          }
-        });
-
-        // Si hay miembros para remover, actualizar el proyecto
-        if (membersToRemove.length > 0) {
-          await Project.findByIdAndUpdate(project._id, {
-            $pull: {
-              members: { user: { $in: membersToRemove } }
-            }
-          });
-          
-          // Recargar el proyecto actualizado
-          const updatedProject = await Project.findById(project._id)
-            .populate('owner', 'name email avatar')
-            .populate('members.user', 'name email avatar');
-          
-          project.members = updatedProject.members;
-          
-          console.log(`🧹 Limpieza: Removidos ${membersToRemove.length} usuarios sin tareas del proyecto ${project.name}`);
-        }
-
         const totalTasks = tasks.length;
         const completedTasks = tasks.filter(task => task.completed).length;
         
@@ -100,7 +79,13 @@ router.get('/', protect, async (req, res) => {
         
         const progressPercentage = totalTasks > 0 ? Math.min(Math.round(totalProgress / totalTasks), 100) : 0;
         
-        return {
+        // Debug: verificar miembros ANTES de toObject()
+        if (project.name === 'Plan Marketing') {
+          console.log('📊 ANTES toObject - Plan Marketing members count:', project.members.length);
+          console.log('📊 ANTES toObject - Plan Marketing members:', JSON.stringify(project.members, null, 2));
+        }
+        
+        const projectObj = {
           ...project.toObject(),
           stats: {
             totalTasks,
@@ -108,6 +93,13 @@ router.get('/', protect, async (req, res) => {
             progressPercentage,
           },
         };
+        
+        // Debug: verificar miembros DESPUÉS de toObject()
+        if (project.name === 'Plan Marketing') {
+          console.log('📊 DESPUÉS toObject - Plan Marketing members:', JSON.stringify(projectObj.members, null, 2));
+        }
+        
+        return projectObj;
       })
     );
 
@@ -348,46 +340,128 @@ router.patch('/:id/archive', protect, async (req, res) => {
 // @access  Private
 router.post('/:id/members', protect, async (req, res) => {
   try {
+    console.log('🔵 POST /api/projects/:id/members - Iniciando...');
+    console.log('📝 Body recibido:', req.body);
+    console.log('👤 Usuario que hace la petición:', req.user._id);
+    
     const { email, role } = req.body;
     const project = await Project.findById(req.params.id);
 
     if (!project) {
+      console.log('❌ Proyecto no encontrado:', req.params.id);
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Verificar permisos
-    const isOwner = project.owner.toString() === req.user._id.toString();
+    console.log('✅ Proyecto encontrado:', project.name);
+    console.log('👥 Miembros actuales:', project.members.length);
+
+    // Verificar permisos - soportar tanto owner como createdBy
+    const projectOwnerId = project.owner || project.createdBy;
+    const isOwner = projectOwnerId && projectOwnerId.toString() === req.user._id.toString();
     const member = project.members.find(m => m.user.toString() === req.user._id.toString());
 
+    console.log('🔐 Verificación de permisos:', {
+      projectOwnerId: projectOwnerId?.toString(),
+      userId: req.user._id.toString(),
+      isOwner,
+      memberRole: member?.role
+    });
+
     if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
-      return res.status(403).json({ message: 'No tienes permisos para agregar miembros' });
+      console.log('❌ Sin permisos para agregar miembros');
+      return res.status(403).json({ 
+        message: 'No tienes permisos para agregar miembros',
+        debug: {
+          projectOwnerId: projectOwnerId?.toString(),
+          userId: req.user._id.toString(),
+          isOwner,
+          memberRole: member?.role
+        }
+      });
     }
 
     // Buscar usuario por email
     const userToAdd = await User.findOne({ email });
 
     if (!userToAdd) {
+      console.log('❌ Usuario no encontrado con email:', email);
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
+
+    console.log('✅ Usuario encontrado:', userToAdd.name, userToAdd.email);
 
     // Verificar si ya es miembro
     const alreadyMember = project.members.some(m => m.user.toString() === userToAdd._id.toString());
 
     if (alreadyMember) {
+      console.log('⚠️ El usuario ya es miembro');
       return res.status(400).json({ message: 'El usuario ya es miembro del proyecto' });
     }
 
     // Agregar miembro
+    console.log('➕ Agregando miembro con rol:', role || 'member');
     project.members.push({
       user: userToAdd._id,
       role: role || 'member',
     });
 
+    console.log('👥 Members array antes de guardar:', JSON.stringify(project.members, null, 2));
     await project.save();
+    console.log('💾 Proyecto guardado');
+
+    // Verificar que se guardó correctamente
+    const savedProject = await Project.findById(project._id);
+    console.log('🔍 Members después de guardar:', JSON.stringify(savedProject.members, null, 2));
 
     // Agregar proyecto al usuario
     await User.findByIdAndUpdate(userToAdd._id, {
       $push: { projects: project._id },
+    });
+    console.log('💾 Usuario actualizado');
+
+    const updatedProject = await Project.findById(project._id)
+      .populate('owner', 'name email avatar')
+      .populate('members.user', 'name email avatar');
+
+    console.log('✅ Miembro agregado exitosamente');
+    res.json({ success: true, project: updatedProject });
+  } catch (error) {
+    console.error('❌ Error agregando miembro:', error);
+    res.status(500).json({ message: 'Error al agregar miembro', error: error.message });
+  }
+});
+// @route   DELETE /api/projects/:id/members/:userId
+// @desc    Eliminar miembro de un proyecto
+// @access  Private
+router.delete('/:id/members/:userId', protect, async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    // Verificar permisos - soportar tanto owner como createdBy
+    const projectOwnerId = project.owner || project.createdBy;
+    const isOwner = projectOwnerId && projectOwnerId.toString() === req.user._id.toString();
+    const member = project.members.find(m => m.user.toString() === req.user._id.toString());
+
+    if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
+      return res.status(403).json({ message: 'No tienes permisos para eliminar miembros' });
+    }
+
+    // No permitir eliminar al owner
+    if (req.params.userId === projectOwnerId?.toString()) {
+      return res.status(400).json({ message: 'No puedes eliminar al propietario del proyecto' });
+    }
+
+    // Eliminar miembro
+    project.members = project.members.filter(m => m.user.toString() !== req.params.userId);
+    await project.save();
+
+    // Eliminar proyecto del usuario
+    await User.findByIdAndUpdate(req.params.userId, {
+      $pull: { projects: project._id },
     });
 
     const updatedProject = await Project.findById(project._id)
@@ -396,9 +470,8 @@ router.post('/:id/members', protect, async (req, res) => {
 
     res.json({ success: true, project: updatedProject });
   } catch (error) {
-    console.error('Error agregando miembro:', error);
-    res.status(500).json({ message: 'Error al agregar miembro', error: error.message });
+    console.error('Error eliminando miembro:', error);
+    res.status(500).json({ message: 'Error al eliminar miembro', error: error.message });
   }
 });
-
 export default router;

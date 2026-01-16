@@ -45,13 +45,22 @@ export const uploadToCloudinary = (fileBuffer, originalName, mimeType) => {
     // Generar un nombre único
     const filename = `${Date.now()}-${originalName.replace(/\s+/g, '-')}`;
 
+    // Opciones base para upload
+    const uploadOptions = {
+      folder: 'nexus/task-attachments',
+      resource_type: resourceType,
+      public_id: filename,
+    };
+
+    // Para PDFs, agregar tipo de acceso para visualización en navegador
+    if (mimeType === 'application/pdf') {
+      uploadOptions.type = 'upload';
+      uploadOptions.access_mode = 'public';
+    }
+
     // Crear stream desde el buffer
     const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: 'nexus/task-attachments',
-        resource_type: resourceType,
-        public_id: filename,
-      },
+      uploadOptions,
       (error, result) => {
         if (error) {
           reject(error);

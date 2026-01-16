@@ -90,12 +90,12 @@ export default function EditProjectModal({ project, isOpen, onClose }) {
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className="error-message" style={{ margin: '0 2rem' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={{ padding: '1.5rem 2rem 2rem' }}>
           <div className="form-group">
             <label htmlFor="name">Nombre del Proyecto *</label>
             <input

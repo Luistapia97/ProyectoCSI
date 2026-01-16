@@ -15,7 +15,7 @@
   box-shadow: var(--shadow);
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 40;
 }
 
 @media (max-width: 1024px) {
@@ -416,6 +416,98 @@
   min-height: 150px;
 }
 
+/* Menú de Configuración del Proyecto */
+.settings-menu-container {
+  position: relative;
+}
+
+.btn-settings {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.btn-settings:hover {
+  background: var(--hover-bg);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.settings-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  min-width: 220px;
+  overflow: hidden;
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-item {
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+  font-size: 14px;
+  text-align: left;
+}
+
+.settings-item:hover {
+  background: var(--hover-bg);
+}
+
+.settings-item.settings-highlight {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.settings-item.settings-highlight:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.settings-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
 .loading-container {
   min-height: 100vh;
   display: flex;
@@ -607,4 +699,122 @@
 
 [data-theme="dark"] .empty-column {
   color: #64748b;
+}
+
+/* Project Settings Menu */
+.project-settings-container {
+  position: relative;
+}
+
+.btn-settings {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.btn-settings:hover {
+  background: var(--bg-secondary);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+  transform: rotate(90deg);
+}
+
+.project-settings-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  min-width: 220px;
+  overflow: hidden;
+  z-index: 9999;
+  animation: menuSlideDown 0.2s ease-out;
+}
+
+@keyframes menuSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.settings-menu-item:hover {
+  background: var(--bg-primary);
+  color: var(--primary-color);
+}
+
+.settings-menu-item:hover svg {
+  transform: translateX(2px);
+}
+
+.settings-menu-item svg {
+  color: var(--text-secondary);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.settings-menu-item:hover svg {
+  color: var(--primary-color);
+}
+
+.settings-menu-item + .settings-menu-item {
+  border-top: 1px solid var(--border-color);
+}
+
+/* Dark mode para menú de configuración */
+[data-theme="dark"] .btn-settings {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .btn-settings:hover {
+  background: #334155;
+  border-color: #667eea;
+}
+
+[data-theme="dark"] .project-settings-menu {
+  background: #1e293b;
+  border-color: #334155;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .settings-menu-item {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .settings-menu-item:hover {
+  background: #334155;
+  color: #667eea;
+}
+
+[data-theme="dark"] .settings-menu-item + .settings-menu-item {
+  border-top-color: #334155;
 }

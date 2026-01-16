@@ -11,12 +11,20 @@ import Toast from './Toast';
 import './CardDetailsModal.css';
 
 // Helper para obtener URL de archivos (soporta Cloudinary y archivos locales antiguos)
-const getAttachmentUrl = (url) => {
+const getAttachmentUrl = (url, fileName = '') => {
   if (!url) return '';
-  // Si la URL ya es completa (Cloudinary), devolverla tal cual
+  
+  // Si la URL ya es completa (Cloudinary o externa)
   if (url.startsWith('http://') || url.startsWith('https://')) {
+    // Si es un PDF de Cloudinary, asegurar que tenga los parámetros correctos
+    if (url.includes('cloudinary.com') && (fileName.toLowerCase().endsWith('.pdf') || url.toLowerCase().includes('.pdf'))) {
+      // Si no tiene fl_attachment, no agregarlo (queremos visualización en navegador)
+      // Cloudinary debe servir PDFs directamente con la URL que devuelve
+      return url;
+    }
     return url;
   }
+  
   // Si es una ruta local antigua, agregar el backend URL
   return `${getBackendURL()}${url}`;
 };
@@ -638,12 +646,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       {isImageFile(attachment.mimeType) ? (
                         <div className="attachment-image-preview">
                           <a
-                            href={getAttachmentUrl(attachment.url)}
+                            href={getAttachmentUrl(attachment.url, attachment.originalName)}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
                             <img
-                              src={getAttachmentUrl(attachment.url)}
+                              src={getAttachmentUrl(attachment.url, attachment.originalName)}
                               alt={attachment.originalName}
                               className="attachment-preview-img"
                             />
@@ -658,7 +666,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                             </div>
                             <div className="attachment-actions">
                               <a
-                                href={getAttachmentUrl(attachment.url)}
+                                href={getAttachmentUrl(attachment.url, attachment.originalName)}
                                 download
                                 className="btn-icon-tiny"
                                 title="Descargar"
@@ -683,7 +691,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                             <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
                             <div className="attachment-details">
                               <a
-                                href={getAttachmentUrl(attachment.url)}
+                                href={getAttachmentUrl(attachment.url, attachment.originalName)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="attachment-name"
@@ -699,7 +707,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                           </div>
                           <div className="attachment-actions">
                             <a
-                              href={getAttachmentUrl(attachment.url)}
+                              href={getAttachmentUrl(attachment.url, attachment.originalName)}
                               download
                               className="btn-icon-tiny"
                               title="Descargar"

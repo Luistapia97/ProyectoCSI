@@ -114,6 +114,7 @@ export const projectsAPI = {
   delete: (id) => api.delete(`/projects/${id}`),
   archive: (id, archived) => api.patch(`/projects/${id}/archive`, { archived }),
   addMember: (id, data) => api.post(`/projects/${id}/members`, data),
+  removeMember: (id, userId) => api.delete(`/projects/${id}/members/${userId}`),
 };
 
 // Tasks
