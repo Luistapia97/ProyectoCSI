@@ -634,14 +634,16 @@
   right: 0;
   bottom: 0;
   z-index: 998;
-  background: transparent;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  pointer-events: all;
 }
 
 .settings-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 0.5rem);
   right: 0;
-  background: var(--bg-secondary);
+  background: white !important;
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   box-shadow: var(--shadow-lg);
@@ -679,8 +681,8 @@
 }
 
 .settings-item:hover {
-  background: var(--bg-primary);
-  color: #667eea;
+  background: rgba(102, 126, 234, 0.1) !important;
+  color: #667eea !important;
 }
 
 .settings-item svg {
