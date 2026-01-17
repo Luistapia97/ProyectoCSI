@@ -421,6 +421,16 @@
   position: relative;
 }
 
+.settings-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 998;
+  background: transparent;
+}
+
 .btn-settings {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -733,14 +743,14 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-lg);
+  padding: 0.5rem;
   min-width: 220px;
-  overflow: hidden;
-  z-index: 9999;
-  animation: menuSlideDown 0.2s ease-out;
+  z-index: 999;
+  animation: slideDown 0.2s ease-out;
 }
 
-@keyframes menuSlideDown {
+@keyframes slideDown {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -752,41 +762,33 @@
 }
 
 .settings-menu-item {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1rem;
-  border: none;
+  gap: 12px;
+  padding: 0.75rem 1rem;
   background: none;
-  width: 100%;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s;
+  border: none;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  text-align: left;
 }
 
 .settings-menu-item:hover {
   background: var(--bg-primary);
-  color: var(--primary-color);
-}
-
-.settings-menu-item:hover svg {
-  transform: translateX(2px);
+  color: #667eea;
 }
 
 .settings-menu-item svg {
-  color: var(--text-secondary);
-  transition: all 0.2s;
   flex-shrink: 0;
+  color: var(--text-secondary);
 }
 
 .settings-menu-item:hover svg {
-  color: var(--primary-color);
-}
-
-.settings-menu-item + .settings-menu-item {
-  border-top: 1px solid var(--border-color);
+  color: #667eea;
 }
 
 /* Dark mode para menú de configuración */

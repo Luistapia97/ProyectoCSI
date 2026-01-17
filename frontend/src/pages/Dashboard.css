@@ -634,6 +634,7 @@
   right: 0;
   bottom: 0;
   z-index: 998;
+  background: transparent;
 }
 
 .settings-dropdown {
