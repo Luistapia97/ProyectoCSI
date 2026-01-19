@@ -16,17 +16,21 @@ const getAttachmentUrl = (url, fileName = '') => {
   
   // Si la URL ya es completa (Cloudinary o externa)
   if (url.startsWith('http://') || url.startsWith('https://')) {
-    // Si es un PDF de Cloudinary, asegurar que tenga los parámetros correctos
-    if (url.includes('cloudinary.com') && (fileName.toLowerCase().endsWith('.pdf') || url.toLowerCase().includes('.pdf'))) {
-      // Si no tiene fl_attachment, no agregarlo (queremos visualización en navegador)
-      // Cloudinary debe servir PDFs directamente con la URL que devuelve
-      return url;
-    }
-    return url;
+    return url; // Devolver URL tal cual, ya sea firmada o pública
   }
   
   // Si es una ruta local antigua, agregar el backend URL
   return `${getBackendURL()}${url}`;
+};
+
+// Función para extraer cloudinaryId de una URL
+const extractCloudinaryId = (url) => {
+  if (!url || !url.includes('cloudinary.com')) return null;
+  
+  // Extraer el public_id de la URL
+  // Formato: https://res.cloudinary.com/{cloud_name}/raw/upload/v1/{folder}/{filename}
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\?|$)/);
+  return match ? match[1] : null;
 };
 
 function UserAvatarDetail({ user, className }) {
@@ -116,6 +120,65 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [editingTagIndex, setEditingTagIndex] = useState(null);
   const [editingTagText, setEditingTagText] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [signedUrls, setSignedUrls] = useState({}); // Almacenar URLs firmadas
+
+  // Función para obtener URL firmada de Cloudinary
+  const getSignedUrl = async (cloudinaryId) => {
+    try {
+      console.log('🔍 Frontend - Obteniendo URL para cloudinaryId:', cloudinaryId);
+      // Obtener token del localStorage
+      const token = localStorage.getItem('token');
+      // Usar el proxy del backend con el token
+      const proxyUrl = `${getBackendURL()}/api/tasks/attachment-proxy/${encodeURIComponent(cloudinaryId)}?token=${token}`;
+      console.log('📤 Frontend - URL proxy generada:', proxyUrl);
+      return proxyUrl;
+    } catch (error) {
+      console.error('Error obteniendo URL firmada:', error);
+      return null;
+    }
+  };
+
+  // Cargar URLs firmadas para archivos PDF de Cloudinary
+  useEffect(() => {
+    const loadSignedUrls = async () => {
+      if (!task.attachments || task.attachments.length === 0) return;
+      
+      const urlsToLoad = {};
+      for (const attachment of task.attachments) {
+        // Para archivos NO imagen de Cloudinary, usar proxy con cloudinaryId
+        if (attachment.cloudinaryId && !isImageFile(attachment.mimeType)) {
+          console.log('🔍 Creando proxy para:', attachment.cloudinaryId);
+          const signedUrl = await getSignedUrl(attachment.cloudinaryId);
+          if (signedUrl) {
+            urlsToLoad[attachment._id] = signedUrl;
+          }
+        }
+      }
+      setSignedUrls(urlsToLoad);
+    };
+
+    loadSignedUrls();
+  }, [task.attachments]);
+
+  // Función para obtener URL final del attachment (firmada o normal)
+  const getFinalAttachmentUrl = (attachment) => {
+    // Si es imagen, usar URL original directamente
+    if (isImageFile(attachment.mimeType)) {
+      return getAttachmentUrl(attachment.url, attachment.originalName);
+    }
+    
+    // Para archivos antiguos de Cloudinary que no funcionan con proxy, 
+    // usar URL original (aunque pueda dar error al visualizar, permite descargar)
+    if (attachment.url && attachment.url.includes('cloudinary.com')) {
+      return attachment.url;
+    }
+    
+    // Para otros archivos, usar URL firmada si está disponible
+    if (signedUrls[attachment._id]) {
+      return signedUrls[attachment._id];
+    }
+    return getAttachmentUrl(attachment.url, attachment.originalName);
+  };
 
   useEffect(() => {
     fetchComments(task._id);
@@ -646,12 +709,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       {isImageFile(attachment.mimeType) ? (
                         <div className="attachment-image-preview">
                           <a
-                            href={getAttachmentUrl(attachment.url, attachment.originalName)}
+                            href={getFinalAttachmentUrl(attachment)}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
                             <img
-                              src={getAttachmentUrl(attachment.url, attachment.originalName)}
+                              src={getFinalAttachmentUrl(attachment)}
                               alt={attachment.originalName}
                               className="attachment-preview-img"
                             />
@@ -666,7 +729,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                             </div>
                             <div className="attachment-actions">
                               <a
-                                href={getAttachmentUrl(attachment.url, attachment.originalName)}
+                                href={getFinalAttachmentUrl(attachment)}
                                 download
                                 className="btn-icon-tiny"
                                 title="Descargar"
@@ -691,7 +754,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                             <span className="attachment-icon">{getFileIcon(attachment.mimeType)}</span>
                             <div className="attachment-details">
                               <a
-                                href={getAttachmentUrl(attachment.url, attachment.originalName)}
+                                href={getFinalAttachmentUrl(attachment)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="attachment-name"
@@ -707,7 +770,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                           </div>
                           <div className="attachment-actions">
                             <a
-                              href={getAttachmentUrl(attachment.url, attachment.originalName)}
+                              href={getFinalAttachmentUrl(attachment)}
                               download
                               className="btn-icon-tiny"
                               title="Descargar"

@@ -307,6 +307,13 @@
   scroll-snap-align: start;
 }
 
+/* Columna de completados más ancha para layout horizontal */
+.board-column:last-child {
+  min-width: 600px;
+  max-width: 100%;
+  flex: 1;
+}
+
 .column-header {
   display: flex;
   flex-direction: column;
@@ -394,6 +401,44 @@
   border-radius: 0.75rem;
   min-height: 200px;
   transition: all 0.2s;
+}
+
+/* Columna de completados con diseño horizontal */
+.board-column:last-child .column-content {
+  flex-direction: row;
+  flex-wrap: wrap;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: auto;
+  max-height: none;
+  padding: 1rem;
+  gap: 1rem;
+  align-content: flex-start;
+}
+
+.board-column:last-child .column-content::-webkit-scrollbar {
+  height: 8px;
+}
+
+.board-column:last-child .column-content::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 10px;
+}
+
+.board-column:last-child .column-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 10px;
+}
+
+.board-column:last-child .column-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Tarjetas en columna completados mantienen su ancho */
+.board-column:last-child .task-card {
+  min-width: 280px;
+  max-width: 280px;
+  flex-shrink: 0;
 }
 
 .column-content.dragging-over {

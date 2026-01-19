@@ -5,7 +5,7 @@ import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
-import uploadTaskAttachment, { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinaryAttachments.js';
+import uploadTaskAttachment, { uploadToCloudinary, deleteFromCloudinary, cloudinary } from '../config/cloudinaryAttachments.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -1218,7 +1218,7 @@ router.post('/:id/attachments', protect, uploadTaskAttachment.single('file'), as
       originalName: req.file.originalname,
       mimeType: req.file.mimetype,
       size: req.file.size,
-      url: result.secure_url,
+      url: result.public_url || result.secure_url, // Usar URL pública si está disponible
       cloudinaryId: result.public_id,
       uploadedBy: req.user._id,
       uploadedAt: new Date(),
@@ -1297,6 +1297,87 @@ router.delete('/:taskId/attachments/:attachmentId', protect, async (req, res) =>
   } catch (error) {
     console.error('Error eliminando archivo:', error);
     res.status(500).json({ message: 'Error al eliminar archivo', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/attachment-proxy/:cloudinaryId
+// @desc    Proxy para servir archivos de Cloudinary
+// @access  Private (pero acepta token por query)
+router.get('/attachment-proxy/:cloudinaryId', async (req, res) => {
+  try {
+    // Aceptar token desde query params para PDFs que se abren en nueva pestaña
+    const token = req.query.token || req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ message: 'No autorizado, sin token' });
+    }
+
+    // Verificar token manualmente
+    const jwt = await import('jsonwebtoken');
+    const decoded = jwt.default.verify(token, process.env.JWT_SECRET);
+    
+    const { cloudinaryId } = req.params;
+    
+    console.log('🔍 Intentando obtener archivo:', cloudinaryId);
+    
+    // Usar el SDK de Cloudinary para generar URLs privadas con autenticación
+    const privateUrl = cloudinary.utils.private_download_url(
+      cloudinaryId,
+      'pdf',
+      {
+        resource_type: 'raw',
+        attachment: false
+      }
+    );
+    
+    console.log('📤 URL privada generada:', privateUrl);
+    
+    // Hacer fetch del archivo usando la URL autenticada
+    const response = await fetch(privateUrl);
+    
+    if (!response.ok) {
+      console.error('❌ Error al obtener archivo, status:', response.status);
+      return res.status(404).json({ message: 'Archivo no encontrado' });
+    }
+    
+    console.log('✅ Archivo encontrado, sirviendo...');
+    
+    // Copiar headers importantes
+    res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline');
+    res.setHeader('Cache-Control', 'private, max-age=3600');
+    
+    // Stream el contenido
+    const buffer = await response.arrayBuffer();
+    res.send(Buffer.from(buffer));
+  } catch (error) {
+    console.error('❌ Error en proxy de archivo:', error);
+    res.status(500).json({ message: 'Error al obtener archivo', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/attachment-url/:cloudinaryId
+// @desc    Generar URL firmada para archivo de Cloudinary
+// @access  Private
+router.get('/attachment-url/:cloudinaryId', protect, async (req, res) => {
+  try {
+    const { cloudinaryId } = req.params;
+    
+    // Generar URL firmada válida por 4 horas
+    const timestamp = Math.round(Date.now() / 1000) + (4 * 60 * 60);
+    
+    const signedUrl = cloudinary.url(cloudinaryId, {
+      resource_type: 'raw',
+      secure: true,
+      type: 'authenticated',
+      sign_url: true,
+      expires_at: timestamp
+    });
+    
+    res.json({ url: signedUrl });
+  } catch (error) {
+    console.error('Error generando URL:', error);
+    res.status(500).json({ message: 'Error al generar URL', error: error.message });
   }
 });
 

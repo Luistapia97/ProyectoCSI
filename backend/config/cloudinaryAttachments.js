@@ -52,9 +52,8 @@ export const uploadToCloudinary = (fileBuffer, originalName, mimeType) => {
       public_id: filename,
     };
 
-    // Para PDFs, agregar tipo de acceso para visualización en navegador
-    if (mimeType === 'application/pdf') {
-      uploadOptions.type = 'upload';
+    // Para PDFs y archivos raw, configurar como públicos para permitir acceso directo
+    if (mimeType === 'application/pdf' || resourceType === 'raw') {
       uploadOptions.access_mode = 'public';
     }
 
@@ -65,6 +64,14 @@ export const uploadToCloudinary = (fileBuffer, originalName, mimeType) => {
         if (error) {
           reject(error);
         } else {
+          // Para archivos raw (especialmente PDFs), generar URL pública explícita
+          if (resourceType === 'raw') {
+            result.public_url = cloudinary.url(result.public_id, {
+              resource_type: 'raw',
+              secure: true,
+              type: 'upload'
+            });
+          }
           resolve(result);
         }
       }
@@ -94,6 +101,25 @@ export const deleteFromCloudinary = async (publicId) => {
     console.error('Error eliminando de Cloudinary:', error);
     throw error;
   }
+};
+
+// Función para obtener URL pública correcta (especialmente para PDFs)
+export const getPublicUrl = (publicId, resourceType = 'raw') => {
+  return cloudinary.url(publicId, {
+    resource_type: resourceType,
+    secure: true,
+    sign_url: false, // No firmar la URL para que sea pública
+    type: 'upload'
+  });
+};
+
+// Función para generar URL firmada temporal (válida por 1 hora)
+export const getSignedUrl = (publicId, resourceType = 'raw') => {
+  const timestamp = Math.round(Date.now() / 1000);
+  return cloudinary.utils.private_download_url(publicId, 'pdf', {
+    resource_type: resourceType,
+    expires_at: timestamp + 3600 // 1 hora
+  });
 };
 
 export { cloudinary, uploadTaskAttachment };
