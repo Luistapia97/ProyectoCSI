@@ -125,12 +125,10 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   // Función para obtener URL firmada de Cloudinary
   const getSignedUrl = async (cloudinaryId) => {
     try {
-      console.log('🔍 Frontend - Obteniendo URL para cloudinaryId:', cloudinaryId);
       // Obtener token del localStorage
       const token = localStorage.getItem('token');
       // Usar el proxy del backend con el token
       const proxyUrl = `${getBackendURL()}/api/tasks/attachment-proxy/${encodeURIComponent(cloudinaryId)}?token=${token}`;
-      console.log('📤 Frontend - URL proxy generada:', proxyUrl);
       return proxyUrl;
     } catch (error) {
       console.error('Error obteniendo URL firmada:', error);
@@ -147,7 +145,6 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       for (const attachment of task.attachments) {
         // Para archivos NO imagen de Cloudinary, usar proxy con cloudinaryId
         if (attachment.cloudinaryId && !isImageFile(attachment.mimeType)) {
-          console.log('🔍 Creando proxy para:', attachment.cloudinaryId);
           const signedUrl = await getSignedUrl(attachment.cloudinaryId);
           if (signedUrl) {
             urlsToLoad[attachment._id] = signedUrl;

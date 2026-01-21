@@ -8,36 +8,30 @@ const connectDB = async () => {
 
     console.log(`✓ MongoDB Conectado: ${conn.connection.host}`);
     
-    // Monitorear cambios en la colección projects con Change Streams
-    try {
-      const projectsCollection = conn.connection.collection('projects');
-      const changeStream = projectsCollection.watch([], { fullDocument: 'updateLookup' });
-      
-      changeStream.on('change', (change) => {
-        if (change.documentKey) {
-          console.log('\n🚨 ================================');
-          console.log('🚨 CAMBIO DETECTADO EN PROJECTS');
-          console.log('🚨 ================================');
-          console.log('Tipo:', change.operationType);
-          console.log('Document ID:', change.documentKey._id);
-          console.log('Timestamp:', new Date().toISOString());
-          
-          if (change.operationType === 'update' && change.updateDescription) {
-            console.log('Campos modificados:', JSON.stringify(change.updateDescription.updatedFields, null, 2));
-            console.log('Campos removidos:', JSON.stringify(change.updateDescription.removedFields, null, 2));
+    // Change Stream DESHABILITADO en producción (causa crashes por timeouts de red)
+    // Solo activar en desarrollo para debugging
+    if (process.env.NODE_ENV === 'development' && process.env.ENABLE_CHANGE_STREAM === 'true') {
+      try {
+        const projectsCollection = conn.connection.collection('projects');
+        const changeStream = projectsCollection.watch([], { fullDocument: 'updateLookup' });
+        
+        changeStream.on('change', (change) => {
+          if (change.documentKey) {
+            console.log('\n🚨 CAMBIO DETECTADO EN PROJECTS');
+            console.log('Tipo:', change.operationType);
+            console.log('Document ID:', change.documentKey._id);
           }
-          
-          if (change.fullDocument && change.fullDocument.name === 'Plan Marketing') {
-            console.log('🚨 Plan Marketing - Members count:', change.fullDocument.members?.length);
-            console.log('🚨 Members:', JSON.stringify(change.fullDocument.members, null, 2));
-          }
-          console.log('🚨 ================================\n');
-        }
-      });
-      
-      console.log('✅ Change Stream activado - monitoreando cambios en projects');
-    } catch (streamError) {
-      console.log('⚠️ Change Stream no disponible:', streamError.message);
+        });
+        
+        changeStream.on('error', (error) => {
+          console.error('Error en Change Stream:', error.message);
+          // NO dejar que crashee la app
+        });
+        
+        console.log('✅ Change Stream activado - modo desarrollo');
+      } catch (streamError) {
+        console.log('⚠️ Change Stream no disponible:', streamError.message);
+      }
     }
   } catch (error) {
     console.error('\n========================================');

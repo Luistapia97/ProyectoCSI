@@ -1282,9 +1282,8 @@ router.delete('/:taskId/attachments/:attachmentId', protect, async (req, res) =>
     if (attachment.cloudinaryId) {
       try {
         await deleteFromCloudinary(attachment.cloudinaryId);
-        console.log('✅ Archivo eliminado de Cloudinary:', attachment.cloudinaryId);
       } catch (error) {
-        console.error('⚠️ Error eliminando de Cloudinary:', error);
+        console.error('Error eliminando archivo de Cloudinary:', error.message);
         // Continuar aunque falle la eliminación en Cloudinary
       }
     }
@@ -1318,8 +1317,6 @@ router.get('/attachment-proxy/:cloudinaryId', async (req, res) => {
     
     const { cloudinaryId } = req.params;
     
-    console.log('🔍 Intentando obtener archivo:', cloudinaryId);
-    
     // Usar el SDK de Cloudinary para generar URLs privadas con autenticación
     const privateUrl = cloudinary.utils.private_download_url(
       cloudinaryId,
@@ -1330,17 +1327,13 @@ router.get('/attachment-proxy/:cloudinaryId', async (req, res) => {
       }
     );
     
-    console.log('📤 URL privada generada:', privateUrl);
-    
     // Hacer fetch del archivo usando la URL autenticada
     const response = await fetch(privateUrl);
     
     if (!response.ok) {
-      console.error('❌ Error al obtener archivo, status:', response.status);
+      console.error('Error al obtener archivo de Cloudinary, status:', response.status);
       return res.status(404).json({ message: 'Archivo no encontrado' });
     }
-    
-    console.log('✅ Archivo encontrado, sirviendo...');
     
     // Copiar headers importantes
     res.setHeader('Content-Type', response.headers.get('content-type') || 'application/pdf');
@@ -1351,7 +1344,7 @@ router.get('/attachment-proxy/:cloudinaryId', async (req, res) => {
     const buffer = await response.arrayBuffer();
     res.send(Buffer.from(buffer));
   } catch (error) {
-    console.error('❌ Error en proxy de archivo:', error);
+    console.error('Error en proxy de archivo:', error.message);
     res.status(500).json({ message: 'Error al obtener archivo', error: error.message });
   }
 });
