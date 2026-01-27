@@ -243,3 +243,21 @@
   font-size: 14px;
   line-height: 1.5;
 }
+
+.info-banner {
+  background: #e3f2fd;
+  border: 1px solid #2196f3;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin: 15px 0;
+  color: #1565c0;
+  font-size: 13px;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.info-banner strong {
+  font-weight: 600;
+}

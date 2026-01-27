@@ -56,7 +56,14 @@ function BlockedTaskModal({ taskId, isBlocked, blockedBy, effortMetrics, onClose
   const handleUnblock = async () => {
     setLoading(true);
     try {
-      await api.post(`/tasks/${taskId}/unblock`);
+      const response = await api.post(`/tasks/${taskId}/unblock`);
+      
+      // Mostrar mensaje con informaci\u00f3n de extensi\u00f3n de fecha si aplica
+      if (response.data.dateExtended) {
+        alert(`\u2705 ${response.data.message}\n\n\ud83d\udcc5 Nueva fecha l\u00edmite actualizada.`);
+      } else {
+        alert('\u2705 Tarea desbloqueada exitosamente');
+      }
       
       if (onUpdate) onUpdate();
       onClose();
@@ -98,6 +105,9 @@ function BlockedTaskModal({ taskId, isBlocked, blockedBy, effortMetrics, onClose
               <p className="info-text">
                 ¿Deseas desbloquear esta tarea?
               </p>
+              <div className="info-banner">
+                📅 <strong>Nota:</strong> Si el bloqueo fue mayor a 1 día, la fecha límite se extenderá automáticamente.
+              </div>
               <button 
                 onClick={handleUnblock} 
                 disabled={loading}

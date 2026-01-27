@@ -318,9 +318,9 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // @route   POST /api/tasks
-// @desc    Crear una nueva tarea (solo administradores)
-// @access  Private (Admin only)
-router.post('/', protect, isAdmin, async (req, res) => {
+// @desc    Crear una nueva tarea
+// @access  Private (todos los usuarios)
+router.post('/', protect, async (req, res) => {
   try {
     const {
       title,
@@ -1662,12 +1662,30 @@ router.post('/:id/unblock', protect, async (req, res) => {
     task.effortMetrics.blockedUntil = blockedUntil;
     task.effortMetrics.blockedBy = 'none';
     
+    // Si el bloqueo fue de más de 24 horas (1 día), extender la fecha límite
+    if (duration >= 24 && task.dueDate) {
+      const daysBlocked = Math.ceil(duration / 24);
+      const currentDueDate = new Date(task.dueDate);
+      currentDueDate.setDate(currentDueDate.getDate() + daysBlocked);
+      task.dueDate = currentDueDate;
+      console.log(`📅 Fecha límite extendida por ${daysBlocked} día(s) debido a bloqueo de ${duration.toFixed(2)}h`);
+    }
+    
     await task.save();
     
+    // Calcular si se extendi\u00f3 la fecha
+    const daysBlocked = duration >= 24 ? Math.ceil(duration / 24) : 0;
+    const dateExtended = daysBlocked > 0 && task.dueDate;
+    
     res.json({
-      message: 'Tarea desbloqueada',
+      message: dateExtended 
+        ? `Tarea desbloqueada. Fecha l\u00edmite extendida por ${daysBlocked} d\u00eda(s)` 
+        : 'Tarea desbloqueada',
       blockedHours: task.effortMetrics.blockedHours,
-      duration: duration
+      duration: duration,
+      dateExtended,
+      daysExtended: daysBlocked,
+      newDueDate: task.dueDate
     });
   } catch (error) {
     console.error('Error desbloqueando tarea:', error);
