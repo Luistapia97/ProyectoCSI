@@ -367,15 +367,20 @@ router.post('/:id/members', protect, async (req, res) => {
       memberRole: member?.role
     });
 
-    if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
+    // Solo owner, admin, leader y supervisor pueden agregar miembros
+    const allowedRoles = ['admin', 'leader', 'supervisor'];
+    const hasPermission = isOwner || (member && allowedRoles.includes(member.role));
+
+    if (!hasPermission) {
       console.log('❌ Sin permisos para agregar miembros');
       return res.status(403).json({ 
-        message: 'No tienes permisos para agregar miembros',
+        message: 'No tienes permisos para agregar miembros. Solo owner, admin, leader y supervisor pueden hacerlo.',
         debug: {
           projectOwnerId: projectOwnerId?.toString(),
           userId: req.user._id.toString(),
           isOwner,
-          memberRole: member?.role
+          memberRole: member?.role,
+          allowedRoles
         }
       });
     }
@@ -446,8 +451,21 @@ router.delete('/:id/members/:userId', protect, async (req, res) => {
     const isOwner = projectOwnerId && projectOwnerId.toString() === req.user._id.toString();
     const member = project.members.find(m => m.user.toString() === req.user._id.toString());
 
-    if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
-      return res.status(403).json({ message: 'No tienes permisos para eliminar miembros' });
+    // Solo owner, admin, leader y supervisor pueden eliminar miembros
+    const allowedRoles = ['admin', 'leader', 'supervisor'];
+    const hasPermission = isOwner || (member && allowedRoles.includes(member.role));
+
+    if (!hasPermission) {
+      return res.status(403).json({ 
+        message: 'No tienes permisos para eliminar miembros. Solo owner, admin, leader y supervisor pueden hacerlo.',
+        debug: {
+          projectOwnerId: projectOwnerId?.toString(),
+          userId: req.user._id.toString(),
+          isOwner,
+          memberRole: member?.role,
+          allowedRoles
+        }
+      });
     }
 
     // No permitir eliminar al owner
