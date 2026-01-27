@@ -292,9 +292,27 @@ export default function Board() {
           </div>
 
           <div className="project-members-header">
-            {currentProject.members?.slice(0, 5).map((member) => (
-              <MemberAvatarHeader key={member.user._id} member={member} className="member-avatar-header" />
-            ))}
+            {/* Mostrar supervisor si existe */}
+            {currentProject.members?.find(m => m.role === 'supervisor') && (
+              <div className="supervisor-badge">
+                <Shield size={14} />
+                <span>Supervisor:</span>
+                <MemberAvatarHeader 
+                  member={currentProject.members.find(m => m.role === 'supervisor')} 
+                  className="member-avatar-header supervisor-avatar" 
+                />
+                <span className="supervisor-name">
+                  {currentProject.members.find(m => m.role === 'supervisor').user.name}
+                </span>
+              </div>
+            )}
+            
+            {/* Miembros regulares */}
+            <div className="regular-members">
+              {currentProject.members?.filter(m => m.role !== 'supervisor').slice(0, 5).map((member) => (
+                <MemberAvatarHeader key={member.user._id} member={member} className="member-avatar-header" />
+              ))}
+            </div>
           </div>
 
           {isAdmin && (
@@ -377,18 +395,16 @@ export default function Board() {
                     </span>
                   </div>
                   
-                  {isAdmin && (
-                    <button
-                      className="btn-add-card"
-                      onClick={() => {
-                        setSelectedColumn(column.name);
-                        setShowCreateModal(true);
-                      }}
-                      title="Crear tarea"
-                    >
-                      <Plus size={18} />
-                    </button>
-                  )}
+                  <button
+                    className="btn-add-card"
+                    onClick={() => {
+                      setSelectedColumn(column.name);
+                      setShowCreateModal(true);
+                    }}
+                    title="Crear tarea"
+                  >
+                    <Plus size={18} />
+                  </button>
                 </div>
               </div>
 

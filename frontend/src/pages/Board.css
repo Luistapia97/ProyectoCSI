@@ -221,6 +221,41 @@
 .project-members-header {
   display: flex;
   align-items: center;
+  gap: 1rem;
+}
+
+.supervisor-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.supervisor-badge svg {
+  color: white;
+}
+
+.supervisor-badge .supervisor-avatar {
+  margin: 0;
+  width: 28px;
+  height: 28px;
+  border: 2px solid white;
+}
+
+.supervisor-name {
+  font-weight: 600;
+  color: white;
+}
+
+.regular-members {
+  display: flex;
+  align-items: center;
   gap: -0.5rem;
 }
 
@@ -233,7 +268,7 @@
   margin-left: -8px;
 }
 
-.member-avatar-header:first-child {
+.regular-members .member-avatar-header:first-child {
   margin-left: 0;
 }
 

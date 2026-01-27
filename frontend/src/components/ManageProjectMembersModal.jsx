@@ -214,6 +214,7 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
                 disabled={loading}
               >
                 <option value="miembro">Miembro</option>
+                <option value="supervisor">Supervisor</option>
                 <option value="lider">Líder</option>
               </select>
             </div>
@@ -278,6 +279,9 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
                       >
                         <option value="miembro">
                           Miembro
+                        </option>
+                        <option value="supervisor">
+                          Supervisor
                         </option>
                         <option value="lider">
                           Líder
