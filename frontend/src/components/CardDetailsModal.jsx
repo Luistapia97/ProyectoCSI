@@ -8,6 +8,9 @@ import { authAPI, tasksAPI, getBackendURL } from '../services/api';
 import { useToast } from '../hooks/useToast';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from './Toast';
+import TimeTracker from './TimeTracker';
+import BlockedTaskModal from './BlockedTaskModal';
+import EstimationPicker from './EstimationPicker';
 import './CardDetailsModal.css';
 
 // Helper para obtener URL de archivos (soporta Cloudinary y archivos locales antiguos)
@@ -100,6 +103,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     priority: task.priority,
     dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
     completed: task.completed,
+    estimatedSize: task.effortMetrics?.estimatedSize || 'M',
+    estimatedHours: task.effortMetrics?.estimatedHours || 8,
   });
   const [newSubtask, setNewSubtask] = useState('');
   const [editingSubtaskIndex, setEditingSubtaskIndex] = useState(null);
@@ -121,6 +126,10 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [editingTagText, setEditingTagText] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [signedUrls, setSignedUrls] = useState({}); // Almacenar URLs firmadas
+  const [showBlockModal, setShowBlockModal] = useState(false); // Modal de bloqueo
+
+  // Verificar si la tarea está bloqueada
+  const isBlocked = task.effortMetrics?.blockedBy && task.effortMetrics.blockedBy !== 'none';
 
   // Función para obtener URL firmada de Cloudinary
   const getSignedUrl = async (cloudinaryId) => {
@@ -190,6 +199,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       priority: task.priority,
       dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
       completed: task.completed,
+      estimatedSize: task.effortMetrics?.estimatedSize || 'M',
+      estimatedHours: task.effortMetrics?.estimatedHours || 8,
     });
   }, [task]);
 
@@ -197,6 +208,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     await updateTask(task._id, {
       ...formData,
       dueDate: formData.dueDate || undefined,
+      effortMetrics: {
+        ...task.effortMetrics,
+        estimatedSize: formData.estimatedSize,
+        estimatedHours: formData.estimatedHours,
+      },
     });
     setEditing(false);
   };
@@ -933,6 +949,19 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
           </div>
 
           <div className="modal-sidebar">
+            {/* Badge de tarea bloqueada */}
+            {isBlocked && (
+              <div className="blocked-badge">
+                🚫 Tarea Bloqueada
+                <button 
+                  onClick={() => setShowBlockModal(true)}
+                  className="btn-view-block"
+                >
+                  Ver detalles
+                </button>
+              </div>
+            )}
+
             {/* Acciones */}
             <div className="sidebar-section">
               {/* Estado de validación */}
@@ -986,6 +1015,14 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   </button>
                 </>
               )}
+              
+              {/* Botones de bloqueo */}
+              <button
+                onClick={() => setShowBlockModal(true)}
+                className={isBlocked ? 'btn-success' : 'btn-danger'}
+              >
+                {isBlocked ? '✅ Desbloquear tarea' : '🚫 Marcar bloqueada'}
+              </button>
             </div>
 
             {/* Detalles */}
@@ -1037,6 +1074,17 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                   </span>
                 )}
               </div>
+
+              {/* Estimación de esfuerzo */}
+              {editing && (
+                <div className="detail-item detail-item-full">
+                  <EstimationPicker
+                    value={formData.estimatedSize}
+                    onChange={(size, hours) => setFormData({ ...formData, estimatedSize: size, estimatedHours: hours })}
+                    required={false}
+                  />
+                </div>
+              )}
 
               <div className="detail-item">
                 <label>
@@ -1237,6 +1285,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
           </div>
         </div>
 
+        {/* TimeTracker Component */}
+        <TimeTracker 
+          taskId={task._id}
+          effortMetrics={task.effortMetrics}
+          onUpdate={() => fetchTask(task._id)}
+        />
+
         {/* Modal de validación */}
         {showValidationModal && (
           <div className="validation-modal-overlay" onClick={() => setShowValidationModal(false)}>
@@ -1268,6 +1323,18 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
               </div>
             </div>
           </div>
+        )}
+
+        {/* Modal de bloqueo */}
+        {showBlockModal && (
+          <BlockedTaskModal
+            taskId={task._id}
+            isBlocked={isBlocked}
+            blockedBy={task.effortMetrics?.blockedBy}
+            effortMetrics={task.effortMetrics}
+            onClose={() => setShowBlockModal(false)}
+            onUpdate={() => fetchTask(task._id)}
+          />
         )}
       </div>
       

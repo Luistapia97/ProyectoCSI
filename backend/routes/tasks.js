@@ -6,6 +6,7 @@ import Project from '../models/Project.js';
 import Comment from '../models/Comment.js';
 import Notification from '../models/Notification.js';
 import uploadTaskAttachment, { uploadToCloudinary, deleteFromCloudinary, cloudinary } from '../config/cloudinaryAttachments.js';
+import effortMetricsService from '../services/effortMetricsService.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -332,6 +333,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       tags,
       color,
       subtasks,
+      effortMetrics,
     } = req.body;
 
     if (!title || !project) {
@@ -355,6 +357,16 @@ router.post('/', protect, isAdmin, async (req, res) => {
         }))
       : [];
 
+    // Inicializar effortMetrics con valores por defecto si no se proporcionan
+    const initialEffortMetrics = effortMetrics || {
+      estimatedSize: 'M',
+      estimatedHours: 6,
+      timeTracking: [],
+      blockedBy: 'none',
+      actualHours: 0,
+      effectiveHours: 0
+    };
+
     const task = await Task.create({
       title,
       description,
@@ -368,6 +380,7 @@ router.post('/', protect, isAdmin, async (req, res) => {
       tags: tags || [],
       color,
       subtasks: formattedSubtasks,
+      effortMetrics: initialEffortMetrics,
     });
 
     // Actualizar estadi­sticas del proyecto
@@ -460,6 +473,7 @@ router.put('/:id', protect, async (req, res) => {
       color,
       completed,
       subtasks,
+      effortMetrics,
     } = req.body;
 
     const isAdmin = req.user.role === 'administrador';
@@ -586,6 +600,15 @@ router.put('/:id', protect, async (req, res) => {
       if (dueDate !== undefined) task.dueDate = dueDate;
       if (tags) task.tags = tags;
       if (color !== undefined) task.color = color;
+
+      // Actualizar effortMetrics si se proporciona
+      if (effortMetrics) {
+        if (!task.effortMetrics) {
+          task.effortMetrics = {};
+        }
+        if (effortMetrics.estimatedSize) task.effortMetrics.estimatedSize = effortMetrics.estimatedSize;
+        if (effortMetrics.estimatedHours !== undefined) task.effortMetrics.estimatedHours = effortMetrics.estimatedHours;
+      }
 
       // Preparar cambios para actualizar el calendario
       if (title) changes.title = title;
@@ -1371,6 +1394,370 @@ router.get('/attachment-url/:cloudinaryId', protect, async (req, res) => {
   } catch (error) {
     console.error('Error generando URL:', error);
     res.status(500).json({ message: 'Error al generar URL', error: error.message });
+  }
+});
+
+// ============================================
+// ENDPOINTS DE MÉTRICAS DE ESFUERZO
+// ============================================
+
+// @route   POST /api/tasks/:id/time-tracking/start
+// @desc    Iniciar timer de seguimiento de tiempo
+// @access  Private
+router.post('/:id/time-tracking/start', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id).populate('project');
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    // Verificar que el usuario esté asignado a la tarea O sea miembro del proyecto
+    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    const isMember = task.project?.members?.some(member => 
+      member.user.toString() === req.user._id.toString()
+    );
+    
+    if (!isAssigned && !isMember) {
+      return res.status(403).json({ message: 'No tienes permisos para trackear tiempo en esta tarea' });
+    }
+    
+    // Verificar si ya hay un timer activo para este usuario
+    if (task.effortMetrics?.activeTimer?.isActive && 
+        task.effortMetrics.activeTimer.userId?.toString() === req.user._id.toString()) {
+      return res.status(400).json({ message: 'Ya tienes un timer activo en esta tarea' });
+    }
+    
+    // Inicializar effortMetrics si no existe
+    if (!task.effortMetrics) {
+      task.effortMetrics = {
+        estimatedSize: 'M',
+        estimatedHours: 6,
+        timeTracking: [],
+        blockedBy: 'none',
+        actualHours: 0,
+        effectiveHours: 0
+      };
+    }
+    
+    // Iniciar timer
+    task.effortMetrics.activeTimer = {
+      userId: req.user._id,
+      startTime: new Date(),
+      isActive: true
+    };
+    
+    await task.save();
+    
+    res.json({
+      message: 'Timer iniciado',
+      timer: task.effortMetrics.activeTimer
+    });
+  } catch (error) {
+    console.error('Error iniciando timer:', error);
+    res.status(500).json({ message: 'Error al iniciar timer', error: error.message });
+  }
+});
+
+// @route   POST /api/tasks/:id/time-tracking/stop
+// @desc    Detener timer y guardar sesión
+// @access  Private
+router.post('/:id/time-tracking/stop', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    // Verificar que hay un timer activo para este usuario
+    if (!task.effortMetrics?.activeTimer?.isActive || 
+        task.effortMetrics.activeTimer.userId?.toString() !== req.user._id.toString()) {
+      return res.status(400).json({ message: 'No tienes un timer activo en esta tarea' });
+    }
+    
+    const { note } = req.body;
+    const now = new Date();
+    const startTime = task.effortMetrics.activeTimer.startTime;
+    const duration = Math.floor((now - startTime) / 60000); // Minutos
+    
+    // Guardar sesión de tracking
+    task.effortMetrics.timeTracking.push({
+      userId: req.user._id,
+      startTime,
+      endTime: now,
+      duration,
+      method: 'timer',
+      note: note || '',
+      createdAt: now
+    });
+    
+    // Desactivar timer
+    task.effortMetrics.activeTimer.isActive = false;
+    
+    await task.save();
+    
+    res.json({
+      message: 'Timer detenido y sesión guardada',
+      session: {
+        duration,
+        hours: Number((duration / 60).toFixed(2))
+      },
+      totalActualHours: task.effortMetrics.actualHours
+    });
+  } catch (error) {
+    console.error('Error deteniendo timer:', error);
+    res.status(500).json({ message: 'Error al detener timer', error: error.message });
+  }
+});
+
+// @route   POST /api/tasks/:id/time-tracking/add-session
+// @desc    Agregar sesión de tiempo manualmente
+// @access  Private
+router.post('/:id/time-tracking/add-session', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    if (!isAssigned) {
+      return res.status(403).json({ message: 'No estás asignado a esta tarea' });
+    }
+    
+    const { startTime, endTime, duration, note } = req.body;
+    
+    // Validar datos
+    if (!duration || duration <= 0) {
+      return res.status(400).json({ message: 'Duración inválida' });
+    }
+    
+    // Inicializar effortMetrics si no existe
+    if (!task.effortMetrics) {
+      task.effortMetrics = {
+        estimatedSize: 'M',
+        estimatedHours: 6,
+        timeTracking: [],
+        blockedBy: 'none',
+        actualHours: 0,
+        effectiveHours: 0
+      };
+    }
+    
+    // Agregar sesión
+    task.effortMetrics.timeTracking.push({
+      userId: req.user._id,
+      startTime: startTime ? new Date(startTime) : new Date(),
+      endTime: endTime ? new Date(endTime) : new Date(),
+      duration, // en minutos
+      method: 'manual',
+      note: note || '',
+      createdAt: new Date()
+    });
+    
+    await task.save();
+    
+    res.json({
+      message: 'Sesión agregada',
+      totalActualHours: task.effortMetrics.actualHours
+    });
+  } catch (error) {
+    console.error('Error agregando sesión:', error);
+    res.status(500).json({ message: 'Error al agregar sesión', error: error.message });
+  }
+});
+
+// @route   POST /api/tasks/:id/block
+// @desc    Marcar tarea como bloqueada
+// @access  Private
+router.post('/:id/block', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    if (!isAssigned) {
+      return res.status(403).json({ message: 'No estás asignado a esta tarea' });
+    }
+    
+    const { blockedBy, reason } = req.body;
+    
+    if (!['external', 'dependency', 'approval', 'information'].includes(blockedBy)) {
+      return res.status(400).json({ message: 'Tipo de bloqueo inválido' });
+    }
+    
+    // Inicializar effortMetrics si no existe
+    if (!task.effortMetrics) {
+      task.effortMetrics = {
+        estimatedSize: 'M',
+        estimatedHours: 6,
+        timeTracking: [],
+        blockedBy: 'none',
+        actualHours: 0,
+        effectiveHours: 0,
+        blockHistory: []
+      };
+    }
+    
+    // Inicializar blockHistory si no existe
+    if (!task.effortMetrics.blockHistory) {
+      task.effortMetrics.blockHistory = [];
+    }
+    
+    task.effortMetrics.blockedBy = blockedBy;
+    task.effortMetrics.blockedSince = new Date();
+    task.effortMetrics.blockedReason = reason || '';
+    task.effortMetrics.blockedUntil = null; // Limpiar blockedUntil cuando se bloquea
+    
+    await task.save();
+    
+    res.json({
+      message: 'Tarea marcada como bloqueada',
+      effortMetrics: task.effortMetrics
+    });
+  } catch (error) {
+    console.error('Error bloqueando tarea:', error);
+    res.status(500).json({ message: 'Error al bloquear tarea', error: error.message });
+  }
+});
+
+// @route   POST /api/tasks/:id/unblock
+// @desc    Desbloquear tarea
+// @access  Private
+router.post('/:id/unblock', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    if (!task.effortMetrics || task.effortMetrics.blockedBy === 'none') {
+      return res.status(400).json({ message: 'La tarea no está bloqueada' });
+    }
+    
+    const blockedUntil = new Date();
+    const blockedSince = task.effortMetrics.blockedSince;
+    const duration = (blockedUntil - blockedSince) / (1000 * 60 * 60); // horas
+    
+    // Inicializar blockHistory si no existe
+    if (!task.effortMetrics.blockHistory) {
+      task.effortMetrics.blockHistory = [];
+    }
+    
+    // Agregar al historial de bloqueos
+    task.effortMetrics.blockHistory.push({
+      blockedBy: task.effortMetrics.blockedBy,
+      reason: task.effortMetrics.blockedReason || 'Sin especificar',
+      blockedSince: blockedSince,
+      blockedUntil: blockedUntil,
+      duration: duration
+    });
+    
+    task.effortMetrics.blockedUntil = blockedUntil;
+    task.effortMetrics.blockedBy = 'none';
+    
+    await task.save();
+    
+    res.json({
+      message: 'Tarea desbloqueada',
+      blockedHours: task.effortMetrics.blockedHours,
+      duration: duration
+    });
+  } catch (error) {
+    console.error('Error desbloqueando tarea:', error);
+    res.status(500).json({ message: 'Error al desbloquear tarea', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/:id/metrics
+// @desc    Obtener métricas de una tarea
+// @access  Private
+router.get('/:id/metrics', protect, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id)
+      .populate('assignedTo', 'name email')
+      .populate('project', 'name');
+    
+    if (!task) {
+      return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+    
+    const efficiency = effortMetricsService.calculateTaskEfficiency(task);
+    
+    res.json({
+      task: {
+        id: task._id,
+        title: task.title,
+        project: task.project,
+        assignedTo: task.assignedTo
+      },
+      effortMetrics: task.effortMetrics,
+      efficiency,
+      summary: {
+        estimated: task.effortMetrics?.estimatedHours || 0,
+        actual: task.effortMetrics?.actualHours || 0,
+        blocked: task.effortMetrics?.blockedHours || 0,
+        effective: task.effortMetrics?.effectiveHours || 0,
+        efficiency
+      }
+    });
+  } catch (error) {
+    console.error('Error obteniendo métricas:', error);
+    res.status(500).json({ message: 'Error al obtener métricas', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/metrics/user/:userId
+// @desc    Obtener reporte de métricas de usuario
+// @access  Private
+router.get('/metrics/user/:userId', protect, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Se requieren fechas de inicio y fin' });
+    }
+    
+    const report = await effortMetricsService.generateUserReport(
+      req.params.userId,
+      new Date(startDate),
+      new Date(endDate)
+    );
+    
+    res.json(report);
+  } catch (error) {
+    console.error('Error generando reporte de usuario:', error);
+    res.status(500).json({ message: 'Error al generar reporte', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/metrics/project/:projectId
+// @desc    Obtener métricas de proyecto
+// @access  Private
+router.get('/metrics/project/:projectId', protect, async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    
+    if (!startDate || !endDate) {
+      return res.status(400).json({ message: 'Se requieren fechas de inicio y fin' });
+    }
+    
+    const report = await effortMetricsService.generateProjectReport(
+      req.params.projectId,
+      new Date(startDate),
+      new Date(endDate)
+    );
+    
+    res.json(report);
+  } catch (error) {
+    console.error('Error generando reporte de proyecto:', error);
+    res.status(500).json({ message: 'Error al generar reporte', error: error.message });
   }
 });
 

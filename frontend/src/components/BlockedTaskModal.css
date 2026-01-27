@@ -1,0 +1,245 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.blocked-task-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-content {
+  padding: 20px;
+}
+
+.unblock-section {
+  text-align: center;
+}
+
+.info-text {
+  font-size: 15px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.btn-unblock {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #4caf50, #45a049);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+.btn-unblock:hover:not(:disabled) {
+  background: linear-gradient(135deg, #45a049, #3d8b40);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.btn-unblock:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.block-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.block-types {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.block-type {
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.block-type:hover {
+  transform: translateX(4px);
+}
+
+.block-type.selected {
+  box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+}
+
+.type-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.type-icon {
+  font-size: 20px;
+}
+
+.type-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.type-description {
+  color: #666;
+  font-size: 13px;
+  margin-left: 30px;
+}
+
+.reason-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.reason-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.reason-textarea:focus {
+  outline: none;
+  border-color: #9b59b6;
+}
+
+.btn-block {
+  padding: 12px 32px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  align-self: center;
+}
+
+.btn-block:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.btn-block:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.blocked-info-card {
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.blocked-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.blocked-icon {
+  font-size: 24px;
+}
+
+.blocked-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.blocked-reason,
+.blocked-since {
+  margin-bottom: 10px;
+}
+
+.blocked-reason strong,
+.blocked-since strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.blocked-reason p,
+.blocked-since p {
+  margin: 0;
+  color: #333;
+  font-size: 14px;
+  line-height: 1.5;
+}

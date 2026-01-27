@@ -85,9 +85,14 @@ router.get('/download/:filename', protect, admin, async (req, res) => {
     // Leer el archivo y enviarlo con headers correctos
     const fileBuffer = await fs.readFile(filepath);
     
+    // 🆕 Headers anti-caché para asegurar descarga del archivo más reciente
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     res.setHeader('Content-Length', fileBuffer.length);
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Last-Modified', new Date().toUTCString());
     res.send(fileBuffer);
   } catch (error) {
     console.error('Error en descarga de reporte:', error);

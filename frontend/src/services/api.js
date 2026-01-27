@@ -156,11 +156,16 @@ export const reportsAPI = {
   download: async (filename) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/reports/download/${filename}`, {
+      // 🆕 Agregar timestamp para evitar caché del navegador
+      const cacheBuster = `?t=${Date.now()}`;
+      const response = await fetch(`${API_URL}/reports/download/${filename}${cacheBuster}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/pdf'
+          'Accept': 'application/pdf',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
         }
       });
       

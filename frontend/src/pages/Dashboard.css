@@ -370,44 +370,42 @@
   font-weight: 500;
 }
 
-.project-stats {
+.project-stats-compact {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: space-around;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: 0.75rem;
   margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
 }
 
-.stat {
+.stat-compact {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.25rem;
 }
 
-.stat-value {
-  font-size: 1.5rem;
+.stat-number {
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
-.stat-label {
+.stat-text {
   font-size: 0.75rem;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
-.progress-bar {
-  height: 6px;
-  background: var(--bg-primary);
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-
-.progress-fill {
-  height: 100%;
-  background: #667eea;
-  border-radius: 999px;
-  transition: width 0.3s ease;
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border-color);
 }
 
 .project-members {

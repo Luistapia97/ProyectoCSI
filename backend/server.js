@@ -209,6 +209,16 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reports', reportRoutes);
 
+// Middleware 404 - Rutas no encontradas
+app.use((req, res, next) => {
+  console.log(`❌ Ruta no encontrada: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    error: 'Ruta no encontrada',
+    path: req.originalUrl,
+    method: req.method
+  });
+});
+
 // Manejador de errores
 app.use((err, req, res, next) => {
   console.error(err.stack);

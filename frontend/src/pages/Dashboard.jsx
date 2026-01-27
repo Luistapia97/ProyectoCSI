@@ -455,29 +455,21 @@ export default function Dashboard() {
                     ))}
                   </div>
 
-                  <div className="project-stats">
-                    <div className="stat">
-                      <span className="stat-value">{stats.total}</span>
-                      <span className="stat-label">Tareas</span>
+                  <div className="project-stats-compact">
+                    <div className="stat-compact">
+                      <span className="stat-number">{stats.total}</span>
+                      <span className="stat-text">Tareas</span>
                     </div>
-                    <div className="stat">
-                      <span className="stat-value">{stats.completed}</span>
-                      <span className="stat-label">Completadas</span>
+                    <div className="stat-divider"></div>
+                    <div className="stat-compact">
+                      <span className="stat-number">{stats.completed}</span>
+                      <span className="stat-text">Completadas</span>
                     </div>
-                    <div className="stat">
-                      <span className="stat-value">{stats.percentage}%</span>
-                      <span className="stat-label">Progreso</span>
+                    <div className="stat-divider"></div>
+                    <div className="stat-compact">
+                      <span className="stat-number" style={{ color: project.color }}>{stats.percentage}%</span>
+                      <span className="stat-text">Progreso</span>
                     </div>
-                  </div>
-
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill" 
-                      style={{ 
-                        width: `${stats.percentage}%`,
-                        backgroundColor: project.color 
-                      }}
-                    ></div>
                   </div>
 
                   <ProjectActiveTasks projectId={project._id} />

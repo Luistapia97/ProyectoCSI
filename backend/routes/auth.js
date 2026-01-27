@@ -204,6 +204,13 @@ router.post('/login', async (req, res) => {
 // Verificar si Zoho OAuth está configurado
 const isZohoConfigured = process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET;
 
+console.log('🔍 Zoho OAuth configurado:', isZohoConfigured ? '✅ SÍ' : '❌ NO');
+if (!isZohoConfigured) {
+  console.warn('⚠️ Las rutas de Zoho NO se registrarán. Falta configuración.');
+} else {
+  console.log('✅ Las rutas de Zoho se registrarán correctamente.');
+}
+
 // @route   GET /api/auth/zoho
 // @desc    Iniciar login con Zoho (Zoho Assist compatible)
 // @access  Public

@@ -77,6 +77,49 @@ const userSchema = new mongoose.Schema({
       push: { type: Boolean, default: true },
     },
   },
+  
+  // Perfil de Esfuerzo (para métricas de productividad)
+  effortProfile: {
+    // Disponibilidad
+    weeklyHours: {
+      type: Number,
+      default: 40 // Horas de trabajo semanales
+    },
+    availabilityPercentage: {
+      type: Number,
+      default: 100, // % de tiempo dedicado a tareas (vs reuniones, admin, etc)
+      min: 0,
+      max: 100
+    },
+    
+    // Experiencia (afecta velocidad esperada)
+    experienceLevel: {
+      type: String,
+      enum: ['junior', 'mid', 'senior', 'lead'],
+      default: 'mid'
+    },
+    
+    // Costo (para cálculo de ROI)
+    costPerHour: {
+      type: Number,
+      default: 0 // Opcional, para análisis de costo
+    },
+    
+    // Especialización (para asignación inteligente)
+    specializations: [{
+      type: String,
+      enum: ['frontend', 'backend', 'devops', 'design', 'qa', 'pm', 'other']
+    }],
+    
+    // Histórico de eficiencia (últimas 4 semanas)
+    efficiencyHistory: [{
+      weekStart: Date,
+      weekEnd: Date,
+      avgEfficiency: Number,
+      tasksCompleted: Number,
+      totalHours: Number
+    }]
+  }
 }, {
   timestamps: true,
 });

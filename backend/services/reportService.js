@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import Task from '../models/Task.js';
 import Project from '../models/Project.js';
 import User from '../models/User.js';
+import effortMetricsService from './effortMetricsService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -90,9 +91,9 @@ class ReportService {
       .populate('members.user', 'name email')
       .lean();
 
-    // Obtener todas las tareas
+    // Obtener todas las tareas CON métricas de esfuerzo completas
     const allTasks = await Task.find({ archived: false })
-      .select('title completed assignedTo project dueDate completedAt archived')
+      .select('title completed assignedTo project dueDate completedAt archived effortMetrics')
       .populate('assignedTo', 'name email')
       .populate('project', 'name')
       .lean();
@@ -125,6 +126,32 @@ class ReportService {
       const totalTasks = userTasks.length;
       const completionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100).toFixed(1) : 0;
 
+      // 🆕 Métricas de bloqueo del usuario
+      const userBlockAnalysis = effortMetricsService.analyzeBlockHistory(userTasks);
+      const totalBlockedHours = userTasks.reduce((sum, t) => 
+        sum + (t.effortMetrics?.blockedHours || 0), 0
+      );
+      const activelyBlockedTasks = userTasks.filter(t => 
+        t.effortMetrics?.blockedBy && t.effortMetrics.blockedBy !== 'none'
+      ).length;
+
+      // 🆕 Métricas de esfuerzo completas
+      const totalEstimatedHours = userTasks.reduce((sum, t) => 
+        sum + (t.effortMetrics?.estimatedHours || 0), 0
+      );
+      const totalActualHours = userTasks.reduce((sum, t) => 
+        sum + (t.effortMetrics?.actualHours || 0), 0
+      );
+      const totalEffectiveHours = userTasks.reduce((sum, t) => 
+        sum + (t.effortMetrics?.effectiveHours || 0), 0
+      );
+      const avgEfficiency = userTasks.length > 0 
+        ? userTasks.reduce((sum, t) => sum + (t.effortMetrics?.efficiency || 0), 0) / userTasks.length 
+        : 0;
+      const tasksWithTracking = userTasks.filter(t => 
+        t.effortMetrics?.timeTracking && t.effortMetrics.timeTracking.length > 0
+      ).length;
+
       // Tareas por proyecto
       const tasksByProject = {};
       userTasks.forEach(task => {
@@ -155,7 +182,19 @@ class ReportService {
           dueSoonTasks,
           pendingValidation,
           completedThisWeek,
-          completionRate
+          completionRate,
+          // 🆕 Métricas de bloqueo
+          totalBlockedHours: totalBlockedHours.toFixed(2),
+          activelyBlockedTasks,
+          blockIncidents: userBlockAnalysis.totalBlockIncidents,
+          mostCommonBlock: userBlockAnalysis.mostCommonBlockReason || 'Ninguno',
+          // 🆕 Métricas de esfuerzo completas
+          estimatedHours: totalEstimatedHours.toFixed(2),
+          actualHours: totalActualHours.toFixed(2),
+          effectiveHours: totalEffectiveHours.toFixed(2),
+          efficiency: avgEfficiency.toFixed(2),
+          tasksWithTracking,
+          trackingCoverage: totalTasks > 0 ? ((tasksWithTracking / totalTasks) * 100).toFixed(1) : 0
         },
         tasksByProject
       };
@@ -206,6 +245,9 @@ class ReportService {
     ).length;
     const globalCompletionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100).toFixed(1) : 0;
 
+    // 🆕 Análisis de bloqueos global
+    const blockAnalysis = effortMetricsService.analyzeBlockHistory(allTasks);
+
     return {
       generatedAt: now,
       period: { from: oneWeekAgo, to: now },
@@ -219,8 +261,71 @@ class ReportService {
         completedThisWeek,
         globalCompletionRate
       },
+      // 🆕 Análisis global de bloqueos
+      blockAnalysis,
       userMetrics,
       projectMetrics
+    };
+  }
+
+  /**
+   * Genera conclusión personalizada basada en las métricas del usuario
+   */
+  generateUserConclusion(metrics) {
+    const evaluation = [];
+    const recommendations = [];
+
+    // Evaluar tasa de cumplimiento
+    if (metrics.completionRate >= 80) {
+      evaluation.push(`Excelente desempeño con ${metrics.completionRate}% de cumplimiento.`);
+    } else if (metrics.completionRate >= 60) {
+      evaluation.push(`Desempeño satisfactorio con ${metrics.completionRate}% de cumplimiento.`);
+      recommendations.push('Revisar prioridades para mejorar la tasa de finalizacion');
+    } else if (metrics.completionRate >= 40) {
+      evaluation.push(`Desempeño por debajo del esperado (${metrics.completionRate}%).`);
+      recommendations.push('Se requiere seguimiento cercano y redistribucion de carga de trabajo');
+    } else {
+      evaluation.push(`Desempeño critico con solo ${metrics.completionRate}% de tareas completadas.`);
+      recommendations.push('Reunion urgente para identificar obstaculos y replantear estrategia');
+    }
+
+    // Evaluar tareas atrasadas
+    if (metrics.overdueTasks > 5) {
+      evaluation.push(`ALERTA: ${metrics.overdueTasks} tareas atrasadas requieren atencion inmediata.`);
+      recommendations.push('Priorizar resolucion de tareas atrasadas antes de nuevas asignaciones');
+    } else if (metrics.overdueTasks > 0) {
+      evaluation.push(`${metrics.overdueTasks} tarea(s) pendiente(s) de vencimiento.`);
+    }
+
+    // Evaluar eficiencia
+    if (metrics.efficiency >= 85) {
+      evaluation.push(`Alta eficiencia (${metrics.efficiency}%) indica uso optimo del tiempo.`);
+    } else if (metrics.efficiency >= 70) {
+      evaluation.push(`Eficiencia aceptable (${metrics.efficiency}%).`);
+    } else if (metrics.efficiency < 70 && metrics.actualHours > 0) {
+      evaluation.push(`Eficiencia baja (${metrics.efficiency}%) sugiere perdidas de tiempo.`);
+      recommendations.push('Analizar causas de baja productividad (bloqueos, interrupciones, etc.)');
+    }
+
+    // Evaluar bloqueos
+    if (metrics.blockIncidents > 3) {
+      evaluation.push(`CRITICO: ${metrics.blockIncidents} bloqueos registrados (${metrics.totalBlockedHours}h perdidas).`);
+      recommendations.push(`Resolver bloqueos recurrentes: tipo mas comun "${metrics.mostCommonBlock}"`);
+    } else if (metrics.blockIncidents > 0) {
+      evaluation.push(`${metrics.blockIncidents} bloqueo(s) identificado(s).`);
+    }
+
+    // Evaluar tracking
+    if (metrics.trackingCoverage < 50 && metrics.totalTasks > 5) {
+      recommendations.push('Mejorar registro de horas: solo ' + metrics.trackingCoverage + '% de tareas tienen seguimiento');
+    }
+
+    // Conclusión final
+    const conclusionText = evaluation.join(' ');
+    
+    return {
+      evaluation: conclusionText,
+      recommendations
     };
   }
 
@@ -228,7 +333,7 @@ class ReportService {
    * Genera el contenido del PDF
    */
   generatePDFContent(doc, data) {
-    const { generatedAt, period, globalMetrics, userMetrics, projectMetrics } = data;
+    const { generatedAt, period, globalMetrics, blockAnalysis, userMetrics, projectMetrics } = data;
 
     // Encabezado con diseño profesional
     this.addHeader(doc, generatedAt, period);
@@ -253,6 +358,57 @@ class ReportService {
       { label: 'Completadas Esta Semana', value: globalMetrics.completedThisWeek, color: '#6366f1', bgColor: '#e0e7ff' }
     ]);
 
+    // ANALISIS DE BLOQUEOS
+    if (blockAnalysis && blockAnalysis.totalBlockedTasks > 0) {
+      doc.moveDown(1.0);
+      this.addSectionTitle(doc, 'ANALISIS DE BLOQUEOS');
+      doc.moveDown(0.4);
+
+      this.addMetricBox(doc, [
+        { label: 'Tareas con Bloqueos', value: blockAnalysis.totalBlockedTasks, color: '#ef4444', bgColor: '#fee2e2' },
+        { label: 'Total Incidentes', value: blockAnalysis.totalBlockIncidents, color: '#f97316', bgColor: '#fed7aa' },
+        { label: 'Horas Bloqueadas', value: blockAnalysis.totalBlockedHours.toFixed(1), color: '#f59e0b', bgColor: '#fef3c7' },
+        { label: 'Promedio por Bloqueo', value: `${blockAnalysis.avgBlockDuration.toFixed(1)}h`, color: '#84cc16', bgColor: '#ecfccb' }
+      ]);
+
+      doc.moveDown(0.6);
+
+      // Bloqueos por tipo
+      doc.fontSize(10).font('Helvetica-Bold').fillColor('#1e293b')
+        .text('Bloqueos por Tipo:', 70);
+      doc.moveDown(0.2);
+      doc.fontSize(9).font('Helvetica').fillColor('#64748b');
+
+      const blockTypes = [
+        { key: 'external', label: 'Externos' },
+        { key: 'dependency', label: 'Dependencias' },
+        { key: 'approval', label: 'Aprobaciones' },
+        { key: 'information', label: 'Informacion' }
+      ];
+
+      blockTypes.forEach(({ key, label }) => {
+        const count = blockAnalysis.blocksByType[key] || 0;
+        if (count > 0) {
+          doc.text(`  - ${label}: ${count} incidentes`, { indent: 10 });
+        }
+      });
+
+      if (blockAnalysis.mostCommonBlockReason && blockAnalysis.mostCommonBlockReason !== 'Sin especificar') {
+        doc.moveDown(0.3);
+        doc.fontSize(9).font('Helvetica-Bold').fillColor('#1e293b')
+          .text('Razón más común: ', 70, doc.y, { continued: true })
+          .font('Helvetica').fillColor('#64748b')
+          .text(blockAnalysis.mostCommonBlockReason);
+      }
+
+      // Impacto en porcentaje
+      if (blockAnalysis.impactPercentage > 0) {
+        doc.moveDown(0.3);
+        doc.fontSize(9).font('Helvetica').fillColor('#ef4444')
+          .text(`ALERTA - Impacto: ${blockAnalysis.impactPercentage.toFixed(1)}% del tiempo total en bloqueos`, 70);
+      }
+    }
+
     doc.moveDown(1);
 
     // DESEMPEÑO POR PROYECTO
@@ -262,19 +418,19 @@ class ReportService {
       doc.moveDown(0.5);
 
       projectMetrics.forEach((project, index) => {
-        this.addNewPageIfNeeded(doc, 120);
+        this.addNewPageIfNeeded(doc, 130);
         
         // Caja del proyecto con borde
         const projectBoxY = doc.y;
-        doc.roundedRect(60, projectBoxY, 480, 90, 5)
+        doc.roundedRect(60, projectBoxY, 480, 105, 5)
           .fillAndStroke('#f8fafc', '#cbd5e1');
         
         doc.fontSize(13).font('Helvetica-Bold').fillColor('#1e293b')
-          .text(`${index + 1}. ${project.name}`, 75, projectBoxY + 15);
+          .text(`${index + 1}. ${project.name}`, 75, projectBoxY + 12);
         doc.fontSize(9).font('Helvetica').fillColor('#64748b')
-          .text(`Miembros del equipo: ${project.members}`, 75, projectBoxY + 35);
+          .text(`Miembros del equipo: ${project.members}`, 75, projectBoxY + 32);
         
-        doc.y = projectBoxY + 55;
+        doc.y = projectBoxY + 52;
 
         this.addMetricRow(doc, [
           { label: 'Total', value: project.metrics.totalTasks, color: '#3b82f6' },
@@ -283,12 +439,12 @@ class ReportService {
           { label: 'Atrasadas', value: project.metrics.overdueTasks, color: '#ef4444' }
         ]);
 
-        doc.moveDown(0.3);
-        const progressBarY = doc.y;
-        this.drawProgressBar(doc, 95, progressBarY, 280, project.metrics.progress);
+        // Barra de progreso dentro de la caja
+        const progressBarY = projectBoxY + 90;
+        this.drawProgressBar(doc, 75, progressBarY, 420, project.metrics.progress);
         
-        doc.y = projectBoxY + 100;
-        doc.moveDown(0.5);
+        doc.y = projectBoxY + 110;
+        doc.moveDown(0.4);
       });
     }
 
@@ -299,53 +455,177 @@ class ReportService {
       doc.moveDown(0.5);
 
       userMetrics.forEach((userData, index) => {
-        this.addNewPageIfNeeded(doc, 200);
+        // Verificar si es necesario nueva página (cada usuario necesita mínimo 500px)
+        this.addNewPageIfNeeded(doc, 550);
 
-        // Caja del usuario con fondo
+        // === ENCABEZADO DEL USUARIO ===
         const userBoxY = doc.y;
-        doc.roundedRect(60, userBoxY, 480, 40, 5)
-          .fill('#f1f5f9');
+        doc.roundedRect(60, userBoxY, 480, 55, 5)
+          .fill('#1e40af');
         
-        doc.fontSize(12).font('Helvetica-Bold').fillColor('#1e293b')
-          .text(`${index + 1}. ${userData.user.name}`, 75, userBoxY + 10);
-        doc.fontSize(9).font('Helvetica').fillColor('#64748b')
-          .text(`${userData.user.email} | ${userData.user.role === 'administrador' ? 'Administrador' : 'Usuario'}`, 75, userBoxY + 25);
+        // Nombre y email
+        doc.fontSize(14).font('Helvetica-Bold').fillColor('#ffffff')
+          .text(`${index + 1}. ${userData.user.name}`, 75, userBoxY + 12);
+        doc.fontSize(9).font('Helvetica').fillColor('#93c5fd')
+          .text(userData.user.email, 75, userBoxY + 32);
         
-        doc.y = userBoxY + 50;
-        doc.moveDown(0.3);
+        // Badge de rol
+        const badgeX = 430;
+        const badgeColor = userData.user.role === 'administrador' ? '#f59e0b' : '#10b981';
+        doc.roundedRect(badgeX, userBoxY + 15, 95, 25, 3)
+          .fill(badgeColor);
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#ffffff')
+          .text(userData.user.role === 'administrador' ? 'ADMIN' : 'USUARIO', badgeX + 15, userBoxY + 20);
+        
+        doc.y = userBoxY + 65;
 
-        // Métricas principales
+        // === INDICADORES CLAVE (KPIs) ===
+        doc.fontSize(11).font('Helvetica-Bold').fillColor('#1e293b')
+          .text('INDICADORES CLAVE', 70);
+        doc.moveDown(0.4);
+        
+        // KPIs principales en cajas destacadas
+        this.addMetricBox(doc, [
+          { label: 'Tasa Cumplimiento', value: `${userData.metrics.completionRate}%`, color: '#667eea', bgColor: '#e0e7ff' },
+          { label: 'Eficiencia', value: `${userData.metrics.efficiency}%`, color: '#06b6d4', bgColor: '#cffafe' },
+          { label: 'Estado', value: userData.metrics.overdueTasks === 0 ? 'Al dia' : `${userData.metrics.overdueTasks} atrasadas`, color: userData.metrics.overdueTasks === 0 ? '#10b981' : '#ef4444', bgColor: userData.metrics.overdueTasks === 0 ? '#d1fae5' : '#fee2e2' }
+        ]);
+
+        doc.moveDown(0.6);
+
+        // === SECCION: ESTADO DE TAREAS ===
+        doc.fontSize(11).font('Helvetica-Bold').fillColor('#1e293b')
+          .text('ESTADO DE TAREAS', 70);
+        doc.moveDown(0.3);
+        
         this.addMetricRow(doc, [
-          { label: 'Total', value: userData.metrics.totalTasks },
+          { label: 'Total', value: userData.metrics.totalTasks, color: '#64748b' },
           { label: 'Completadas', value: userData.metrics.completedTasks, color: '#10b981' },
           { label: 'Pendientes', value: userData.metrics.pendingTasks, color: '#f59e0b' },
           { label: 'Atrasadas', value: userData.metrics.overdueTasks, color: '#ef4444' }
         ]);
 
-        doc.moveDown(0.2);
+        doc.moveDown(0.15);
         this.addMetricRow(doc, [
-          { label: 'Por Vencer (7 días)', value: userData.metrics.dueSoonTasks, color: '#f59e0b' },
+          { label: 'Por Vencer (7d)', value: userData.metrics.dueSoonTasks, color: '#f59e0b' },
           { label: 'Por Validar', value: userData.metrics.pendingValidation, color: '#6366f1' },
-          { label: 'Completadas (Semana)', value: userData.metrics.completedThisWeek, color: '#10b981' },
-          { label: 'Tasa Cumplimiento', value: `${userData.metrics.completionRate}%`, color: '#667eea' }
+          { label: 'Esta Semana', value: userData.metrics.completedThisWeek, color: '#10b981' },
+          { label: 'Cobertura Tracking', value: `${userData.metrics.trackingCoverage}%`, color: '#14b8a6' }
         ]);
 
-        // Tareas por proyecto
-        if (Object.keys(userData.tasksByProject).length > 0) {
+        doc.moveDown(0.6);
+
+        // === SECCION: ANALISIS DE BLOQUEOS ===
+        if (userData.metrics.blockIncidents > 0 || userData.metrics.totalBlockedHours > 0) {
+          doc.fontSize(11).font('Helvetica-Bold').fillColor('#1e293b')
+            .text('ANALISIS DE BLOQUEOS', 70);
           doc.moveDown(0.3);
-          doc.fontSize(10).font('Helvetica-Bold').text('Tareas por Proyecto:');
-          doc.fontSize(8).font('Helvetica');
+          
+          this.addMetricRow(doc, [
+            { label: 'Horas Bloqueadas', value: `${userData.metrics.totalBlockedHours}h`, color: '#f59e0b' },
+            { label: 'Tareas Bloqueadas', value: userData.metrics.activelyBlockedTasks, color: '#ef4444' },
+            { label: 'Incidentes', value: userData.metrics.blockIncidents, color: '#f97316' },
+            { label: 'Tipo Comun', value: userData.metrics.mostCommonBlock, color: '#84cc16' }
+          ]);
+
+          doc.moveDown(0.6);
+        }
+
+        // === SECCION: METRICAS DE ESFUERZO ===
+        this.addNewPageIfNeeded(doc, 100);
+        doc.fontSize(11).font('Helvetica-Bold').fillColor('#1e293b')
+          .text('METRICAS DE ESFUERZO', 70);
+        doc.moveDown(0.3);
+        
+        this.addMetricRow(doc, [
+          { label: 'Hrs Estimadas', value: `${userData.metrics.estimatedHours}h`, color: '#3b82f6' },
+          { label: 'Hrs Reales', value: `${userData.metrics.actualHours}h`, color: '#10b981' },
+          { label: 'Hrs Efectivas', value: `${userData.metrics.effectiveHours}h`, color: '#8b5cf6' },
+          { label: 'Con Tracking', value: userData.metrics.tasksWithTracking, color: '#6366f1' }
+        ]);
+
+        doc.moveDown(0.6);
+
+        // === SECCION: TAREAS POR PROYECTO ===
+        if (Object.keys(userData.tasksByProject).length > 0) {
+          const projectCount = Object.keys(userData.tasksByProject).length;
+          const projectListHeight = Math.min(projectCount * 15 + 10, 120);
+          
+          // Verificar espacio antes de la sección
+          this.addNewPageIfNeeded(doc, projectListHeight + 80);
+          
+          doc.fontSize(11).font('Helvetica-Bold').fillColor('#1e293b')
+            .text('DISTRIBUCION POR PROYECTO', 70);
+          doc.moveDown(0.3);
+          
+          // Fondo para la lista
+          const projectListY = doc.y;
+          
+          doc.roundedRect(70, projectListY, 460, projectListHeight, 3)
+            .fill('#f8fafc');
+          
+          doc.fontSize(9).font('Helvetica').fillColor('#334155');
+          let currentY = projectListY + 8;
           
           Object.entries(userData.tasksByProject).forEach(([projectName, stats]) => {
+            const completionPerc = stats.total > 0 ? ((stats.completed / stats.total) * 100).toFixed(0) : 0;
+            const statusIcon = completionPerc >= 80 ? '[OK]' : completionPerc >= 50 ? '[!]' : '[X]';
+            
             doc.text(
-              `  • ${projectName}: ${stats.completed}/${stats.total} completadas` +
-              (stats.overdue > 0 ? ` (${stats.overdue} atrasadas)` : ''),
-              { indent: 10 }
+              `${statusIcon} ${projectName}: ${stats.completed}/${stats.total} (${completionPerc}%)` +
+              (stats.overdue > 0 ? ` - ALERTA: ${stats.overdue} atrasadas` : ''),
+              80, currentY
             );
+            currentY += 15;
+          });
+          
+          doc.y = projectListY + projectListHeight + 5;
+        }
+
+        // Generar conclusión basada en las métricas
+        const conclusion = this.generateUserConclusion(userData.metrics);
+        
+        // Calcular altura necesaria para conclusión y recomendaciones
+        const estimatedLines = Math.ceil(conclusion.evaluation.length / 70);
+        const conclusionHeight = Math.max(100, estimatedLines * 13 + 55);
+        const recsHeight = conclusion.recommendations.length * 35 + 40;
+        const totalNeededSpace = conclusionHeight + recsHeight + 50;
+        
+        // Verificar si hay espacio suficiente, si no, nueva página
+        this.addNewPageIfNeeded(doc, totalNeededSpace);
+        
+        doc.moveDown(0.5);
+        
+        // Fondo para la conclusión (altura dinámica)
+        const conclusionY = doc.y;
+        doc.roundedRect(70, conclusionY, 460, conclusionHeight, 5)
+          .fill('#f0f9ff');
+        
+        // Título de la conclusión
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#1e40af')
+          .text('Evaluacion General:', 80, conclusionY + 10);
+        
+        // Texto de conclusión
+        doc.fontSize(9).font('Helvetica').fillColor('#334155')
+          .text(conclusion.evaluation, 80, conclusionY + 30, { width: 440, align: 'justify', lineGap: 2 });
+        
+        // Posicionar después de la caja de conclusión
+        doc.y = conclusionY + conclusionHeight + 15;
+
+        // Recomendaciones
+        if (conclusion.recommendations.length > 0) {
+          doc.fontSize(10).font('Helvetica-Bold').fillColor('#1e40af')
+            .text('Recomendaciones:', 70);
+          doc.moveDown(0.4);
+          
+          doc.fontSize(9).font('Helvetica').fillColor('#334155');
+          conclusion.recommendations.forEach((rec, idx) => {
+            doc.text(`${idx + 1}. ${rec}`, 80, doc.y, { width: 450, lineGap: 2 });
+            doc.moveDown(0.4);
           });
         }
 
-        doc.moveDown(0.8);
+        doc.moveDown(2.5);
       });
     }
 
@@ -452,14 +732,14 @@ class ReportService {
       doc.fontSize(8).font('Helvetica').fillColor('#64748b')
         .text(metric.label, x, y);
       
-      // Valor con círculo de color
-      doc.circle(x, y + 18, 3).fill(metric.color || '#1e293b');
+      // Valor con circulo de color
+      doc.circle(x, y + 17, 3).fill(metric.color || '#1e293b');
       doc.fontSize(12).font('Helvetica-Bold')
         .fillColor(metric.color || '#1e293b')
-        .text(metric.value.toString(), x + 8, y + 14);
+        .text(metric.value.toString(), x + 8, y + 13);
     });
 
-    doc.y = y + 32;
+    doc.y = y + 34;
   }
 
   drawProgressBar(doc, x, y, width, percentage) {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Calendar, Flag, Tag, Users, Plus, Trash2, CheckSquare } from 'lucide-react';
 import useTaskStore from '../store/taskStore';
 import { authAPI, getBackendURL } from '../services/api';
+import EstimationPicker from './EstimationPicker';
 import './Modal.css';
 
 const PRIORITIES = ['baja', 'media', 'alta', 'urgente'];
@@ -53,6 +54,8 @@ export default function CreateCardModal({ projectId, column, onClose }) {
     dueDate: '',
     tags: '',
     assignedTo: [],
+    estimatedSize: 'M',
+    estimatedHours: 8,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -124,6 +127,11 @@ export default function CreateCardModal({ projectId, column, onClose }) {
       return;
     }
 
+    if (!formData.estimatedSize) {
+      setError('La estimación de esfuerzo es requerida');
+      return;
+    }
+
     setLoading(true);
 
     const tagsArray = formData.tags
@@ -141,6 +149,14 @@ export default function CreateCardModal({ projectId, column, onClose }) {
       tags: tagsArray,
       assignedTo: formData.assignedTo,
       subtasks: subtasks.length > 0 ? subtasks : undefined,
+      effortMetrics: {
+        estimatedSize: formData.estimatedSize,
+        estimatedHours: formData.estimatedHours,
+        timeTracking: [],
+        blockedBy: 'none',
+        actualHours: 0,
+        effectiveHours: 0
+      }
     });
 
     setLoading(false);
@@ -262,6 +278,13 @@ export default function CreateCardModal({ projectId, column, onClose }) {
               />
             </div>
           </div>
+
+          {/* Estimación de esfuerzo */}
+          <EstimationPicker
+            value={formData.estimatedSize}
+            onChange={(size, hours) => setFormData({ ...formData, estimatedSize: size, estimatedHours: hours })}
+            required={true}
+          />
 
           <div className="form-group">
             <label htmlFor="tags">
