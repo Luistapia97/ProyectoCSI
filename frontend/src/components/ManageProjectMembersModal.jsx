@@ -59,16 +59,26 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
         return;
       }
 
+      // Mapear el rol del español al inglés que espera el backend
+      let roleToSend;
+      if (selectedRole === 'lider') {
+        roleToSend = 'leader';
+      } else if (selectedRole === 'supervisor') {
+        roleToSend = 'supervisor';
+      } else {
+        roleToSend = 'member';
+      }
+
       console.log('🔄 Agregando miembro:', {
         projectId: project._id,
         email: selectedUser.email,
-        role: selectedRole === 'lider' ? 'leader' : 'member'
+        role: roleToSend
       });
 
       // Usar projectsAPI en lugar de fetch directo
       const response = await projectsAPI.addMember(project._id, {
         email: selectedUser.email,
-        role: selectedRole === 'lider' ? 'leader' : 'member'
+        role: roleToSend
       });
 
       console.log('📡 Respuesta del servidor:', response);
@@ -277,14 +287,20 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
                         disabled={loading}
                         className="role-select"
                       >
-                        <option value="miembro">
+                        <option value="member">
                           Miembro
                         </option>
                         <option value="supervisor">
                           Supervisor
                         </option>
-                        <option value="lider">
+                        <option value="leader">
                           Líder
+                        </option>
+                        <option value="admin">
+                          Admin
+                        </option>
+                        <option value="guest">
+                          Invitado
                         </option>
                       </select>
 
