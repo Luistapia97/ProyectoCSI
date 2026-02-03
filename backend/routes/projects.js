@@ -14,21 +14,6 @@ router.get('/', protect, async (req, res) => {
   try {
     console.log('🔍 GET /projects - Usuario:', req.user.email, req.user._id.toString());
     
-    // Primero, consultar directamente de la DB SIN populate para ver miembros crudos
-    const rawProjects = await Project.find({
-      $or: [
-        { owner: req.user._id },
-        { 'members.user': req.user._id },
-      ],
-      archived: false,
-      name: 'Plan Marketing' // Solo el proyecto problemático
-    }).lean();
-    
-    if (rawProjects.length > 0) {
-      console.log('🔬 DATOS CRUDOS de MongoDB - Plan Marketing members count:', rawProjects[0].members.length);
-      console.log('🔬 DATOS CRUDOS de MongoDB - Plan Marketing members:', JSON.stringify(rawProjects[0].members, null, 2));
-    }
-    
     const projects = await Project.find({
       $or: [
         { owner: req.user._id },
@@ -43,67 +28,84 @@ router.get('/', protect, async (req, res) => {
     // Agregar estadísticas de tareas a cada proyecto
     const projectsWithStats = await Promise.all(
       projects.map(async (project) => {
-        // NOTA: Se removió la lógica de limpieza automática de miembros sin tareas
-        // Los miembros ahora deben ser gestionados manualmente por los administradores
-        
-        const tasks = await Task.find({ 
-          project: project._id,
-          archived: { $ne: true }
-        });
-        
-        const totalTasks = tasks.length;
-        const completedTasks = tasks.filter(task => task.completed).length;
-        
-        // Calcular progreso basado en columnas (igual que en Board.jsx)
-        let totalProgress = 0;
-        if (totalTasks > 0) {
-          tasks.forEach(task => {
-            const columnName = task.column?.toLowerCase() || '';
-            let columnProgress = 0;
-            
-            if (columnName.includes('completad') || columnName.includes('hecho') || columnName === 'done') {
-              // En completado: 100% solo si está validada, sino 75%
-              columnProgress = (!task.pendingValidation && task.validatedBy) ? 100 : 75;
-            } else if (columnName.includes('progreso') || columnName.includes('proceso') || columnName === 'in progress') {
-              columnProgress = 50;
-            } else if (columnName.includes('pendiente') || columnName.includes('hacer') || columnName === 'to do') {
-              columnProgress = 0;
-            } else {
-              // Fallback: usar estado de completado
-              columnProgress = task.completed ? 75 : 0;
-            }
-            
-            totalProgress += columnProgress;
+        try {
+          // NOTA: Se removió la lógica de limpieza automática de miembros sin tareas
+          // Los miembros ahora deben ser gestionados manualmente por los administradores
+          
+          const tasks = await Task.find({ 
+            project: project._id,
+            archived: { $ne: true }
           });
+          
+          const totalTasks = tasks.length;
+          const completedTasks = tasks.filter(task => task.completed).length;
+          
+          // Calcular progreso basado en columnas (igual que en Board.jsx)
+          let totalProgress = 0;
+          if (totalTasks > 0) {
+            tasks.forEach(task => {
+              const columnName = task.column?.toLowerCase() || '';
+              let columnProgress = 0;
+              
+              if (columnName.includes('completad') || columnName.includes('hecho') || columnName === 'done') {
+                // En completado: 100% solo si está validada, sino 75%
+                columnProgress = (!task.pendingValidation && task.validatedBy) ? 100 : 75;
+              } else if (columnName.includes('progreso') || columnName.includes('proceso') || columnName === 'in progress') {
+                columnProgress = 50;
+              } else if (columnName.includes('pendiente') || columnName.includes('hacer') || columnName === 'to do') {
+                columnProgress = 0;
+              } else {
+                // Fallback: usar estado de completado
+                columnProgress = task.completed ? 75 : 0;
+              }
+              
+              totalProgress += columnProgress;
+            });
+          }
+          
+          const progressPercentage = totalTasks > 0 ? Math.min(Math.round(totalProgress / totalTasks), 100) : 0;
+          
+          const projectObj = {
+            ...project.toObject(),
+            stats: {
+              totalTasks,
+              completedTasks,
+              progressPercentage,
+            },
+          };
+          
+          return projectObj;
+        } catch (error) {
+          console.error(`❌ Error procesando proyecto ${project._id} (${project.name}):`, error.message);
+          // Intentar devolver datos básicos sin populate problemático
+          try {
+            return {
+              _id: project._id,
+              name: project.name || 'Proyecto sin nombre',
+              description: project.description || '',
+              owner: project.owner,
+              members: [],
+              archived: project.archived,
+              createdAt: project.createdAt,
+              updatedAt: project.updatedAt,
+              stats: {
+                totalTasks: 0,
+                completedTasks: 0,
+                progressPercentage: 0,
+              },
+              error: 'Datos corruptos - requiere reparación'
+            };
+          } catch (fallbackError) {
+            console.error(`❌ Error crítico con proyecto ${project._id}:`, fallbackError.message);
+            return null;
+          }
         }
-        
-        const progressPercentage = totalTasks > 0 ? Math.min(Math.round(totalProgress / totalTasks), 100) : 0;
-        
-        // Debug: verificar miembros ANTES de toObject()
-        if (project.name === 'Plan Marketing') {
-          console.log('📊 ANTES toObject - Plan Marketing members count:', project.members.length);
-          console.log('📊 ANTES toObject - Plan Marketing members:', JSON.stringify(project.members, null, 2));
-        }
-        
-        const projectObj = {
-          ...project.toObject(),
-          stats: {
-            totalTasks,
-            completedTasks,
-            progressPercentage,
-          },
-        };
-        
-        // Debug: verificar miembros DESPUÉS de toObject()
-        if (project.name === 'Plan Marketing') {
-          console.log('📊 DESPUÉS toObject - Plan Marketing members:', JSON.stringify(projectObj.members, null, 2));
-        }
-        
-        return projectObj;
       })
     );
 
-    res.json({ success: true, projects: projectsWithStats });
+    // Filtrar proyectos nulos
+    const validProjects = projectsWithStats.filter(p => p !== null);
+    res.json({ success: true, projects: validProjects });
   } catch (error) {
     console.error('Error obteniendo proyectos:', error);
     res.status(500).json({ message: 'Error al obtener proyectos', error: error.message });
@@ -367,20 +369,15 @@ router.post('/:id/members', protect, async (req, res) => {
       memberRole: member?.role
     });
 
-    // Solo owner, admin, leader y supervisor pueden agregar miembros
-    const allowedRoles = ['admin', 'leader', 'supervisor'];
-    const hasPermission = isOwner || (member && allowedRoles.includes(member.role));
-
-    if (!hasPermission) {
+    if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
       console.log('❌ Sin permisos para agregar miembros');
       return res.status(403).json({ 
-        message: 'No tienes permisos para agregar miembros. Solo owner, admin, leader y supervisor pueden hacerlo.',
+        message: 'No tienes permisos para agregar miembros',
         debug: {
           projectOwnerId: projectOwnerId?.toString(),
           userId: req.user._id.toString(),
           isOwner,
-          memberRole: member?.role,
-          allowedRoles
+          memberRole: member?.role
         }
       });
     }
@@ -451,21 +448,8 @@ router.delete('/:id/members/:userId', protect, async (req, res) => {
     const isOwner = projectOwnerId && projectOwnerId.toString() === req.user._id.toString();
     const member = project.members.find(m => m.user.toString() === req.user._id.toString());
 
-    // Solo owner, admin, leader y supervisor pueden eliminar miembros
-    const allowedRoles = ['admin', 'leader', 'supervisor'];
-    const hasPermission = isOwner || (member && allowedRoles.includes(member.role));
-
-    if (!hasPermission) {
-      return res.status(403).json({ 
-        message: 'No tienes permisos para eliminar miembros. Solo owner, admin, leader y supervisor pueden hacerlo.',
-        debug: {
-          projectOwnerId: projectOwnerId?.toString(),
-          userId: req.user._id.toString(),
-          isOwner,
-          memberRole: member?.role,
-          allowedRoles
-        }
-      });
+    if (!isOwner && (!member || member.role === 'member' || member.role === 'guest')) {
+      return res.status(403).json({ message: 'No tienes permisos para eliminar miembros' });
     }
 
     // No permitir eliminar al owner
@@ -492,4 +476,91 @@ router.delete('/:id/members/:userId', protect, async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar miembro', error: error.message });
   }
 });
+
+// @route   PATCH /api/projects/:id/members/:userId/role
+// @desc    Actualizar rol de un miembro
+// @access  Private
+router.patch('/:id/members/:userId/role', protect, async (req, res) => {
+  try {
+    console.log('🔄 PATCH /api/projects/:id/members/:userId/role - Iniciando...');
+    console.log('📝 Body recibido:', req.body);
+    console.log('👤 Usuario que hace la petición:', req.user._id);
+    
+    const { role } = req.body;
+    const project = await Project.findById(req.params.id);
+
+    if (!project) {
+      console.log('❌ Proyecto no encontrado:', req.params.id);
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    console.log('✅ Proyecto encontrado:', project.name);
+
+    // Verificar permisos - soportar tanto owner como createdBy
+    const projectOwnerId = project.owner || project.createdBy;
+    const isOwner = projectOwnerId && projectOwnerId.toString() === req.user._id.toString();
+    const member = project.members.find(m => m.user.toString() === req.user._id.toString());
+
+    console.log('🔐 Verificación de permisos:', {
+      projectOwnerId: projectOwnerId?.toString(),
+      userId: req.user._id.toString(),
+      isOwner,
+      memberRole: member?.role,
+      userSystemRole: req.user.role
+    });
+
+    // Verificar que el usuario tenga permisos administrativos
+    // Permitir: administradores del sistema, owner del proyecto, admin, leader, supervisor del proyecto
+    const isSystemAdmin = req.user.role === 'administrador';
+    const hasAdminPermissions = isSystemAdmin || 
+      isOwner || 
+      (member && ['admin', 'leader', 'supervisor'].includes(member.role));
+
+    if (!hasAdminPermissions) {
+      console.log('❌ Sin permisos para actualizar roles - Rol del sistema:', req.user.role, '- Rol en proyecto:', member?.role || 'no es miembro');
+      return res.status(403).json({ 
+        message: 'No tienes permisos para actualizar roles de miembros. Se requiere ser administrador del sistema o tener rol de administrador, líder o supervisor en el proyecto.'
+      });
+    }
+
+    // Validar que el rol sea válido
+    const validRoles = ['member', 'supervisor', 'leader', 'admin', 'guest', 'owner'];
+    if (!validRoles.includes(role)) {
+      console.log('❌ Rol inválido:', role);
+      return res.status(400).json({ message: 'Rol inválido' });
+    }
+
+    // Buscar el miembro en el proyecto
+    const memberIndex = project.members.findIndex(m => m.user.toString() === req.params.userId);
+
+    if (memberIndex === -1) {
+      console.log('❌ Miembro no encontrado en el proyecto');
+      return res.status(404).json({ message: 'El usuario no es miembro del proyecto' });
+    }
+
+    // No permitir cambiar el rol del owner
+    if (req.params.userId === projectOwnerId?.toString() && role !== 'owner') {
+      console.log('❌ No se puede cambiar el rol del propietario');
+      return res.status(400).json({ message: 'No puedes cambiar el rol del propietario del proyecto' });
+    }
+
+    // Actualizar el rol
+    console.log('🔄 Actualizando rol de:', project.members[memberIndex].user.toString(), 'a:', role);
+    project.members[memberIndex].role = role;
+
+    await project.save();
+    console.log('💾 Proyecto guardado');
+
+    const updatedProject = await Project.findById(project._id)
+      .populate('owner', 'name email avatar')
+      .populate('members.user', 'name email avatar');
+
+    console.log('✅ Rol actualizado exitosamente');
+    res.json({ success: true, project: updatedProject });
+  } catch (error) {
+    console.error('❌ Error actualizando rol de miembro:', error);
+    res.status(500).json({ message: 'Error al actualizar rol', error: error.message });
+  }
+});
+
 export default router;

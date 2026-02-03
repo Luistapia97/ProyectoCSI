@@ -115,6 +115,7 @@ export const projectsAPI = {
   archive: (id, archived) => api.patch(`/projects/${id}/archive`, { archived }),
   addMember: (id, data) => api.post(`/projects/${id}/members`, data),
   removeMember: (id, userId) => api.delete(`/projects/${id}/members/${userId}`),
+  updateMemberRole: (id, userId, role) => api.patch(`/projects/${id}/members/${userId}/role`, { role }),
 };
 
 // Tasks
@@ -140,6 +141,8 @@ export const tasksAPI = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   deleteAttachment: (taskId, attachmentId) => api.delete(`/tasks/${taskId}/attachments/${attachmentId}`),
+  startTimer: (id) => api.post(`/tasks/${id}/time-tracking/start`),
+  stopTimer: (id, data) => api.post(`/tasks/${id}/time-tracking/stop`, data),
 };
 
 // Reports
@@ -156,16 +159,11 @@ export const reportsAPI = {
   download: async (filename) => {
     try {
       const token = localStorage.getItem('token');
-      // 🆕 Agregar timestamp para evitar caché del navegador
-      const cacheBuster = `?t=${Date.now()}`;
-      const response = await fetch(`${API_URL}/reports/download/${filename}${cacheBuster}`, {
+      const response = await fetch(`${API_URL}/reports/download/${filename}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/pdf',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
+          'Accept': 'application/pdf'
         }
       });
       

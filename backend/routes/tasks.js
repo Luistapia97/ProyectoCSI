@@ -481,8 +481,19 @@ router.put('/:id', protect, async (req, res) => {
       assignee => assignee.toString() === req.user._id.toString()
     );
 
-    // Validar permisos
-    if (!isAdmin && !isAssigned) {
+    // Verificar que el usuario es miembro del proyecto
+    const projectDoc = await Project.findById(task.project);
+    if (!projectDoc) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isOwner = projectDoc.owner.toString() === req.user._id.toString();
+    const isMember = projectDoc.members.some(
+      m => m.user.toString() === req.user._id.toString()
+    );
+
+    // Validar permisos: Admin, Owner, Miembro del proyecto o Asignado
+    if (!isAdmin && !isOwner && !isMember && !isAssigned) {
       return res.status(403).json({ 
         message: 'No tienes permiso para editar esta tarea' 
       });
@@ -494,8 +505,8 @@ router.put('/:id', protect, async (req, res) => {
     let oldAssignedTo = [];
     let newUsers = [];
 
-    // Admin puede editar todo
-    if (isAdmin) {
+    // Admin y miembros del proyecto pueden editar todo
+    if (isAdmin || isOwner || isMember) {
       oldAssignedTo = task.assignedTo || [];
       const oldDueDate = task.dueDate;
       
@@ -1481,6 +1492,9 @@ router.post('/:id/time-tracking/stop', protect, async (req, res) => {
     const startTime = task.effortMetrics.activeTimer.startTime;
     const duration = Math.floor((now - startTime) / 60000); // Minutos
     
+    // Sanitizar la nota para evitar problemas con caracteres especiales
+    const sanitizedNote = note ? note.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim() : '';
+    
     // Guardar sesión de tracking
     task.effortMetrics.timeTracking.push({
       userId: req.user._id,
@@ -1488,7 +1502,7 @@ router.post('/:id/time-tracking/stop', protect, async (req, res) => {
       endTime: now,
       duration,
       method: 'timer',
-      note: note || '',
+      note: sanitizedNote,
       createdAt: now
     });
     
@@ -1534,6 +1548,9 @@ router.post('/:id/time-tracking/add-session', protect, async (req, res) => {
       return res.status(400).json({ message: 'Duración inválida' });
     }
     
+    // Sanitizar la nota para evitar problemas con caracteres especiales
+    const sanitizedNote = note ? note.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim() : '';
+    
     // Inicializar effortMetrics si no existe
     if (!task.effortMetrics) {
       task.effortMetrics = {
@@ -1553,7 +1570,7 @@ router.post('/:id/time-tracking/add-session', protect, async (req, res) => {
       endTime: endTime ? new Date(endTime) : new Date(),
       duration, // en minutos
       method: 'manual',
-      note: note || '',
+      note: sanitizedNote,
       createdAt: new Date()
     });
     

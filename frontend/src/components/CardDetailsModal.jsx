@@ -127,6 +127,9 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [isDragging, setIsDragging] = useState(false);
   const [signedUrls, setSignedUrls] = useState({}); // Almacenar URLs firmadas
   const [showBlockModal, setShowBlockModal] = useState(false); // Modal de bloqueo
+  const [showStartTimerDialog, setShowStartTimerDialog] = useState(false); // Modal para iniciar timer
+  const [showStopTimerDialog, setShowStopTimerDialog] = useState(false); // Modal para detener timer
+  const [stopTimerNote, setStopTimerNote] = useState(''); // Nota para detener timer
 
   // Verificar si la tarea está bloqueada
   const isBlocked = task.effortMetrics?.blockedBy && task.effortMetrics.blockedBy !== 'none';
@@ -203,6 +206,69 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       estimatedHours: task.effortMetrics?.estimatedHours || 8,
     });
   }, [task]);
+
+  // Preguntar si se quiere iniciar el timer al abrir el modal
+  useEffect(() => {
+    const checkTimerStatus = async () => {
+      // Recargar la tarea para obtener el estado más reciente
+      await fetchTask(task._id);
+      const updatedTask = tasks.find(t => t._id === task._id) || task;
+      
+      // Solo preguntar si no hay un timer activo y la tarea no está completada
+      if (!updatedTask.effortMetrics?.activeTimer?.isActive && !updatedTask.completed) {
+        setShowStartTimerDialog(true);
+      }
+    };
+
+    checkTimerStatus();
+  }, []); // Solo ejecutar una vez al montar el componente
+
+  // Función para iniciar el timer
+  const handleStartTimer = async () => {
+    try {
+      await tasksAPI.startTimer(task._id);
+      // Recargar la tarea para actualizar el estado
+      await fetchTask(task._id);
+      setShowStartTimerDialog(false);
+    } catch (error) {
+      console.error('Error iniciando timer:', error);
+      // Solo mostrar error si no es porque ya hay un timer activo
+      if (error.response?.status !== 400) {
+        alert(error.response?.data?.message || 'Error al iniciar timer automáticamente');
+      }
+      setShowStartTimerDialog(false);
+    }
+  };
+
+  // Función para detener el timer
+  const handleStopTimer = async () => {
+    if (!stopTimerNote.trim()) {
+      alert('Debes agregar una descripción de lo realizado');
+      return;
+    }
+
+    try {
+      await tasksAPI.stopTimer(task._id, { note: stopTimerNote });
+      // Recargar la tarea para actualizar el estado
+      await fetchTask(task._id);
+      setShowStopTimerDialog(false);
+      setStopTimerNote('');
+      onClose(); // Cerrar el modal después de detener el timer
+    } catch (error) {
+      console.error('Error deteniendo timer:', error);
+      alert(error.response?.data?.message || 'Error al detener timer');
+    }
+  };
+
+  // Interceptar el cierre del modal para verificar si hay timer activo
+  const handleCloseModal = () => {
+    // Verificar si hay un timer activo
+    if (task.effortMetrics?.activeTimer?.isActive) {
+      setShowStopTimerDialog(true);
+    } else {
+      onClose();
+    }
+  };
 
   const handleUpdate = async () => {
     await updateTask(task._id, {
@@ -598,7 +664,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const isAdmin = user?.role === 'administrador';
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={handleCloseModal}>
       <div className="modal-content modal-large" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title-section">
@@ -613,7 +679,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
               <h2>{task.title}</h2>
             )}
           </div>
-          <button onClick={onClose} className="modal-close">
+          <button onClick={handleCloseModal} className="modal-close">
             <X size={24} />
           </button>
         </div>
@@ -1167,33 +1233,29 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                       <div key={assignedUser._id} className="assigned-user-item">
                         <UserAvatarDetail user={assignedUser} className="assigned-user-avatar" />
                         <span className="assigned-user-name">{assignedUser.name}</span>
-                        {isAdmin && (
-                          <button
-                            onClick={() => handleAssignUser(assignedUser._id)}
-                            className="btn-remove-user"
-                            title="Quitar usuario"
-                          >
-                            <X size={14} />
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleAssignUser(assignedUser._id)}
+                          className="btn-remove-user"
+                          title="Quitar usuario"
+                        >
+                          <X size={14} />
+                        </button>
                       </div>
                     ))
                   ) : (
                     <p className="no-assigned-users">Sin usuarios asignados</p>
                   )}
                 </div>
-                {isAdmin && (
-                  <button
-                    onClick={() => setShowUserSelector(!showUserSelector)}
-                    className="btn-add-user"
-                  >
-                    <UserPlus size={16} />
-                    Asignar usuario
-                  </button>
-                )}
+                <button
+                  onClick={() => setShowUserSelector(!showUserSelector)}
+                  className="btn-add-user"
+                >
+                  <UserPlus size={16} />
+                  Asignar usuario
+                </button>
                 
                 {/* Selector de usuarios */}
-                {showUserSelector && isAdmin && (
+                {showUserSelector && (
                   <div className="user-selector">
                     {availableUsers.map((availableUser) => {
                       const isAssigned = task.assignedTo?.some(u => u._id === availableUser._id);
@@ -1243,13 +1305,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 </>
               ) : (
                 <button 
-                  onClick={() => {
-                    if (!isAdmin) {
-                      showToast('Solo los administradores pueden editar tareas', 'warning');
-                      return;
-                    }
-                    setEditing(true);
-                  }} 
+                  onClick={() => setEditing(true)} 
                   className="btn-secondary"
                 >
                   Editar tarea
@@ -1349,6 +1405,66 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       ))}
       
       {confirmDialog && <ConfirmDialog {...confirmDialog} isOpen={true} />}
+
+      {/* Modal para iniciar timer */}
+      <ConfirmDialog 
+        isOpen={showStartTimerDialog}
+        title="Iniciar Timer"
+        message="¿Deseas iniciar el timer automáticamente para esta tarea?"
+        type="question"
+        confirmText="Iniciar Timer"
+        cancelText="No, gracias"
+        onConfirm={handleStartTimer}
+        onCancel={() => setShowStartTimerDialog(false)}
+        confirmButtonClass="info"
+      />
+
+      {/* Modal para detener timer */}
+      {showStopTimerDialog && (
+        <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" style={{ maxWidth: '500px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Detener Timer</h3>
+              <button onClick={() => setShowStopTimerDialog(false)} className="btn-close">
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <p style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
+                Tienes un timer activo. Debes detenerlo antes de cerrar la tarea.
+              </p>
+              <div className="form-group">
+                <label htmlFor="stop-timer-note">
+                  Descripción de lo realizado <span style={{ color: 'var(--danger)' }}>*</span>
+                </label>
+                <textarea
+                  id="stop-timer-note"
+                  value={stopTimerNote}
+                  onChange={(e) => setStopTimerNote(e.target.value)}
+                  placeholder="Describe qué trabajaste en este tiempo..."
+                  rows={4}
+                  style={{ width: '100%', resize: 'vertical' }}
+                />
+              </div>
+            </div>
+            <div className="modal-actions">
+              <button 
+                className="btn-secondary" 
+                onClick={() => setShowStopTimerDialog(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn-primary" 
+                onClick={handleStopTimer}
+                disabled={!stopTimerNote.trim()}
+              >
+                Detener Timer y Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -59,26 +59,16 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
         return;
       }
 
-      // Mapear el rol del español al inglés que espera el backend
-      let roleToSend;
-      if (selectedRole === 'lider') {
-        roleToSend = 'leader';
-      } else if (selectedRole === 'supervisor') {
-        roleToSend = 'supervisor';
-      } else {
-        roleToSend = 'member';
-      }
-
       console.log('🔄 Agregando miembro:', {
         projectId: project._id,
         email: selectedUser.email,
-        role: roleToSend
+        role: selectedRole === 'supervisor' ? 'supervisor' : 'member'
       });
 
       // Usar projectsAPI en lugar de fetch directo
       const response = await projectsAPI.addMember(project._id, {
         email: selectedUser.email,
-        role: roleToSend
+        role: selectedRole === 'supervisor' ? 'supervisor' : 'member'
       });
 
       console.log('📡 Respuesta del servidor:', response);
@@ -141,17 +131,29 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
     setError('');
 
     try {
-      const updatedMembers = project.members.map(m => 
-        m.user._id === userId ? { ...m, role: newRole } : m
-      );
+      console.log('🔄 Actualizando rol de miembro:', {
+        projectId: project._id,
+        userId,
+        newRole
+      });
 
-      const result = await updateProject(project._id, { members: updatedMembers });
+      const response = await projectsAPI.updateMemberRole(project._id, userId, newRole);
 
-      if (!result.success) {
-        setError(result.error || 'Error al actualizar rol');
+      console.log('📡 Respuesta del servidor:', response);
+
+      if (response.data.success && response.data.project) {
+        console.log('✅ Rol actualizado exitosamente');
+        // Actualizar directamente en el store
+        setCurrentProject(response.data.project);
+        setError('');
+      } else {
+        console.error('❌ Error en la respuesta:', response.data);
+        setError(response.data.message || 'Error al actualizar rol');
       }
     } catch (error) {
-      setError('Error al actualizar rol');
+      console.error('❌ Error actualizando rol:', error);
+      console.error('❌ Error response:', error.response);
+      setError(`Error al actualizar rol: ${error.response?.data?.message || error.message}`);
     }
     
     setLoading(false);
@@ -225,7 +227,6 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
               >
                 <option value="miembro">Miembro</option>
                 <option value="supervisor">Supervisor</option>
-                <option value="lider">Líder</option>
               </select>
             </div>
 
@@ -292,15 +293,6 @@ export default function ManageProjectMembersModal({ project, isOpen, onClose }) 
                         </option>
                         <option value="supervisor">
                           Supervisor
-                        </option>
-                        <option value="leader">
-                          Líder
-                        </option>
-                        <option value="admin">
-                          Admin
-                        </option>
-                        <option value="guest">
-                          Invitado
                         </option>
                       </select>
 
