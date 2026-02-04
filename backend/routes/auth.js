@@ -583,9 +583,9 @@ router.delete('/delete-zoho-accounts', async (req, res) => {
 });
 
 // @route   GET /api/auth/users
-// @desc    Obtener todos los usuarios (solo admin)
-// @access  Private (Admin only)
-router.get('/users', protect, isAdmin, async (req, res) => {
+// @desc    Obtener todos los usuarios
+// @access  Private
+router.get('/users', protect, async (req, res) => {
   try {
     const users = await User.find()
       .select('-password')

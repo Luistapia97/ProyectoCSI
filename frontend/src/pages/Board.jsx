@@ -188,7 +188,7 @@ export default function Board() {
 
   const getTasksByColumn = (columnName) => {
     return tasks
-      .filter(task => task.column === columnName)
+      .filter(task => task.column === columnName && !task.archived)
       .sort((a, b) => a.position - b.position);
   };
 

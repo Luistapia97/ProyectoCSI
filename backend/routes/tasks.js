@@ -388,16 +388,17 @@ router.post('/', protect, async (req, res) => {
       $inc: { 'stats.totalTasks': 1 },
     });
 
-    // Agregar usuarios asignados como miembros del proyecto si no estÃ¡n ya
+    // Agregar usuarios asignados como miembros del proyecto si no están ya
     if (assignedTo && assignedTo.length > 0) {
       for (const userId of assignedTo) {
+        if (!userId) continue; // Saltar IDs nulos
         const isMember = projectDoc.members.some(
-          m => m.user.toString() === userId.toString()
+          m => m.user && m.user.toString() === userId.toString()
         );
-        const isOwner = projectDoc.owner.toString() === userId.toString();
+        const isOwner = projectDoc.owner ? projectDoc.owner.toString() === userId.toString() : false;
 
         if (!isMember && !isOwner) {
-          console.log(`âž• Agregando usuario ${userId} como miembro del proyecto ${project}`);
+          console.log(`➕ Agregando usuario ${userId} como miembro del proyecto ${project}`);
           await Project.findByIdAndUpdate(project, {
             $push: {
               members: {
@@ -416,7 +417,9 @@ router.post('/', protect, async (req, res) => {
 
     // Crear notificaciones para asignados
     if (assignedTo && assignedTo.length > 0) {
-      const notifications = assignedTo.map(userId => ({
+      const notifications = assignedTo
+        .filter(userId => userId != null) // Filtrar nulls
+        .map(userId => ({
         user: userId,
         type: 'task_assigned',
         title: 'Nueva tarea asignada',
@@ -426,13 +429,15 @@ router.post('/', protect, async (req, res) => {
         relatedUser: req.user._id,
       }));
 
-      const createdNotifications = await Notification.insertMany(notifications);
+      if (notifications.length > 0) {
+        const createdNotifications = await Notification.insertMany(notifications);
       
-      // Emitir notificaciones por Socket.IO a cada usuario
-      const io = req.app.get('io');
-      createdNotifications.forEach(notification => {
-        io.to(`user-${notification.user}`).emit('notification', notification);
-      });
+        // Emitir notificaciones por Socket.IO a cada usuario
+        const io = req.app.get('io');
+        createdNotifications.forEach(notification => {
+          io.to(`user-${notification.user}`).emit('notification', notification);
+        });
+      }
     }
 
     // Emitir evento
@@ -478,7 +483,7 @@ router.put('/:id', protect, async (req, res) => {
 
     const isAdmin = req.user.role === 'administrador';
     const isAssigned = task.assignedTo && task.assignedTo.some(
-      assignee => assignee.toString() === req.user._id.toString()
+      assignee => assignee && assignee.toString() === req.user._id.toString()
     );
 
     // Verificar que el usuario es miembro del proyecto
@@ -487,9 +492,9 @@ router.put('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    const isOwner = projectDoc.owner.toString() === req.user._id.toString();
+    const isOwner = projectDoc.owner ? projectDoc.owner.toString() === req.user._id.toString() : false;
     const isMember = projectDoc.members.some(
-      m => m.user.toString() === req.user._id.toString()
+      m => m.user && m.user.toString() === req.user._id.toString()
     );
 
     // Validar permisos: Admin, Owner, Miembro del proyecto o Asignado
@@ -518,17 +523,18 @@ router.put('/:id', protect, async (req, res) => {
       // Si se actualiza assignedTo, agregar usuarios como miembros del proyecto
       if (assignedTo) {
         const newAssignedUsers = assignedTo.filter(
-          userId => !oldAssignedTo.some(oldId => oldId.toString() === userId.toString())
+          userId => userId && !oldAssignedTo.some(oldId => oldId && oldId.toString() === userId.toString())
         );
 
         if (newAssignedUsers.length > 0) {
           const projectDoc = await Project.findById(task.project);
           
           for (const userId of newAssignedUsers) {
+            if (!userId) continue; // Saltar IDs nulos
             const isMember = projectDoc.members.some(
-              m => m.user.toString() === userId.toString()
+              m => m.user && m.user.toString() === userId.toString()
             );
-            const isOwner = projectDoc.owner.toString() === userId.toString();
+            const isOwner = projectDoc.owner ? projectDoc.owner.toString() === userId.toString() : false;
 
             if (!isMember && !isOwner) {
               console.log(`➕ Agregando usuario ${userId} como miembro del proyecto ${task.project}`);
@@ -544,7 +550,9 @@ router.put('/:id', protect, async (req, res) => {
           }
 
           // Crear notificaciones para nuevos asignados
-          const notifications = newAssignedUsers.map(userId => ({
+          const notifications = newAssignedUsers
+            .filter(userId => userId != null) // Filtrar nulls
+            .map(userId => ({
             user: userId,
             type: 'task_assigned',
             title: 'Nueva tarea asignada',
@@ -554,7 +562,9 @@ router.put('/:id', protect, async (req, res) => {
             relatedUser: req.user._id,
           }));
 
-          await Notification.insertMany(notifications);
+          if (notifications.length > 0) {
+            await Notification.insertMany(notifications);
+          }
         }
 
         // Usuarios removidos de la tarea
@@ -580,7 +590,7 @@ router.put('/:id', protect, async (req, res) => {
             /*
             if (otherTasks === 0) {
               const projectDoc = await Project.findById(task.project);
-              const isOwner = projectDoc.owner.toString() === userIdStr;
+              const isOwner = projectDoc.owner ? projectDoc.owner.toString() === userIdStr : false;
 
               if (!isOwner) {
                 console.log(`➖ Removiendo usuario ${userId} del proyecto ${task.project} (sin tareas asignadas)`);
@@ -681,8 +691,8 @@ router.get('/archived/:projectId', protect, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
     
-    const isOwner = project.owner.toString() === req.user._id.toString();
-    const isMember = project.members.some(m => m.user.toString() === req.user._id.toString());
+    const isOwner = project.owner ? project.owner.toString() === req.user._id.toString() : false;
+    const isMember = project.members.some(m => m.user && m.user.toString() === req.user._id.toString());
     const isAdmin = req.user.role === 'administrador';
     
     if (!isOwner && !isMember && !isAdmin) {
@@ -706,13 +716,37 @@ router.get('/archived/:projectId', protect, async (req, res) => {
 
 // @route   PATCH /api/tasks/:id/archive
 // @desc    Archivar o desarchivar una tarea
-// @access  Private (Assigned user or Admin)
+// @access  Private (Assigned user or Admin or Project Member)
 router.patch('/:id/archive', protect, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
 
     if (!task) {
       return res.status(404).json({ message: 'Tarea no encontrada' });
+    }
+
+    // Verificar permisos
+    const isAdmin = req.user.role === 'administrador';
+    const isAssigned = task.assignedTo?.some(
+      assignee => assignee && assignee.toString() === req.user._id.toString()
+    );
+
+    // Verificar que el usuario es miembro del proyecto
+    const projectDoc = await Project.findById(task.project);
+    if (!projectDoc) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isOwner = projectDoc.owner ? projectDoc.owner.toString() === req.user._id.toString() : false;
+    const isMember = projectDoc.members.some(
+      m => m.user && m.user.toString() === req.user._id.toString()
+    );
+
+    // Permitir archivar a: Admin, Owner, Miembro del proyecto, o Asignado
+    if (!isAdmin && !isOwner && !isMember && !isAssigned) {
+      return res.status(403).json({ 
+        message: 'No tienes permiso para archivar esta tarea' 
+      });
     }
 
     const { archived } = req.body;
@@ -743,7 +777,7 @@ router.patch('/:id/archive', protect, async (req, res) => {
 
 // @route   DELETE /api/tasks/:id
 // @desc    Eliminar una tarea
-// @access  Private (Assigned user or Admin)
+// @access  Private (Assigned user or Admin or Project Member)
 router.delete('/:id', protect, async (req, res) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -752,17 +786,54 @@ router.delete('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
 
+    // Verificar permisos
+    const isAdmin = req.user.role === 'administrador';
+    const isAssigned = task.assignedTo?.some(
+      assignee => assignee && assignee.toString() === req.user._id.toString()
+    );
+
+    // Verificar que el usuario es miembro del proyecto
+    const projectDoc = await Project.findById(task.project);
+    if (!projectDoc) {
+      return res.status(404).json({ message: 'Proyecto no encontrado' });
+    }
+
+    const isOwner = projectDoc.owner ? projectDoc.owner.toString() === req.user._id.toString() : false;
+    const isMember = projectDoc.members.some(
+      m => m.user && m.user.toString() === req.user._id.toString()
+    );
+
+    // Permitir eliminación a: Admin, Owner, Miembro del proyecto, o Asignado
+    if (!isAdmin && !isOwner && !isMember && !isAssigned) {
+      return res.status(403).json({ 
+        message: 'No tienes permiso para eliminar esta tarea' 
+      });
+    }
+
     // Guardar usuarios asignados antes de eliminar
     const assignedUsers = task.assignedTo || [];
     const projectId = task.project;
 
-    // Archivar en lugar de eliminar
-    task.archived = true;
-    await task.save();
+    // Si la tarea ya está archivada, eliminarla permanentemente
+    // Si no está archivada, solo archivarla
+    if (task.archived) {
+      // Eliminar permanentemente
+      await Task.findByIdAndDelete(req.params.id);
+      
+      // Actualizar estadísticas del proyecto
+      await Project.findByIdAndUpdate(projectId, {
+        $inc: { 'stats.totalTasks': -1 },
+      });
+    } else {
+      // Archivar en lugar de eliminar
+      task.archived = true;
+      await task.save();
+    }
 
     // Verificar si los usuarios removidos deben ser eliminados del proyecto
     if (assignedUsers.length > 0) {
       for (const userId of assignedUsers) {
+        if (!userId) continue; // Saltar IDs nulos
         // Verificar si el usuario tiene otras tareas en el proyecto
         const userIdStr = userId.toString();
         const otherTasks = await Task.countDocuments({
@@ -778,7 +849,7 @@ router.delete('/:id', protect, async (req, res) => {
         if (otherTasks === 0) {
           const projectDoc = await Project.findById(projectId);
           if (projectDoc) {
-            const isOwner = projectDoc.owner.toString() === userIdStr;
+            const isOwner = projectDoc.owner ? projectDoc.owner.toString() === userIdStr : false;
 
             if (!isOwner) {
               console.log(`➖ Removiendo usuario ${userId} del proyecto ${projectId} (tarea eliminada, sin otras tareas)`);
@@ -883,7 +954,7 @@ router.put('/:taskId/comments/:commentId', protect, async (req, res) => {
     }
 
     // Verificar que el usuario sea el autor del comentario
-    if (comment.user.toString() !== req.user._id.toString()) {
+    if (!comment.user || comment.user.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'No tienes permiso para editar este comentario' });
     }
 
@@ -922,7 +993,7 @@ router.delete('/:taskId/comments/:commentId', protect, async (req, res) => {
     }
 
     // Verificar que el usuario sea el autor o admin
-    const isAuthor = comment.user.toString() === req.user._id.toString();
+    const isAuthor = comment.user && comment.user.toString() === req.user._id.toString();
     const isAdmin = req.user.role === 'administrador';
 
     if (!isAuthor && !isAdmin) {
@@ -1144,7 +1215,9 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
 
       // Crear notificación para usuarios asignados
       if (task.assignedTo && task.assignedTo.length > 0) {
-        const notifications = task.assignedTo.map(userId => ({
+        const notifications = task.assignedTo
+          .filter(userId => userId != null) // Filtrar nulls
+          .map(userId => ({
           user: userId,
           type: 'task_validation_rejected',
           title: 'Validación rechazada',
@@ -1154,7 +1227,9 @@ router.post('/:id/validate', protect, isAdmin, async (req, res) => {
           relatedUser: req.user._id,
         }));
 
-        await Notification.insertMany(notifications);
+        if (notifications.length > 0) {
+          await Notification.insertMany(notifications);
+        }
       }
     }
 
@@ -1426,7 +1501,7 @@ router.post('/:id/time-tracking/start', protect, async (req, res) => {
     // Verificar que el usuario esté asignado a la tarea O sea miembro del proyecto
     const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
     const isMember = task.project?.members?.some(member => 
-      member.user.toString() === req.user._id.toString()
+      member.user && member.user.toString() === req.user._id.toString()
     );
     
     if (!isAssigned && !isMember) {

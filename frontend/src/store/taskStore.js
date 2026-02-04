@@ -43,13 +43,16 @@ const useTaskStore = create((set, get) => ({
 
   createTask: async (taskData) => {
     try {
+      console.log('📝 Creando tarea:', taskData);
       const response = await tasksAPI.create(taskData);
+      console.log('✅ Tarea creada:', response.data);
       set((state) => ({
         tasks: [...state.tasks, response.data.task],
       }));
       return { success: true, task: response.data.task };
     } catch (error) {
-      console.error('Error creando tarea:', error);
+      console.error('❌ Error creando tarea:', error);
+      console.error('❌ Respuesta:', error.response?.data);
       return { 
         success: false, 
         error: error.response?.data?.message || 'Error al crear tarea' 

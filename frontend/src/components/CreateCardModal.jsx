@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Calendar, Flag, Tag, Users, Plus, Trash2, CheckSquare } from 'lucide-react';
 import useTaskStore from '../store/taskStore';
+import useAuthStore from '../store/authStore';
 import { authAPI, getBackendURL } from '../services/api';
 import EstimationPicker from './EstimationPicker';
 import './Modal.css';
@@ -47,6 +48,7 @@ function UserAvatarSelector({ user }) {
 
 export default function CreateCardModal({ projectId, column, onClose }) {
   const { createTask } = useTaskStore();
+  const { user: currentUser } = useAuthStore();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -62,6 +64,8 @@ export default function CreateCardModal({ projectId, column, onClose }) {
   const [availableUsers, setAvailableUsers] = useState([]);
   const [subtasks, setSubtasks] = useState([]);
   const [newSubtaskText, setNewSubtaskText] = useState('');
+
+  const isAdmin = currentUser?.role === 'administrador';
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
@@ -84,8 +88,16 @@ export default function CreateCardModal({ projectId, column, onClose }) {
 
   const loadUsers = async () => {
     try {
-      const response = await authAPI.getAllUsers();
-      setAvailableUsers(response.data.users || []);
+      if (isAdmin) {
+        // Administradores ven todos los usuarios
+        const response = await authAPI.getAllUsers();
+        setAvailableUsers(response.data.users || []);
+      } else {
+        // Usuarios normales solo se ven a sí mismos
+        if (currentUser) {
+          setAvailableUsers([currentUser]);
+        }
+      }
     } catch (error) {
       console.error('Error cargando usuarios:', error);
     }
@@ -102,13 +114,17 @@ export default function CreateCardModal({ projectId, column, onClose }) {
 
   const addSubtask = () => {
     if (newSubtaskText.trim()) {
-      setSubtasks([...subtasks, { text: newSubtaskText.trim(), completed: false }]);
+      setSubtasks([...subtasks, { 
+        id: Date.now() + Math.random(), 
+        text: newSubtaskText.trim(), 
+        completed: false 
+      }]);
       setNewSubtaskText('');
     }
   };
 
-  const removeSubtask = (index) => {
-    setSubtasks(subtasks.filter((_, i) => i !== index));
+  const removeSubtask = (id) => {
+    setSubtasks(subtasks.filter(st => st.id !== id));
   };
 
   const handleSubtaskKeyPress = (e) => {
@@ -214,12 +230,12 @@ export default function CreateCardModal({ projectId, column, onClose }) {
               Subtareas ({subtasks.length})
             </label>
             <div className="subtasks-list">
-              {subtasks.map((subtask, index) => (
-                <div key={index} className="subtask-item">
+              {subtasks.map((subtask) => (
+                <div key={subtask.id} className="subtask-item">
                   <span>{subtask.text}</span>
                   <button
                     type="button"
-                    onClick={() => removeSubtask(index)}
+                    onClick={() => removeSubtask(subtask.id)}
                     className="btn-icon-tiny btn-danger"
                   >
                     <Trash2 size={14} />
@@ -303,7 +319,10 @@ export default function CreateCardModal({ projectId, column, onClose }) {
           <div className="form-group">
             <label>
               <Users size={18} />
-              Asignar usuarios ({formData.assignedTo.length})
+              {isAdmin 
+                ? `Asignar usuarios (${formData.assignedTo.length})`
+                : 'Asignarme esta tarea'
+              }
             </label>
             <div className="user-selection-grid">
               {availableUsers.map((user) => (

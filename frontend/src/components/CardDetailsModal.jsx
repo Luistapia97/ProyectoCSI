@@ -290,10 +290,17 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       type: 'danger',
       confirmText: 'Eliminar',
       onConfirm: async () => {
-        await deleteTask(task._id);
-        showToast('Tarea eliminada exitosamente', 'success');
-        setConfirmDialog(null);
-        onClose();
+        const result = await deleteTask(task._id);
+        if (result.success) {
+          showToast('Tarea eliminada exitosamente', 'success');
+          setConfirmDialog(null);
+          onClose();
+          // Forzar actualización del componente padre
+          window.dispatchEvent(new Event('tasksUpdated'));
+        } else {
+          showToast('Error al eliminar la tarea: ' + (result.error || 'Error desconocido'), 'error');
+          setConfirmDialog(null);
+        }
       },
       onCancel: () => setConfirmDialog(null)
     });
@@ -492,9 +499,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const loadUsers = async () => {
     try {
       const response = await authAPI.getAllUsers();
-      setAvailableUsers(response.data.users || []);
+      const allUsers = response.data.users || [];
+      console.log('👥 Usuarios cargados en CardDetailsModal:', allUsers.length);
+      setAvailableUsers(allUsers);
     } catch (error) {
-      console.error('Error cargando usuarios:', error);
+      console.error('❌ Error cargando usuarios:', error);
     }
   };
 
@@ -512,6 +521,8 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
         assignedTo: [...currentAssigned, userId],
       });
     }
+    // Recargar la tarea para reflejar los cambios inmediatamente
+    await fetchTask(task._id);
   };
 
   const handleRequestValidation = async () => {
