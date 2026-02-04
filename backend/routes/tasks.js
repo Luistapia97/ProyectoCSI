@@ -569,7 +569,7 @@ router.put('/:id', protect, async (req, res) => {
 
         // Usuarios removidos de la tarea
         const removedUsers = oldAssignedTo.filter(
-          oldId => !assignedTo.some(newId => newId.toString() === oldId.toString())
+          oldId => oldId && !assignedTo.some(newId => newId && newId.toString() === oldId.toString())
         );
 
         // Si hay usuarios removidos, verificar si deben ser removidos del proyecto
@@ -608,12 +608,12 @@ router.put('/:id', protect, async (req, res) => {
         task.assignedTo = assignedTo;
         
         // Verificar si cambiÃ³ la lista de asignados
-        assignedToChanged = JSON.stringify(oldAssignedTo.map(id => id.toString()).sort()) !== 
-          JSON.stringify(assignedTo.map(id => id.toString()).sort());
+        assignedToChanged = JSON.stringify(oldAssignedTo.filter(id => id).map(id => id.toString()).sort()) !== 
+          JSON.stringify(assignedTo.filter(id => id).map(id => id.toString()).sort());
         
         // Identificar nuevos usuarios para sincronizar
         newUsers = assignedTo.filter(
-          newId => !oldAssignedTo.some(oldId => oldId.toString() === newId.toString())
+          newId => newId && !oldAssignedTo.some(oldId => oldId && oldId.toString() === newId.toString())
         );
       }
       
@@ -1499,7 +1499,7 @@ router.post('/:id/time-tracking/start', protect, async (req, res) => {
     }
     
     // Verificar que el usuario esté asignado a la tarea O sea miembro del proyecto
-    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    const isAssigned = task.assignedTo.some(user => user && user.toString() === req.user._id.toString());
     const isMember = task.project?.members?.some(member => 
       member.user && member.user.toString() === req.user._id.toString()
     );
@@ -1611,7 +1611,7 @@ router.post('/:id/time-tracking/add-session', protect, async (req, res) => {
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
     
-    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    const isAssigned = task.assignedTo.some(user => user && user.toString() === req.user._id.toString());
     if (!isAssigned) {
       return res.status(403).json({ message: 'No estás asignado a esta tarea' });
     }
@@ -1672,7 +1672,7 @@ router.post('/:id/block', protect, async (req, res) => {
       return res.status(404).json({ message: 'Tarea no encontrada' });
     }
     
-    const isAssigned = task.assignedTo.some(user => user.toString() === req.user._id.toString());
+    const isAssigned = task.assignedTo.some(user => user && user.toString() === req.user._id.toString());
     if (!isAssigned) {
       return res.status(403).json({ message: 'No estás asignado a esta tarea' });
     }
