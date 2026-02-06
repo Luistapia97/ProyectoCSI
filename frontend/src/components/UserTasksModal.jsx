@@ -76,7 +76,15 @@ export default function UserTasksModal({ type, onClose, title, icon: Icon }) {
   };
 
   const handleTaskClick = (task) => {
-    setSelectedTask(task);
+    // Si ya hay una tarea seleccionada, cerrar primero para forzar re-render
+    if (selectedTask) {
+      setSelectedTask(null);
+      setTimeout(() => {
+        setSelectedTask(task);
+      }, 10);
+    } else {
+      setSelectedTask(task);
+    }
   };
 
   const handleCloseTaskDetails = () => {
@@ -219,6 +227,7 @@ export default function UserTasksModal({ type, onClose, title, icon: Icon }) {
       {selectedTask && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1100 }}>
           <CardDetailsModal 
+            key={selectedTask._id}
             task={selectedTask} 
             onClose={handleCloseTaskDetails}
           />

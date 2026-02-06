@@ -76,10 +76,11 @@ function UserAvatarDetail({ user, className }) {
 
 export default function CardDetailsModal({ task: initialTask, onClose }) {
   const { user } = useAuthStore();
-  const { updateTask, deleteTask, fetchComments, addComment, updateComment, deleteComment, comments, requestValidation, validateTask, currentTask, tasks, fetchTask } = useTaskStore();
+  const { updateTask, deleteTask, fetchComments, addComment, updateComment, deleteComment, comments, requestValidation, validateTask, tasks, fetchTask } = useTaskStore();
   
-  // Obtener la tarea actualizada del store o usar la inicial
-  const task = tasks.find(t => t._id === initialTask._id) || currentTask || initialTask;
+  // Obtener la tarea del store si existe, sino usar initialTask
+  // IMPORTANTE: Priorizar initialTask para evitar mostrar la tarea incorrecta
+  const task = tasks.find(t => t._id === initialTask._id) || initialTask;
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
