@@ -11,6 +11,8 @@ import ArchivedProjectsModal from '../components/ArchivedProjectsModal';
 import ProjectActiveTasks from '../components/ProjectActiveTasks';
 import NotificationBell from '../components/NotificationBell';
 import ReportsManager from '../components/ReportsManager';
+import UserTasksModal from '../components/UserTasksModal';
+import ActiveTimersIndicator from '../components/ActiveTimersIndicator';
 import socketService from '../services/socket';
 import { authAPI, projectsAPI, tasksAPI, getBackendURL } from '../services/api';
 import { useToast } from '../hooks/useToast';
@@ -69,6 +71,7 @@ export default function Dashboard() {
   const [showArchivedProjects, setShowArchivedProjects] = useState(false);
   const [showReportsManager, setShowReportsManager] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showTasksModal, setShowTasksModal] = useState(null);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
   const [theme, setTheme] = useState('light');
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -347,7 +350,11 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {/* Estadísticas del usuario */}
             <div className="user-stats-container">
-              <div className="user-stat-card">
+              <div 
+                className="user-stat-card clickable-stat" 
+                onClick={() => setShowTasksModal('active')}
+                title="Ver tareas activas"
+              >
                 <div className="stat-icon stat-icon-active">
                   <CheckCircle2 size={18} />
                 </div>
@@ -356,7 +363,11 @@ export default function Dashboard() {
                   <span className="stat-label">Activas</span>
                 </div>
               </div>
-              <div className="user-stat-card">
+              <div 
+                className="user-stat-card clickable-stat" 
+                onClick={() => setShowTasksModal('pending-validation')}
+                title="Ver tareas pendientes de validación"
+              >
                 <div className="stat-icon stat-icon-validation">
                   <Clock size={18} />
                 </div>
@@ -365,7 +376,11 @@ export default function Dashboard() {
                   <span className="stat-label">Por validar</span>
                 </div>
               </div>
-              <div className="user-stat-card">
+              <div 
+                className="user-stat-card clickable-stat" 
+                onClick={() => setShowTasksModal('due-soon')}
+                title="Ver tareas por vencer"
+              >
                 <div className="stat-icon stat-icon-due">
                   <AlertTriangle size={18} />
                 </div>
@@ -535,7 +550,31 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {showTasksModal && (
+        <UserTasksModal
+          type={showTasksModal}
+          onClose={() => setShowTasksModal(null)}
+          title={
+            showTasksModal === 'active' 
+              ? 'Tareas Activas' 
+              : showTasksModal === 'pending-validation'
+              ? 'Tareas Pendientes de Validación'
+              : 'Tareas Por Vencer'
+          }
+          icon={
+            showTasksModal === 'active'
+              ? CheckCircle2
+              : showTasksModal === 'pending-validation'
+              ? Clock
+              : AlertTriangle
+          }
+        />
+      )}
       
+      {/* Indicador de timers activos */}
+      <ActiveTimersIndicator />
+
       {toasts.map(toast => (
         <Toast
           key={toast.id}

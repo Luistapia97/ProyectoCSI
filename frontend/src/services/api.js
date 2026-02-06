@@ -121,6 +121,9 @@ export const projectsAPI = {
 // Tasks
 export const tasksAPI = {
   getUserStats: () => api.get('/tasks/user-stats'),
+  getUserActiveTasks: () => api.get('/tasks/user/active'),
+  getUserPendingValidation: () => api.get('/tasks/user/pending-validation'),
+  getUserDueSoon: () => api.get('/tasks/user/due-soon'),
   getByProject: (projectId) => api.get(`/tasks/project/${projectId}`),
   getArchived: (projectId) => api.get(`/tasks/archived/${projectId}`),
   getActiveByUser: (projectId) => api.get(`/tasks/project/${projectId}/active-by-user`),

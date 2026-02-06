@@ -128,8 +128,9 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
   const [signedUrls, setSignedUrls] = useState({}); // Almacenar URLs firmadas
   const [showBlockModal, setShowBlockModal] = useState(false); // Modal de bloqueo
   const [showStartTimerDialog, setShowStartTimerDialog] = useState(false); // Modal para iniciar timer
+  const [showCloseWithTimerDialog, setShowCloseWithTimerDialog] = useState(false); // Modal para cerrar con timer activo
   const [showStopTimerDialog, setShowStopTimerDialog] = useState(false); // Modal para detener timer
-  const [stopTimerNote, setStopTimerNote] = useState(''); // Nota para detener timer
+  const [stopTimerNote, setStopTimerNote] = useState(''); // Nota al detener timer
 
   // Verificar si la tarea está bloqueada
   const isBlocked = task.effortMetrics?.blockedBy && task.effortMetrics.blockedBy !== 'none';
@@ -207,21 +208,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     });
   }, [task]);
 
-  // Preguntar si se quiere iniciar el timer al abrir el modal
+  // Preguntar automáticamente si se quiere iniciar el timer al abrir la tarea
   useEffect(() => {
-    const checkTimerStatus = async () => {
-      // Recargar la tarea para obtener el estado más reciente
-      await fetchTask(task._id);
-      const updatedTask = tasks.find(t => t._id === task._id) || task;
-      
-      // Solo preguntar si no hay un timer activo y la tarea no está completada
-      if (!updatedTask.effortMetrics?.activeTimer?.isActive && !updatedTask.completed) {
-        setShowStartTimerDialog(true);
-      }
-    };
-
-    checkTimerStatus();
-  }, []); // Solo ejecutar una vez al montar el componente
+    if (task && !task.effortMetrics?.activeTimer?.isActive && !task.completed) {
+      setShowStartTimerDialog(true);
+    }
+  }, [task._id]);
 
   // Función para iniciar el timer
   const handleStartTimer = async () => {
@@ -240,7 +232,28 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
     }
   };
 
-  // Función para detener el timer
+  // Interceptar el cierre del modal para verificar si hay timer activo
+  const handleCloseModal = () => {
+    // Verificar si hay un timer activo
+    if (task.effortMetrics?.activeTimer?.isActive) {
+      setShowCloseWithTimerDialog(true);
+    } else {
+      onClose();
+    }
+  };
+
+  // Confirmar cierre con timer activo
+  const handleConfirmCloseWithTimer = () => {
+    setShowCloseWithTimerDialog(false);
+    onClose();
+  };
+
+  // Mostrar modal para detener timer
+  const handleRequestStopTimer = () => {
+    setShowStopTimerDialog(true);
+  };
+
+  // Detener timer con nota
   const handleStopTimer = async () => {
     if (!stopTimerNote.trim()) {
       alert('Debes agregar una descripción de lo realizado');
@@ -249,24 +262,12 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
 
     try {
       await tasksAPI.stopTimer(task._id, { note: stopTimerNote });
-      // Recargar la tarea para actualizar el estado
       await fetchTask(task._id);
       setShowStopTimerDialog(false);
       setStopTimerNote('');
-      onClose(); // Cerrar el modal después de detener el timer
     } catch (error) {
       console.error('Error deteniendo timer:', error);
       alert(error.response?.data?.message || 'Error al detener timer');
-    }
-  };
-
-  // Interceptar el cierre del modal para verificar si hay timer activo
-  const handleCloseModal = () => {
-    // Verificar si hay un timer activo
-    if (task.effortMetrics?.activeTimer?.isActive) {
-      setShowStopTimerDialog(true);
-    } else {
-      onClose();
     }
   };
 
@@ -1357,6 +1358,7 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
           taskId={task._id}
           effortMetrics={task.effortMetrics}
           onUpdate={() => fetchTask(task._id)}
+          onStopTimerRequest={handleRequestStopTimer}
         />
 
         {/* Modal de validación */}
@@ -1430,6 +1432,19 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
         confirmButtonClass="info"
       />
 
+      {/* Modal para cerrar con timer activo */}
+      <ConfirmDialog 
+        isOpen={showCloseWithTimerDialog}
+        title="Tienes un timer activo en esta tarea"
+        message="El timer seguirá corriendo en segundo plano. No olvides detenerlo antes de que agote el tiempo.¿Deseas cerrar esta tarea?"
+        type="warning"
+        confirmText="Aceptar"
+        cancelText="Cancelar"
+        onConfirm={handleConfirmCloseWithTimer}
+        onCancel={() => setShowCloseWithTimerDialog(false)}
+        confirmButtonClass="warning"
+      />
+
       {/* Modal para detener timer */}
       {showStopTimerDialog && (
         <div className="modal-overlay" onClick={(e) => e.stopPropagation()}>
@@ -1442,11 +1457,11 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
             </div>
             <div className="modal-body">
               <p style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
-                Tienes un timer activo. Debes detenerlo antes de cerrar la tarea.
+                Describe qué trabajaste durante este tiempo
               </p>
               <div className="form-group">
                 <label htmlFor="stop-timer-note">
-                  Descripción de lo realizado <span style={{ color: 'var(--danger)' }}>*</span>
+                  Descripción <span style={{ color: 'var(--danger)' }}>*</span>
                 </label>
                 <textarea
                   id="stop-timer-note"
@@ -1470,12 +1485,13 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
                 onClick={handleStopTimer}
                 disabled={!stopTimerNote.trim()}
               >
-                Detener Timer y Cerrar
+                Detener Timer
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }

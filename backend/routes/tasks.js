@@ -137,6 +137,85 @@ router.get('/user-stats', protect, async (req, res) => {
   }
 });
 
+// @route   GET /api/tasks/user/active
+// @desc    Obtener tareas activas del usuario actual (completas)
+// @access  Private
+router.get('/user/active', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const tasks = await Task.find({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+    })
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('project', 'name color')
+      .sort({ dueDate: 1, priority: -1 });
+
+    res.json({ success: true, tasks, count: tasks.length });
+  } catch (error) {
+    console.error('Error obteniendo tareas activas del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener tareas activas', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/user/pending-validation
+// @desc    Obtener tareas pendientes de validación del usuario actual
+// @access  Private
+router.get('/user/pending-validation', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const tasks = await Task.find({
+      assignedTo: userId,
+      pendingValidation: true,
+      archived: false,
+    })
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('project', 'name color')
+      .sort({ dueDate: 1, priority: -1 });
+
+    res.json({ success: true, tasks, count: tasks.length });
+  } catch (error) {
+    console.error('Error obteniendo tareas pendientes de validación del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener tareas pendientes', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/user/due-soon
+// @desc    Obtener tareas por vencer del usuario actual (próximas 7 días)
+// @access  Private
+router.get('/user/due-soon', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const now = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(now.getDate() + 7);
+
+    const tasks = await Task.find({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+      dueDate: {
+        $gte: now,
+        $lte: sevenDaysFromNow,
+      },
+    })
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('project', 'name color')
+      .sort({ dueDate: 1, priority: -1 });
+
+    res.json({ success: true, tasks, count: tasks.length });
+  } catch (error) {
+    console.error('Error obteniendo tareas por vencer del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener tareas por vencer', error: error.message });
+  }
+});
+
 // @route   GET /api/tasks/pending-validation
 // @desc    Obtener tareas pendientes de validación (solo administradores)
 // @access  Private (Admin only)

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import './TimeTracker.css';
 
-function TimeTracker({ taskId, effortMetrics, onUpdate }) {
+function TimeTracker({ taskId, effortMetrics, onUpdate, onStopTimerRequest }) {
   const [isTracking, setIsTracking] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [showManualEntry, setShowManualEntry] = useState(false);
@@ -18,13 +18,19 @@ function TimeTracker({ taskId, effortMetrics, onUpdate }) {
       const startTime = new Date(effortMetrics.activeTimer.startTime);
       const now = new Date();
       setElapsedTime(Math.floor((now - startTime) / 1000));
+    } else {
+      setIsTracking(false);
+      setElapsedTime(0);
     }
   }, [effortMetrics]);
 
   useEffect(() => {
-    if (isTracking) {
+    if (isTracking && effortMetrics?.activeTimer?.startTime) {
       intervalRef.current = setInterval(() => {
-        setElapsedTime(prev => prev + 1);
+        // Recalcular desde el startTime del servidor para evitar desfase
+        const startTime = new Date(effortMetrics.activeTimer.startTime);
+        const now = new Date();
+        setElapsedTime(Math.floor((now - startTime) / 1000));
       }, 1000);
     } else {
       if (intervalRef.current) {
@@ -37,7 +43,7 @@ function TimeTracker({ taskId, effortMetrics, onUpdate }) {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isTracking]);
+  }, [isTracking, effortMetrics?.activeTimer?.startTime]);
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -59,6 +65,13 @@ function TimeTracker({ taskId, effortMetrics, onUpdate }) {
   };
 
   const handleStopTimer = async () => {
+    // Si hay un callback para solicitar detener el timer, usarlo (para mostrar modal con nota)
+    if (onStopTimerRequest) {
+      onStopTimerRequest();
+      return;
+    }
+
+    // Fallback: detener directamente si no hay callback
     try {
       await api.post(`/tasks/${taskId}/time-tracking/stop`, { note });
       setIsTracking(false);

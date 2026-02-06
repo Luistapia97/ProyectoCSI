@@ -819,6 +819,22 @@
   border-color: rgba(102, 126, 234, 0.3);
 }
 
+.user-stat-card.clickable-stat {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-stat-card.clickable-stat:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
+  border-color: rgba(102, 126, 234, 0.5);
+}
+
+.user-stat-card.clickable-stat:active {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
 .stat-icon {
   display: flex;
   align-items: center;
