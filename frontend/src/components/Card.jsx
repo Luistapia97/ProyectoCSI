@@ -97,7 +97,6 @@ export default function Card({ task, onClick }) {
       {/* Badge de URGENTE */}
       {isUrgent && !task.completed && (
         <div className="urgent-badge">
-          <span className="urgent-icon">🔥</span>
           <span className="urgent-text">URGENTE</span>
         </div>
       )}

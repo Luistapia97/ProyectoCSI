@@ -294,11 +294,6 @@
   letter-spacing: 0.5px;
 }
 
-.urgent-icon {
-  font-size: 1rem;
-  animation: flame 1.5s ease-in-out infinite;
-}
-
 .urgent-text {
   font-weight: 800;
 }
@@ -310,16 +305,6 @@
   }
   50% {
     box-shadow: 0 4px 16px rgba(220, 38, 38, 0.6);
-  }
-}
-
-/* Animación de llama */
-@keyframes flame {
-  0%, 100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-2px) scale(1.1);
   }
 }
 
