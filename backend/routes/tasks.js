@@ -126,10 +126,19 @@ router.get('/user-stats', protect, async (req, res) => {
       },
     });
 
+    // Tareas urgentes/alta prioridad (no completadas, no archivadas)
+    const urgentTasks = await Task.countDocuments({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+      priority: { $in: ['urgente', 'alta'] },
+    });
+
     res.json({
       activeTasks,
       pendingValidation,
       tasksDueSoon,
+      urgentTasks,
     });
   } catch (error) {
     console.error('Error obteniendo estadísticas del usuario:', error);
@@ -213,6 +222,31 @@ router.get('/user/due-soon', protect, async (req, res) => {
   } catch (error) {
     console.error('Error obteniendo tareas por vencer del usuario:', error);
     res.status(500).json({ message: 'Error al obtener tareas por vencer', error: error.message });
+  }
+});
+
+// @route   GET /api/tasks/user/urgent
+// @desc    Obtener tareas urgentes/alta del usuario actual
+// @access  Private
+router.get('/user/urgent', protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const tasks = await Task.find({
+      assignedTo: userId,
+      completed: false,
+      archived: false,
+      priority: { $in: ['urgente', 'alta'] },
+    })
+      .populate('assignedTo', 'name email avatar')
+      .populate('createdBy', 'name email avatar')
+      .populate('project', 'name color')
+      .sort({ priority: -1, dueDate: 1 }); // Urgentes primero, luego por fecha
+
+    res.json({ success: true, tasks, count: tasks.length });
+  } catch (error) {
+    console.error('Error obteniendo tareas urgentes del usuario:', error);
+    res.status(500).json({ message: 'Error al obtener tareas urgentes', error: error.message });
   }
 });
 

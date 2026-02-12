@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive, Edit, Users, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Settings, Shield, BarChart3, Layout, Archive, Edit, Users, Trash2, AlertTriangle } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import useProjectStore from '../store/projectStore';
 import useTaskStore from '../store/taskStore';
@@ -71,6 +71,7 @@ export default function Board() {
   const [showProjectSettings, setShowProjectSettings] = useState(false);
   const [showEditProjectModal, setShowEditProjectModal] = useState(false);
   const [showManageMembersModal, setShowManageMembersModal] = useState(false);
+  const [showOnlyUrgent, setShowOnlyUrgent] = useState(false); // Filtro de urgentes
   
   const isAdmin = user?.role === 'administrador';
 
@@ -187,9 +188,30 @@ export default function Board() {
   }, [searchParams, tasks, setSearchParams]);
 
   const getTasksByColumn = (columnName) => {
-    return tasks
-      .filter(task => task.column === columnName && !task.archived)
-      .sort((a, b) => a.position - b.position);
+    // Mapeo de prioridades a números para ordenamiento
+    const priorityOrder = { urgente: 4, alta: 3, media: 2, baja: 1 };
+
+    let columnTasks = tasks
+      .filter(task => task.column === columnName && !task.archived);
+
+    // Filtrar solo urgentes/alta si el filtro está activo
+    if (showOnlyUrgent) {
+      columnTasks = columnTasks.filter(task => 
+        task.priority === 'urgente' || task.priority === 'alta'
+      );
+    }
+
+    // Ordenar por prioridad primero, luego por posición
+    return columnTasks.sort((a, b) => {
+      const priorityA = priorityOrder[a.priority] || 0;
+      const priorityB = priorityOrder[b.priority] || 0;
+      
+      if (priorityB !== priorityA) {
+        return priorityB - priorityA; // Mayor prioridad primero
+      }
+      
+      return a.position - b.position; // Mismo priority, ordenar por posición
+    });
   };
 
   const handleDragEnd = async (result) => {
@@ -260,6 +282,25 @@ export default function Board() {
         <div className="board-header-right">
           <NotificationBell />
           
+          {/* Botón filtro de urgentes */}
+          <button 
+            onClick={() => setShowOnlyUrgent(!showOnlyUrgent)} 
+            className={`btn-secondary ${showOnlyUrgent ? 'active-filter' : ''}`}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px', 
+              padding: '8px 16px',
+              backgroundColor: showOnlyUrgent ? '#dc2626' : undefined,
+              color: showOnlyUrgent ? 'white' : undefined,
+              borderColor: showOnlyUrgent ? '#dc2626' : undefined
+            }}
+            title={showOnlyUrgent ? "Mostrar todas las tareas" : "Mostrar solo urgentes/alta"}
+          >
+            <AlertTriangle size={18} />
+            {showOnlyUrgent ? "Urgentes activo" : "Solo urgentes"}
+          </button>
+
           {isAdmin && (
             <button 
               onClick={() => setShowArchivedTasks(true)} 

@@ -85,12 +85,23 @@ export default function Card({ task, onClick }) {
     ? getLocalDate(task.dueDate) < new Date() && !task.completed
     : false;
 
+  const isUrgent = task.priority === 'urgente';
+  const isHighPriority = task.priority === 'alta' || task.priority === 'urgente';
+
   return (
     <div
-      className={`task-card ${task.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''} ${task.pendingValidation ? 'pending-validation' : ''}`}
+      className={`task-card ${task.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''} ${task.pendingValidation ? 'pending-validation' : ''} ${isUrgent ? 'urgent-task' : ''} ${isHighPriority ? 'high-priority-task' : ''}`}
       onClick={onClick}
       style={task.color ? { borderLeftColor: task.color } : {}}
     >
+      {/* Badge de URGENTE */}
+      {isUrgent && !task.completed && (
+        <div className="urgent-badge">
+          <span className="urgent-icon">🔥</span>
+          <span className="urgent-text">URGENTE</span>
+        </div>
+      )}
+
       {task.pendingValidation && (
         <div className="validation-badge">
           <CheckCircle size={14} />
@@ -99,7 +110,12 @@ export default function Card({ task, onClick }) {
       )}
       
       <div className="card-header">
-        <h4 className="card-title">{task.title}</h4>
+        <div className="card-title-container">
+          {isHighPriority && !task.completed && (
+            <span className="priority-flag" title={`Prioridad: ${task.priority}`}>🚩</span>
+          )}
+          <h4 className="card-title">{task.title}</h4>
+        </div>
         <div
           className="priority-indicator"
           style={{ backgroundColor: priorityColor }}

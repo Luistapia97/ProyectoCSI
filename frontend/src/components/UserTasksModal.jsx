@@ -43,6 +43,8 @@ export default function UserTasksModal({ type, onClose, title, icon: Icon }) {
         response = await tasksAPI.getUserPendingValidation();
       } else if (type === 'due-soon') {
         response = await tasksAPI.getUserDueSoon();
+      } else if (type === 'urgent') {
+        response = await tasksAPI.getUserUrgentTasks();
       }
 
       const fetchedTasks = response.data.tasks || [];

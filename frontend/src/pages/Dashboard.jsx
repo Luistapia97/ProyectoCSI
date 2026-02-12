@@ -80,6 +80,7 @@ export default function Dashboard() {
     activeTasks: 0,
     pendingValidation: 0,
     tasksDueSoon: 0,
+    urgentTasks: 0,
   });
   
   const isAdmin = user?.role === 'administrador';
@@ -350,6 +351,23 @@ export default function Dashboard() {
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             {/* Estadísticas del usuario */}
             <div className="user-stats-container">
+              {/* Stat card de urgentes - Destacada */}
+              {userStats.urgentTasks > 0 && (
+                <div 
+                  className="user-stat-card clickable-stat urgent-stat" 
+                  onClick={() => setShowTasksModal('urgent')}
+                  title="Ver tareas urgentes"
+                >
+                  <div className="stat-icon stat-icon-urgent">
+                    <AlertTriangle size={18} />
+                  </div>
+                  <div className="stat-info">
+                    <span className="stat-value">{userStats.urgentTasks}</span>
+                    <span className="stat-label">Urgentes</span>
+                  </div>
+                </div>
+              )}
+
               <div 
                 className="user-stat-card clickable-stat" 
                 onClick={() => setShowTasksModal('active')}
@@ -560,6 +578,8 @@ export default function Dashboard() {
               ? 'Tareas Activas' 
               : showTasksModal === 'pending-validation'
               ? 'Tareas Pendientes de Validación'
+              : showTasksModal === 'urgent'
+              ? 'Tareas Urgentes'
               : 'Tareas Por Vencer'
           }
           icon={
@@ -567,6 +587,8 @@ export default function Dashboard() {
               ? CheckCircle2
               : showTasksModal === 'pending-validation'
               ? Clock
+              : showTasksModal === 'urgent'
+              ? AlertTriangle
               : AlertTriangle
           }
         />

@@ -5,6 +5,7 @@ import { es } from 'date-fns/locale';
 import useTaskStore from '../store/taskStore';
 import useAuthStore from '../store/authStore';
 import { authAPI, tasksAPI, getBackendURL } from '../services/api';
+import socketService from '../services/socket';
 import { useToast } from '../hooks/useToast';
 import ConfirmDialog from './ConfirmDialog';
 import Toast from './Toast';
@@ -76,11 +77,11 @@ function UserAvatarDetail({ user, className }) {
 
 export default function CardDetailsModal({ task: initialTask, onClose }) {
   const { user } = useAuthStore();
-  const { updateTask, deleteTask, fetchComments, addComment, updateComment, deleteComment, comments, requestValidation, validateTask, tasks, fetchTask } = useTaskStore();
+  const { updateTask, deleteTask, fetchComments, addComment, updateComment, deleteComment, comments, requestValidation, validateTask, tasks, fetchTask, currentTask } = useTaskStore();
   
-  // Obtener la tarea del store si existe, sino usar initialTask
-  // IMPORTANTE: Priorizar initialTask para evitar mostrar la tarea incorrecta
-  const task = tasks.find(t => t._id === initialTask._id) || initialTask;
+  // Obtener la tarea del store si existe, priorizar currentTask para actualizaciones en tiempo real
+  // IMPORTANTE: Priorizar currentTask si el ID coincide (para updates vía socket)
+  const task = (currentTask?._id === initialTask._id ? currentTask : tasks.find(t => t._id === initialTask._id)) || initialTask;
 
   const getAvatarUrl = (avatarUrl) => {
     if (!avatarUrl || avatarUrl.trim() === '' || avatarUrl === 'undefined' || avatarUrl.includes('undefined') || avatarUrl === 'null') return null;
@@ -215,6 +216,22 @@ export default function CardDetailsModal({ task: initialTask, onClose }) {
       setShowStartTimerDialog(true);
     }
   }, [task._id]);
+
+  // Escuchar actualizaciones de socket para actualizar timer en tiempo real
+  useEffect(() => {
+    const handleTaskUpdate = (updatedTask) => {
+      if (updatedTask._id === task._id) {
+        // Actualizar la tarea en el store para reflejar cambios del timer
+        fetchTask(task._id);
+      }
+    };
+
+    socketService.on('task-updated', handleTaskUpdate);
+
+    return () => {
+      socketService.off('task-updated', handleTaskUpdate);
+    };
+  }, [task._id, fetchTask]);
 
   // Función para iniciar el timer
   const handleStartTimer = async () => {
