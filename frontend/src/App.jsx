@@ -95,6 +95,12 @@ function AuthSuccess() {
 export default function App() {
   const { loadUser } = useAuthStore();
 
+  // Aplicar el tema guardado al iniciar la aplicación
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
   useEffect(() => {
     loadUser();
   }, [loadUser]);

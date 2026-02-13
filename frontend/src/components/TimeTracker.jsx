@@ -328,7 +328,7 @@ function TimeTracker({ taskId, effortMetrics, onUpdate, onStopTimerRequest }) {
                     {(session.duration / 60).toFixed(2)}h
                   </span>
                   <span className="session-method">
-                    {session.method === 'timer' ? '⏱️' : '✏️'}
+                    {session.method === 'timer' ? '⏱' : ''}
                   </span>
                 </div>
                 <div className="session-date">

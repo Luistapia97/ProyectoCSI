@@ -373,3 +373,142 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+
+/* === MODO OSCURO TIMETRACKER === */
+
+[data-theme="dark"] .time-tracker {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .tracker-header h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .timer-display {
+  color: #a78bfa;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+[data-theme="dark"] .btn-start {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .btn-start:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+[data-theme="dark"] .btn-stop {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .btn-stop:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .btn-manual {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .btn-manual:hover {
+  background: var(--hover-bg);
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .btn-save-manual {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+[data-theme="dark"] .btn-save-manual:hover {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+  box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+[data-theme="dark"] .time-input-group label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .time-input-group input {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .time-input-group input:focus {
+  border-color: #8b5cf6;
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .time-separator {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .note-input {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .note-input:focus {
+  border-color: #8b5cf6;
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .note-input::placeholder {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .session-item {
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .session-item:hover {
+  background: var(--hover-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .session-date {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .blocked-session {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), var(--bg-tertiary));
+  border-left-color: #f59e0b;
+}
+
+[data-theme="dark"] .blocked-duration {
+  color: #fbbf24 !important;
+}
+
+[data-theme="dark"] .blocked-reason-note {
+  background: rgba(245, 158, 11, 0.2);
+  border-left-color: #f59e0b;
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .blocked-reason-note strong {
+  color: #fbbf24;
+}
+
+[data-theme="dark"] .stats-text,
+[data-theme="dark"] .stats-number,
+[data-theme="dark"] .estimated-label {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .progress-text {
+  color: var(--text-secondary);
+}
+
+/* === FIN MODO OSCURO TIMETRACKER === */

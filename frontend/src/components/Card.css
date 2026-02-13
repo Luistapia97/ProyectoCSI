@@ -258,22 +258,24 @@
 }
 
 [data-theme="dark"] .validation-badge {
-  background: #78350f;
-  color: #fcd34d;
-  border-color: #92400e;
+  background: #d97706;
+  color: #fffbeb;
+  border-color: #f59e0b;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
 }
 
 [data-theme="dark"] .card-title {
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 [data-theme="dark"] .card-description {
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 [data-theme="dark"] .card-tag {
-  background: #334155;
-  color: #e2e8f0;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 
 /* === Estilos para tareas urgentes === */

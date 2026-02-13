@@ -25,11 +25,16 @@ body {
 }
 
 [data-theme="dark"] {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --border-color: #334155;
+  --bg-primary: #1a1f2e;
+  --bg-secondary: #242938;
+  --bg-tertiary: #2d3548;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --border-color: #475569;
+  --hover-bg: #334155;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 /* Scrollbar personalizado */
@@ -155,6 +160,62 @@ a:hover {
   white-space: nowrap;
   border-width: 0;
 }
+
+/* === MEJORAS MODO OSCURO === */
+
+/* Enlaces en modo oscuro */
+[data-theme="dark"] a {
+  color: #818cf8;
+}
+
+[data-theme="dark"] a:hover {
+  color: #a5b4fc;
+}
+
+/* Botones primarios en modo oscuro */
+[data-theme="dark"] .btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .btn-primary:hover:not(:disabled) {
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+}
+
+/* Botones secundarios en modo oscuro */
+[data-theme="dark"] .btn-secondary {
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+  background: var(--hover-bg);
+  border-color: #818cf8;
+}
+
+/* Inputs y placeholders en modo oscuro */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+  border-color: #818cf8;
+  background: var(--bg-tertiary);
+}
+
+/* === FIN MEJORAS MODO OSCURO === */
 
 /* Responsive */
 @media (max-width: 768px) {

@@ -641,7 +641,7 @@
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  background: white !important;
+  background: white;
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   box-shadow: var(--shadow-lg);
@@ -649,6 +649,12 @@
   min-width: 220px;
   z-index: 999;
   animation: slideDown 0.2s ease-out;
+}
+
+[data-theme="dark"] .settings-dropdown {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
 @keyframes slideDown {
@@ -679,8 +685,13 @@
 }
 
 .settings-item:hover {
-  background: rgba(102, 126, 234, 0.1) !important;
-  color: #667eea !important;
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+[data-theme="dark"] .settings-item:hover {
+  background: var(--hover-bg);
+  color: #a5b4fc;
 }
 
 .settings-item svg {
@@ -690,6 +701,10 @@
 
 .settings-item:hover svg {
   color: #667eea;
+}
+
+[data-theme="dark"] .settings-item:hover svg {
+  color: #a5b4fc;
 }
 
 /* Estilos destacados para editar proyecto y gestionar miembros */
@@ -815,8 +830,13 @@
 
 .user-stat-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: var(--shadow-lg);
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .user-stat-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  border-color: #818cf8;
 }
 
 .user-stat-card.clickable-stat {
@@ -826,8 +846,13 @@
 
 .user-stat-card.clickable-stat:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 6px 16px rgba(129, 140, 248, 0.3);
+  border-color: #818cf8;
+}
+
+[data-theme="dark"] .user-stat-card.clickable-stat:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+  border-color: #a5b4fc;
 }
 
 .user-stat-card.clickable-stat:active {
@@ -911,6 +936,16 @@
   transform: translateY(-2px);
 }
 
+[data-theme="dark"] .urgent-stat {
+  border-color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .urgent-stat:hover {
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+  border-color: #f87171;
+}
+
 .stat-info {
   display: flex;
   flex-direction: column;
@@ -937,8 +972,8 @@
 }
 
 [data-theme="dark"] .user-stat-card {
-  background: #1e293b;
-  border-color: #475569;
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
 }
 
 [data-theme="dark"] .user-stat-card:hover {

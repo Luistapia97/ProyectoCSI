@@ -73,7 +73,11 @@ export default function Dashboard() {
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
   const [showTasksModal, setShowTasksModal] = useState(null);
   const [pendingUsersCount, setPendingUsersCount] = useState(0);
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState(() => {
+    // Recuperar el tema guardado en localStorage o usar 'light' por defecto
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || 'light';
+  });
   const [confirmDialog, setConfirmDialog] = useState(null);
   const { showToast, toasts, removeToast } = useToast();
   const [userStats, setUserStats] = useState({
@@ -159,8 +163,15 @@ export default function Dashboard() {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
   };
+
+  // Aplicar el tema guardado al cargar la página
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
 
   const getProjectStats = (project) => {
     const total = project.stats?.totalTasks || 0;
