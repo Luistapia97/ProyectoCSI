@@ -274,7 +274,7 @@ export default function Dashboard() {
                 display: 'flex', 
                 alignItems: 'center', 
                 gap: '4px',
-                color: isAdmin ? '#f59e0b' : '#6366f1'
+                color: isAdmin ? '#f59e0b' : '#3b82f6'
               }}>
                 {isAdmin ? <Shield size={14} /> : <UserIcon size={14} />}
                 {isAdmin ? 'Administrador' : 'Usuario'}

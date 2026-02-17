@@ -8,7 +8,7 @@ export default function EditProjectModal({ project, isOpen, onClose }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    color: '#667eea',
+    color: '#3b82f6',
     tags: []
   });
   const [tagInput, setTagInput] = useState('');
@@ -20,15 +20,15 @@ export default function EditProjectModal({ project, isOpen, onClose }) {
       setFormData({
         name: project.name || '',
         description: project.description || '',
-        color: project.color || '#667eea',
+        color: project.color || '#3b82f6',
         tags: project.tags || []
       });
     }
   }, [project]);
 
   const colorOptions = [
-    { name: 'Púrpura', value: '#667eea' },
     { name: 'Azul', value: '#3b82f6' },
+    { name: 'Azul claro', value: '#06b6d4' },
     { name: 'Verde', value: '#10b981' },
     { name: 'Rojo', value: '#ef4444' },
     { name: 'Naranja', value: '#f97316' },

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, AlertTriangle } from 'lucide-react';
 import { tasksAPI } from '../services/api';
+import socketService from '../services/socket';
 import CardDetailsModal from './CardDetailsModal';
 import './ActiveTimersIndicator.css';
 
@@ -39,7 +40,30 @@ export default function ActiveTimersIndicator() {
     // Verificar cada 30 segundos
     const interval = setInterval(checkActiveTimers, 30000);
 
-    return () => clearInterval(interval);
+    // Escuchar actualizaciones en tiempo real
+    const handleTaskUpdate = (updatedTask) => {
+      if (updatedTask.effortMetrics?.activeTimer?.isActive) {
+        // Si el timer está activo, agregar o actualizar en la lista
+        setActiveTimers(prev => {
+          const exists = prev.find(t => t._id === updatedTask._id);
+          if (exists) {
+            return prev.map(t => t._id === updatedTask._id ? updatedTask : t);
+          } else {
+            return [...prev, updatedTask];
+          }
+        });
+      } else {
+        // Si el timer no está activo, remover de la lista
+        setActiveTimers(prev => prev.filter(t => t._id !== updatedTask._id));
+      }
+    };
+
+    socketService.on('task-updated', handleTaskUpdate);
+
+    return () => {
+      clearInterval(interval);
+      socketService.off('task-updated', handleTaskUpdate);
+    };
   }, []);
 
   // Actualizar lista cuando se cierra el modal

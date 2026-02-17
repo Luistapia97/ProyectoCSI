@@ -426,9 +426,9 @@
 }
 
 [data-theme="dark"] .tab-button.active {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
-  border-color: #6366f1;
+  border-color: #3b82f6;
 }
 
 [data-theme="dark"] .btn-disconnect {
@@ -442,13 +442,13 @@
 }
 
 [data-theme="dark"] .btn-connect {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-color: #6366f1;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
 }
 
 [data-theme="dark"] .btn-connect:hover {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 [data-theme="dark"] .connection-form {
@@ -471,7 +471,7 @@
 
 [data-theme="dark"] .instructions code {
   background: var(--bg-secondary);
-  color: #a78bfa;
+  color: #60a5fa;
   border: 1px solid var(--border-color);
 }
 

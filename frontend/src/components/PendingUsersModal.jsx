@@ -144,8 +144,8 @@ export default function PendingUsersModal({ onClose }) {
         }
 
         .pending-user-card:hover {
-          border-color: #6366f1;
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+          border-color: #3b82f6;
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
         }
 
         .pending-user-info {
@@ -183,7 +183,7 @@ export default function PendingUsersModal({ onClose }) {
 
         .user-provider {
           font-weight: 600;
-          color: #6366f1;
+          color: #3b82f6;
         }
 
         .pending-user-actions {

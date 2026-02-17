@@ -62,7 +62,7 @@ body {
   width: 40px;
   height: 40px;
   border: 4px solid var(--border-color);
-  border-top-color: #667eea;
+  border-top-color: #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -73,7 +73,7 @@ body {
 
 /* Botones globales */
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   padding: 0.875rem 1.5rem;
   border: none;
@@ -90,7 +90,7 @@ body {
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
 }
 
 .btn-primary:disabled {
@@ -111,9 +111,9 @@ body {
 }
 
 .btn-secondary:hover {
-  background: rgba(102, 126, 234, 0.08);
-  border-color: #667eea;
-  color: #667eea;
+  background: rgba(59, 130, 246, 0.08);
+  border-color: #3b82f6;
+  color: #3b82f6;
 }
 
 /* Inputs y selects globales */
@@ -140,12 +140,12 @@ select {
 
 /* Links */
 a {
-  color: #6366f1;
+  color: #3b82f6;
   text-decoration: none;
 }
 
 a:hover {
-  color: #4f46e5;
+  color: #1e40af;
 }
 
 /* Ocultar elementos visualmente pero mantenerlos accesibles */
@@ -165,21 +165,21 @@ a:hover {
 
 /* Enlaces en modo oscuro */
 [data-theme="dark"] a {
-  color: #818cf8;
+  color: #93c5fd;
 }
 
 [data-theme="dark"] a:hover {
-  color: #a5b4fc;
+  color: #bfdbfe;
 }
 
 /* Botones primarios en modo oscuro */
 [data-theme="dark"] .btn-primary {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 [data-theme="dark"] .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
 }
 
 /* Botones secundarios en modo oscuro */
@@ -190,7 +190,7 @@ a:hover {
 
 [data-theme="dark"] .btn-secondary:hover {
   background: var(--hover-bg);
-  border-color: #818cf8;
+  border-color: #93c5fd;
 }
 
 /* Inputs y placeholders en modo oscuro */
@@ -211,7 +211,7 @@ a:hover {
 [data-theme="dark"] input:focus,
 [data-theme="dark"] textarea:focus,
 [data-theme="dark"] select:focus {
-  border-color: #818cf8;
+  border-color: #93c5fd;
   background: var(--bg-tertiary);
 }
 

@@ -54,7 +54,7 @@ export default function UserTasksModal({ type, onClose, title, icon: Icon }) {
       const grouped = fetchedTasks.reduce((acc, task) => {
         const projectId = task.project?._id || 'sin-proyecto';
         const projectName = task.project?.name || 'Sin proyecto';
-        const projectColor = task.project?.color || '#6366f1';
+        const projectColor = task.project?.color || '#3b82f6';
 
         if (!acc[projectId]) {
           acc[projectId] = {

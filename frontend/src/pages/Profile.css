@@ -118,7 +118,7 @@
   border-radius: 50%;
   overflow: hidden;
   border: 4px solid var(--primary-color);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 .avatar-preview img {

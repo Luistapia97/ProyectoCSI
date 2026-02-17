@@ -136,7 +136,7 @@ export default function ProjectAnalytics({ tasks, project }) {
       {/* Tarjetas de resumen */}
       <div className="stats-cards">
         <div className="stat-card">
-          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+          <div className="stat-icon" style={{ background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' }}>
             <TrendingUp size={24} />
           </div>
           <div className="stat-content">
@@ -251,7 +251,7 @@ export default function ProjectAnalytics({ tasks, project }) {
               <Line 
                 type="monotone" 
                 dataKey="completadas" 
-                stroke="#8b5cf6" 
+                stroke="#2563eb" 
                 strokeWidth={2}
                 name="Tareas Completadas"
               />

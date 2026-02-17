@@ -127,7 +127,7 @@ export default function ManageUsersModal({ onClose }) {
                   </div>
 
                   <div className="user-item-role" style={{
-                    color: user.role === 'administrador' ? '#f59e0b' : '#6366f1'
+                    color: user.role === 'administrador' ? '#f59e0b' : '#3b82f6'
                   }}>
                     {user.role === 'administrador' ? <Shield size={16} /> : <UserIcon size={16} />}
                     <span>{user.role === 'administrador' ? 'Admin' : 'Usuario'}</span>

@@ -4,7 +4,7 @@ import useProjectStore from '../store/projectStore';
 import './Modal.css';
 
 const PROJECT_COLORS = [
-  '#6366f1', '#8b5cf6', '#ec4899', '#ef4444',
+  '#3b82f6', '#2563eb', '#ec4899', '#ef4444',
   '#f59e0b', '#10b981', '#06b6d4', '#3b82f6',
 ];
 
@@ -13,7 +13,7 @@ export default function CreateProjectModal({ onClose }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    color: '#6366f1',
+    color: '#3b82f6',
     tags: '',
   });
   const [loading, setLoading] = useState(false);
