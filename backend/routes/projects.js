@@ -148,16 +148,22 @@ router.get('/:id', protect, async (req, res) => {
       return res.status(404).json({ message: 'Proyecto no encontrado' });
     }
 
-    // Verificar que el usuario tenga acceso
-    const hasAccess = 
-      project.owner._id.toString() === req.user._id.toString() ||
-      project.members.some(m => m.user._id.toString() === req.user._id.toString());
+    // Verificar que el usuario tenga acceso sin romperse si hay referencias eliminadas
+    const currentUserId = req.user._id.toString();
+    const ownerId = project.owner?._id?.toString?.() || project.owner?.toString?.();
+    const hasAccess =
+      ownerId === currentUserId ||
+      project.members.some((member) => member.user?._id?.toString?.() === currentUserId);
 
     if (!hasAccess) {
       return res.status(403).json({ message: 'No tienes acceso a este proyecto' });
     }
 
-    res.json({ success: true, project });
+    // Limpiar miembros huérfanos antes de responder
+    const projectData = project.toObject();
+    projectData.members = (projectData.members || []).filter((member) => member.user);
+
+    res.json({ success: true, project: projectData });
   } catch (error) {
     console.error('Error obteniendo proyecto:', error);
     res.status(500).json({ message: 'Error al obtener proyecto', error: error.message });

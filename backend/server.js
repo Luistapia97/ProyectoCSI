@@ -32,6 +32,14 @@ import './config/passport.js'; // Configuración de Passport
 // Conectar a la base de datos
 connectDB();
 
+// Importar todos los modelos para registrar esquemas en Mongoose
+// IMPORTANTE: Esto debe ocurrir ANTES de que las rutas usen populate()
+import User from './models/User.js';
+import Project from './models/Project.js';
+import Task from './models/Task.js';
+import Notification from './models/Notification.js';
+import Comment from './models/Comment.js';
+
 // Mongoose logging solo en desarrollo
 // if (process.env.NODE_ENV === 'development') {
 //   setupMongooseLogging();
